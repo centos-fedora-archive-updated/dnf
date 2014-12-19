@@ -7,7 +7,7 @@
 
 Name:		dnf
 Version:	0.5.4
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
 Group:		System Environment/Base
 # For a breakdown of the licensing, see PACKAGE-LICENSING
@@ -107,6 +107,7 @@ popd
 %dir %{confdir}
 %dir %{pluginconfpath}
 %config(noreplace) %{confdir}/dnf.conf
+%dir %{confdir}/protected.d
 %config(noreplace) %{confdir}/protected.d/dnf.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %ghost %{_localstatedir}/log/%{name}.log
@@ -135,6 +136,8 @@ popd
 %systemd_postun_with_restart dnf-makecache.timer
 
 %changelog
+* Fri Dec 19 2014 Ralf Corsepius <corsepiu@fedoraproject.org> - 0.5.4-3
+- Own %%{configdir}/protected.d (RHBZ#1175098).
 
 * Tue Jul 29 2014 Aleš Kozumplík <ales@redhat.com> - 0.5.4-2
 - whole user name can contain non-ascii chars (RhBug:1121280) (Jan Silhan)
