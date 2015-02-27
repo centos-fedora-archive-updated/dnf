@@ -9,6 +9,10 @@
 %global py2pluginpath %{python_sitelib}/dnf-plugins
 %global py3pluginpath %{python3_sitelib}/dnf-plugins
 
+%if 0%{?rhel} <= 7
+%bcond_with python3
+%endif
+
 Name:		dnf
 Version:	0.6.4
 Release:	1%{?snapshot}%{?dist}
@@ -75,6 +79,7 @@ Requires:   rpm-python
 %description -n python-dnf
 Python 2 interface to DNF.
 
+%if %{with python3}
 %package -n python3-dnf
 Summary:    Python 3 interface to DNF.
 BuildRequires:  python3
@@ -97,6 +102,7 @@ Requires:   rpm-python3
 Obsoletes:  dnf <= 0.6.4-1
 %description -n python3-dnf
 Python 3 interface to DNF.
+%endif
 
 %package automatic
 Summary:    Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
@@ -110,37 +116,48 @@ Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
 %setup -q -n dnf
+
+%if %{with python3}
 rm -rf py3
 mkdir ../py3
 cp -a . ../py3/
 mv ../py3 ./
+%endif
 
 %build
 %cmake .
 make %{?_smp_mflags}
 make doc-man
+
+%if %{with python3}
 pushd py3
 %cmake -DPYTHON_DESIRED:str=3 -DWITH_MAN=0 .
 make %{?_smp_mflags}
 popd
+%endif
 
 %install
 make install DESTDIR=$RPM_BUILD_ROOT
 %find_lang %{name}
+
+%if %{with python3}
 pushd py3
 make install DESTDIR=$RPM_BUILD_ROOT
 popd
+mkdir -p $RPM_BUILD_ROOT%{py3pluginpath}/__pycache__
+%endif
 
 mkdir -p $RPM_BUILD_ROOT%{pluginconfpath}
 mkdir -p $RPM_BUILD_ROOT%{py2pluginpath}
-mkdir -p $RPM_BUILD_ROOT%{py3pluginpath}/__pycache__
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log
 touch $RPM_BUILD_ROOT%{_localstatedir}/log/%{name}.log
+
 %if 0%{?fedora} >= 23
 ln -sr $RPM_BUILD_ROOT%{_bindir}/dnf-3 $RPM_BUILD_ROOT%{_bindir}/dnf
 %else
 ln -sr $RPM_BUILD_ROOT%{_bindir}/dnf-2 $RPM_BUILD_ROOT%{_bindir}/dnf
 %endif
+
 ln -sr $RPM_BUILD_ROOT%{_bindir}/dnf $RPM_BUILD_ROOT%{_bindir}/yum
 
 %check
@@ -185,6 +202,7 @@ popd
 %{python_sitelib}/dnf/
 %dir %{py2pluginpath}
 
+%if %{with python3}
 %files -n python3-dnf
 %doc AUTHORS README.rst COPYING PACKAGE-LICENSING
 %{_bindir}/dnf-3
@@ -192,6 +210,7 @@ popd
 %{python3_sitelib}/dnf/
 %dir %{py3pluginpath}
 %dir %{py3pluginpath}/__pycache__
+%endif
 
 %files automatic
 %doc AUTHORS COPYING PACKAGE-LICENSING
@@ -904,3 +923,4 @@ popd
 - refactor: Move MockBase methods to BaseStubMixin. (Radek Holy)
 - refactor: Move repo-pkgs info to a standalone class instead of reusing the InfoCommand. (Radek Holy)
 - refactor: Move InfoCommand._print_packages to BaseCli.output_packages. (Radek Holy)
+
