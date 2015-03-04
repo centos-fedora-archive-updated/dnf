@@ -162,9 +162,12 @@ ln -sr $RPM_BUILD_ROOT%{_bindir}/dnf $RPM_BUILD_ROOT%{_bindir}/yum
 
 %check
 make ARGS="-V" test
+
+%if %{with python3}
 pushd py3
 make ARGS="-V" test
 popd
+%endif
 
 %files -f %{name}.lang
 %doc AUTHORS README.rst COPYING PACKAGE-LICENSING
