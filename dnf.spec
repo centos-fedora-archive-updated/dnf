@@ -1,4 +1,4 @@
-%{!?gitrev: %global gitrev 8c7d45a}
+%{!?gitrev: %global gitrev 07b4201}
 %{!?hawkey_version: %global hawkey_version 0.5.3}
 %{!?librepo_version: %global librepo_version 1.7.5}
 %{!?libcomps_version: %global libcomps_version 0.1.6}
