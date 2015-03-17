@@ -1,37 +1,70 @@
-%global gitrev a7e0aa1
-%global hawkey_version 0.5.2
-%global librepo_version 1.7.5
-%global libcomps_version 0.1.6
-%global rpm_version 4.12.0
+%{!?hawkey_version: %global hawkey_version 0.5.3}
+%{!?librepo_version: %global librepo_version 1.7.5}
+%{!?libcomps_version: %global libcomps_version 0.1.6}
+%{!?rpm_version: %global rpm_version 4.12.0}
 
 %global confdir %{_sysconfdir}/dnf
 
-Name:       dnf
-Version:    0.6.3
-Release:    3%{?dist}
-Summary:    Package manager forked from Yum, using libsolv as a dependency resolver
-Group:      System Environment/Base
+%global pluginconfpath %{confdir}/plugins
+%global py2pluginpath %{python_sitelib}/dnf-plugins
+%global py3pluginpath %{python3_sitelib}/dnf-plugins
+
+Name:		dnf
+Version:	0.6.5
+Release:	1%{?snapshot}%{?dist}
+Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
-License:    GPLv2+ and GPLv2 and GPL
-URL:        https://github.com/rpm-software-management/dnf
-Source0:    http://rpm-software-management.fedorapeople.org/dnf-%{gitrev}.tar.xz
+License:	GPLv2+ and GPLv2 and GPL
+URL:		https://github.com/rpm-software-management/dnf
+# The Source0 tarball can be generated using following commands:
+# git clone http://github.com/rpm-software-management/dnf.git
+# cd dnf/package
+# ./archive
+# tarball will be generated in $HOME/rpmbuild/sources/
+Source0:    http://rpm-software-management.fedorapeople.org/dnf-%{version}.tar.xz
 BuildArch:  noarch
 BuildRequires:  cmake
+BuildRequires:  gettext
+BuildRequires:  python-bugzilla
+BuildRequires:  python-sphinx
+BuildRequires:  systemd
+%if 0%{?fedora} >= 23
+Requires:   python3-dnf = %{version}-%{release}
+%else
+Requires:   python-dnf = %{version}-%{release}
+%endif
+Requires(post):     systemd
+Requires(preun):    systemd
+Requires(postun):   systemd
+%description
+Package manager forked from Yum, using libsolv as a dependency resolver.
+
+%package conf
+Requires:   libreport-filesystem
+Summary:    Configuration files for DNF.
+%description conf
+Configuration files for DNF.
+
+%package -n dnf-yum
+Conflicts:      yum
+Requires:   dnf = %{version}-%{release}
+Summary:    As a Yum CLI compatibility layer, supplies /usr/bin/yum redirecting to DNF.
+%description -n dnf-yum
+As a Yum CLI compatibility layer, supplies /usr/bin/yum redirecting to DNF.
+
+%package -n python-dnf
+Summary:    Python 2 interface to DNF.
 BuildRequires:  pygpgme
 BuildRequires:  pyliblzma
 BuildRequires:  python2
-BuildRequires:  python-bugzilla
 BuildRequires:  python-hawkey >= %{hawkey_version}
 BuildRequires:  python-iniparse
 BuildRequires:  python-libcomps >= %{libcomps_version}
 BuildRequires:  python-librepo >= %{librepo_version}
 BuildRequires:  python-nose
-BuildRequires:  python-sphinx
 BuildRequires:  rpm-python >= %{rpm_version}
-BuildRequires:  systemd
-BuildRequires:  gettext
+Requires:   dnf-conf = %{version}-%{release}
 Requires:   deltarpm
-Requires:   libreport-filesystem
 Requires:   pygpgme
 Requires:   pyliblzma
 Requires:   python-hawkey >= %{hawkey_version}
@@ -40,24 +73,12 @@ Requires:   python-libcomps >= %{libcomps_version}
 Requires:   python-librepo >= %{librepo_version}
 Requires:   rpm-plugin-systemd-inhibit
 Requires:   rpm-python >= %{rpm_version}
-Requires(post):     systemd
-Requires(preun):    systemd
-Requires(postun):   systemd
-
-%description
-Package manager forked from Yum, using libsolv as a dependency resolver.
-
-%package -n dnf-yum
-Conflicts:      yum
-Requires:   dnf = %{version}-%{release}
-Summary:    As a Yum CLI compatibility layer, supplies /usr/bin/yum redirecting to DNF.
-
-%description -n dnf-yum
-As a Yum CLI compatibility layer, supplies /usr/bin/yum redirecting to DNF.
+Obsoletes:  dnf <= 0.6.4
+%description -n python-dnf
+Python 2 interface to DNF.
 
 %package -n python3-dnf
-Summary:    Package manager forked from Yum, using libsolv as a dependency resolver
-Group:      System Environment/Base
+Summary:    Python 3 interface to DNF.
 BuildRequires:  python3
 BuildRequires:  python3-devel
 BuildRequires:  python3-hawkey >= %{hawkey_version}
@@ -67,7 +88,8 @@ BuildRequires:  python3-librepo >= %{librepo_version}
 BuildRequires:  python3-nose
 BuildRequires:  python3-pygpgme
 BuildRequires:  rpm-python3 >= %{rpm_version}
-Requires:   dnf = %{version}-%{release}
+Requires:   dnf-conf = %{version}-%{release}
+Requires:   deltarpm
 Requires:   python3-hawkey >= %{hawkey_version}
 Requires:   python3-iniparse
 Requires:   python3-libcomps >= %{libcomps_version}
@@ -75,21 +97,17 @@ Requires:   python3-librepo >= %{librepo_version}
 Requires:   python3-pygpgme
 Requires:   rpm-plugin-systemd-inhibit
 Requires:   rpm-python3 >= %{rpm_version}
-
+Obsoletes:  dnf <= 0.6.4
 %description -n python3-dnf
-Package manager forked from Yum, using libsolv as a dependency resolver.
+Python 3 interface to DNF.
 
 %package automatic
 Summary:    Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
-Group:      System Environment/Base
-BuildRequires:  python2
-BuildRequires:  python-nose
 BuildRequires:  systemd
 Requires:   dnf = %{version}-%{release}
 Requires(post):     systemd
 Requires(preun):    systemd
-Requires(postun):   systemd
-
+Requires(postun):	systemd
 %description automatic
 Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
@@ -110,21 +128,22 @@ make %{?_smp_mflags}
 popd
 
 %install
-rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 %find_lang %{name}
 pushd py3
 make install DESTDIR=$RPM_BUILD_ROOT
 popd
 
-%global pluginconfpath %{confdir}/plugins
-%global py2pluginpath %{python_sitelib}/dnf-plugins
-%global py3pluginpath %{python3_sitelib}/dnf-plugins
 mkdir -p $RPM_BUILD_ROOT%{pluginconfpath}
 mkdir -p $RPM_BUILD_ROOT%{py2pluginpath}
-mkdir -p $RPM_BUILD_ROOT%{py3pluginpath}
+mkdir -p $RPM_BUILD_ROOT%{py3pluginpath}/__pycache__
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log
 touch $RPM_BUILD_ROOT%{_localstatedir}/log/%{name}.log
+%if 0%{?fedora} >= 23
+ln -sr $RPM_BUILD_ROOT%{_bindir}/dnf-3 $RPM_BUILD_ROOT%{_bindir}/dnf
+%else
+ln -sr $RPM_BUILD_ROOT%{_bindir}/dnf-2 $RPM_BUILD_ROOT%{_bindir}/dnf
+%endif
 ln -sr $RPM_BUILD_ROOT%{_bindir}/dnf $RPM_BUILD_ROOT%{_bindir}/yum
 
 %check
@@ -136,35 +155,48 @@ popd
 %files -f %{name}.lang
 %doc AUTHORS README.rst COPYING PACKAGE-LICENSING
 %{_bindir}/dnf
-%dir %{confdir}
-%dir %{pluginconfpath}
-%config(noreplace) %{confdir}/dnf.conf
-%dir %{confdir}/protected.d
-%config(noreplace) %{confdir}/protected.d/dnf.conf
-%config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
-%ghost %{_localstatedir}/log/%{name}.log
-%ghost %{_localstatedir}/log/%{name}-rpm.log
-%ghost %{_localstatedir}/log/%{name}-plugin.log
-%config %{_sysconfdir}/bash_completion.d/dnf-completion.bash
-%{_sysconfdir}/libreport/events.d/collect_dnf.conf
 %{_mandir}/man8/dnf.8.gz
-%{_mandir}/man8/dnf.conf.8.gz
+%{_mandir}/man5/dnf.conf.5.gz
+%config %{_sysconfdir}/bash_completion.d/dnf-completion.bash
 %{_unitdir}/dnf-makecache.service
 %{_unitdir}/dnf-makecache.timer
-%exclude %{python_sitelib}/dnf/automatic
-%{python_sitelib}/dnf/
-%{py2pluginpath}
+%{_tmpfilesdir}/dnf.conf
+
+%files conf
+%doc AUTHORS README.rst COPYING PACKAGE-LICENSING
+%dir %{confdir}
+%dir %{pluginconfpath}
+%dir %{confdir}/protected.d
+%config(noreplace) %{confdir}/dnf.conf
+%config(noreplace) %{confdir}/protected.d/dnf.conf
+%config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
+%ghost %{_localstatedir}/log/hawkey.log
+%ghost %{_localstatedir}/log/%{name}.log
+%ghost %{_localstatedir}/log/%{name}.rpm.log
+%ghost %{_localstatedir}/log/%{name}.plugin.log
+%config %{_sysconfdir}/bash_completion.d/dnf-completion.bash
+%{_sysconfdir}/libreport/events.d/collect_dnf.conf
 
 %files -n dnf-yum
 %doc AUTHORS README.rst COPYING PACKAGE-LICENSING
 %{_bindir}/yum
+
+%files -n python-dnf
+%{_bindir}/dnf-2
+%doc AUTHORS README.rst COPYING PACKAGE-LICENSING
+%exclude %{python_sitelib}/dnf/automatic
+%{python_sitelib}/dnf/
+%ghost %{_sharedstatedir}/dnf
+%dir %{py2pluginpath}
 
 %files -n python3-dnf
 %doc AUTHORS README.rst COPYING PACKAGE-LICENSING
 %{_bindir}/dnf-3
 %exclude %{python3_sitelib}/dnf/automatic
 %{python3_sitelib}/dnf/
-%{py3pluginpath}
+%ghost %{_sharedstatedir}/dnf
+%dir %{py3pluginpath}
+%dir %{py3pluginpath}/__pycache__
 
 %files automatic
 %doc AUTHORS COPYING PACKAGE-LICENSING
@@ -194,8 +226,59 @@ popd
 %systemd_postun_with_restart dnf-automatic.timer
 
 %changelog
-* Fri Dec 19 2014 Ralf Corsepius <corsepiu@fedoraproject.org> - 0.6.3-3
-- Own %%{configdir}/protected.d (RHBZ#1175098).
+* Tue Mar 17 2015 Michal Luscon <mluscon@redhat.com> 0.6.5-1
+- new package built with tito
+
+
+* Wed Feb 4 2015 Jan Silhan <jsilhan@redhat.com> - 0.6.4-1
+- Adapt to librepo-1.7.13, metalink and mirrorlist are not loaded anymore when the repo is local. (Radek Holy)
+- not raises value error when no metadata exist (Jan Silhan)
+- Remove lock files during boot (RhBug:1154476) (Michal Luscon)
+- doc: groups are ordered not categories (Jan Silhan)
+- doc: added Package attributes to API (Jan Silhan)
+- README: link to bug reporting guide (Jan Silhan)
+- README: the official documentation is on readthedoc (Jan Silhan)
+- i18n: unicode encoding does not throw error (RhBug:1155877) (Jan Silhan)
+- conf: added minrate repo option (Related:RhBug:1175466) (Jan Silhan)
+- conf: added timeout repo option (RhBug:1175466) (Jan Silhan)
+- doc: api_queries: add 'file' filter description (RhBug:1186461) (Igor Gnatenko)
+- doc: documenting enablegroups (Jan Silhan)
+- log: printing metadata timestamp (RhBug:1170156) (Jan Silhan)
+- base: setup default cachedir value (RhBug:1184943) (Michal Luscon)
+- orders groups/environments by display_order tag (RhBug:1177002) (Jan Silhan)
+- no need to call create_cmdline_repo (Jan Silhan)
+- base: package-spec matches all packages which the name glob pattern fits (RhBug:1169165) (Michal Luscon)
+- doc: move dnf.conf to appropriate man page section (RhBug:1167982) (Michal Luscon)
+- tests: add test for blocking process lock (Michal Luscon)
+- lock: fix several race conditions in process lock mechanism (Michal Luscon)
+- base: use blocking process lock during download phase (RhBug:1157233) (Michal Luscon)
+- Update the Source0 generation commands in dnf.spec.in file (Parag Nemade)
+- Enhancement to dnf.spec.in file which follows current fedora packaging guidelines (Parag Nemade)
+- doc: add some examples and documentation of the core use case (RhBug:1138096) (Radek Holy)
+- bash-completion: enable downgrading packages for local files (RhBug:1181189) (Igor Gnatenko)
+- group: prints plain package name when package not in any repo (RhBug:1181397) (Jan Silhan)
+- spec: own __pycache__ for python 3 (Igor Gnatenko)
+- changed hawkey.log dir to /var/log (RhBug:1175434) (Jan Silhan)
+- bash-completion: handle sqlite errors (Igor Gnatenko)
+- use LANG=C when invoking 'dnf help' and 'sed' with regular expressions (Jakub Dorňák)
+- spec: own __pycache__ directory for py3 (Igor Gnatenko)
+- doc: mentioning Install command accepts path to local rpm package (Jan Silhan)
+- groups: in erase and install cmd non-existent group does not abort transaction (Jan Silhan)
+- doc: running tests in README (Jan Silhan)
+- api: transaction: added install_set and remove_set (RhBug:1162887) (Jan Silhan)
+- cosmetic: fixed some typos in documentation (Jan Silhan)
+- groups: environments described after @ sign works (RhBug:1156084) (Jan Silhan)
+- own /etc/dnf/protected.d (RhBug:1175098) (Jan Silhan)
+- i18n: computing width of char right (RhBug:1174136) (Jan Silhan)
+- cosmetic: renamed _splitArg -> _split_arg (Jan Silhan)
+- conf: removed include name conflict (RhBug:1055910) (Jan Silhan)
+- output: removed unpredictible decision based on probability introduced in ab4d2c5 (Jan Silhan)
+- output: history list is not limited to 20 records (RhBug:1155918) (Jan Silhan)
+- doc: referenced forgotten bug fix to release notes (Jan Silhan)
+- cosmetic: doc: removed duplicated word (Jan Silhan)
+- doc: described unavailable package corner case with skip_if_unavailable option (RhBug:1119030) (Jan Silhan)
+- log: replaced size with maxsize directive (RhBug:1177394) (Jan Silhan)
+- spec: fixed %ghost log file names (Jan Silhan)
 
 * Mon Dec 8 2014 Jan Silhan <jsilhan@redhat.com> - 0.6.3-2
 - logging: reverted naming from a6dde81
