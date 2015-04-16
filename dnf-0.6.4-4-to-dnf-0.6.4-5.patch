@@ -1,0 +1,80 @@
+diff --git a/dnf.spec b/dnf.spec
+index 12f3e77..2deea95 100644
+--- a/dnf.spec
++++ b/dnf.spec
+@@ -11,7 +11,7 @@
+ 
+ Name:		dnf
+ Version:	0.6.4
+-Release:	4%{?snapshot}%{?dist}
++Release:	5%{?snapshot}%{?dist}
+ Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
+ # For a breakdown of the licensing, see PACKAGE-LICENSING
+ License:	GPLv2+ and GPLv2 and GPL
+@@ -197,6 +197,10 @@ popd
+ %systemd_postun_with_restart dnf-automatic.timer
+ 
+ %changelog
++* Thu Apr 16 2015 Michal Luscon <mluscon@redhat.com> 0.6.4-5
++- Revert "completion: work with just python(3)-dnf"
++- Revert "bash-completion: use python method to get commands (RhBug:1187579)"
++
+ * Thu Apr 16 2015 Michal Luscon <mluscon@redhat.com> 0.6.4-4
+ - upload correct source archive 0.6.4 
+ 
+diff --git a/etc/bash_completion.d/dnf-completion.bash b/etc/bash_completion.d/dnf-completion.bash
+index 62f0cf1..4538607 100644
+--- a/etc/bash_completion.d/dnf-completion.bash
++++ b/etc/bash_completion.d/dnf-completion.bash
+@@ -20,12 +20,6 @@
+ # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ # 02110-1301  USA
+ 
+-if [ -e /usr/bin/dnf-2 ]; then
+-    alias dnf="dnf-2"
+-else
+-    alias dnf="dnf-3"
+-fi
+-
+ _dnf_help_command()
+ {
+     local cmd=$( dnf help $1 | grep -E "^$1" | tr "|" " " )
+@@ -35,15 +29,7 @@ _dnf_help_command()
+ 
+ _dnf()
+ {
+-    local commandlist="$( compgen -W '$( python << END
+-import dnf.cli
+-b = dnf.cli.cli.BaseCli()
+-c = dnf.cli.Cli(b)
+-c.configure(["help"])
+-for cmd in c.cli_commands:
+-    print(cmd)
+-END
+-)' )"
++    local commandlist="$( compgen -W '$( LANG=C dnf help | cut -d" " -s -f1 | LANG=C sed -e "/^[A-Z]/d" -e "/:/d" )' )"
+ 
+     local cur prev words cword
+     _init_completion -s || return
+@@ -85,7 +71,7 @@ END
+     if [[ $command ]]; then
+ 
+         case $command in
+-            install|update|upgrade|info)
++            install|update|info)
+                 if [[ "$cur" == \.* ]] || [[ "$cur" == \/* ]]; then
+                     [[ $command != "info" ]] && ext='@(rpm)' || ext=''
+                 else
+@@ -196,4 +182,4 @@ END
+         [[ $prev != -* ]] && COMPREPLY=( $( compgen -W '$( echo $commandlist )' -- "$cur" ) )
+     fi
+ } &&
+-complete -F _dnf dnf dnf-2 dnf-3
++complete -F _dnf dnf
+diff --git a/rel-eng/packages/dnf b/rel-eng/packages/dnf
+index cf457e0..126e3e7 100644
+--- a/rel-eng/packages/dnf
++++ b/rel-eng/packages/dnf
+@@ -1 +1 @@
+-0.6.4-4 ./
++0.6.4-5 ./
