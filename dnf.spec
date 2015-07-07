@@ -15,7 +15,7 @@
 
 Name:		dnf
 Version:	0.6.4
-Release:	1%{?snapshot}%{?dist}
+Release:	2%{?snapshot}%{?dist}
 Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:	GPLv2+ and GPLv2 and GPL
@@ -26,6 +26,7 @@ URL:		https://github.com/rpm-software-management/dnf
 # ./archive
 # tarball will be generated in $HOME/rpmbuild/sources/
 Source0:    http://rpm-software-management.fedorapeople.org/dnf-%{gitrev}.tar.xz
+Patch0: better-file-pattern-recognition-RhBug-1195385.patch
 BuildArch:  noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -116,6 +117,8 @@ Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
 %setup -q -n dnf
+
+%patch0 -p1
 
 %if %{with python3}
 rm -rf py3
@@ -243,6 +246,8 @@ popd
 %systemd_postun_with_restart dnf-automatic.timer
 
 %changelog
+* Tue Jul 07 2015 Michal Luscon <mluscon@redhat.com> - 0.6.4-2
+- better file pattern recognition (RhBug:1195385) (Jan Silhan)
 
 * Fri Feb 27 2015 Jan Silhan <jsilhan@redhat.com> - 0.6.4-1
 - revert of e56dd41, does not fix BZ:1109927 now (Jan Silhan)

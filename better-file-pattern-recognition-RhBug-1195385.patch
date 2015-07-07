@@ -1,0 +1,82 @@
+From 6e854bed3827e33ec51af2bfd738c8e8cc76ad65 Mon Sep 17 00:00:00 2001
+From: Jan Silhan <jsilhan@redhat.com>
+Date: Mon, 9 Mar 2015 14:27:53 +0100
+Subject: [PATCH 3/4] better file pattern recognition (RhBug:1195385)
+
+fixes regration introduced in c388ac6
+---
+ dnf/subject.py        |  3 ++-
+ tests/repos/main.repo |  1 +
+ tests/test_install.py | 18 +++++++++++++++---
+ 3 files changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/dnf/subject.py b/dnf/subject.py
+index e5ed68d..660cbd8 100644
+--- a/dnf/subject.py
++++ b/dnf/subject.py
+@@ -25,6 +25,7 @@ from dnf.util import first, is_glob_pattern
+ 
+ import dnf.selector
+ import hawkey
++import re
+ 
+ class Subject(object):
+     # :api
+@@ -77,7 +78,7 @@ class Subject(object):
+ 
+     @property
+     def filename_pattern(self):
+-        return self.subj.pattern.find('/') != -1
++        return re.search(r"^\*?/", self.subj.pattern)
+ 
+     @property
+     def pattern(self):
+diff --git a/tests/repos/main.repo b/tests/repos/main.repo
+index 380c193..e44ca4e 100644
+--- a/tests/repos/main.repo
++++ b/tests/repos/main.repo
+@@ -19,4 +19,5 @@
+ =Pkg: trampoline 2.1 1 noarch
+ =Prv: henry(the_horse)
+ =Prv: splendid = 2.1
++=Prv: php(a/b)
+ =Prv: /all/be/there
+diff --git a/tests/test_install.py b/tests/test_install.py
+index e0da4e6..afee8d2 100644
+--- a/tests/test_install.py
++++ b/tests/test_install.py
+@@ -30,8 +30,8 @@ class CommonTest(support.ResultTestCase):
+ 
+     - contains a package "lotus-3-17.x86_64" (The package can be installed.)
+     - contains a package "lotus-3-17.i686" (The package can be installed.)
+-    - contains a package "trampoline-2.1-1.noarch" that contains "*/there" and
+-      provides "splendid > 2.0" (The package can be installed.)
++    - contains a package "trampoline-2.1-1.noarch" that contains "*/there",
++      provides "splendid > 2.0" and "php(a/b)" (The package can be installed.)
+     - contains a package "mrkite-2-0.x86_64" (The package can be installed
+       together with the package "trampoline".)
+     - contains a package "mrkite-k-h-1-1.x86_64" (The package can be
+@@ -61,7 +61,19 @@ class CommonTest(support.ResultTestCase):
+         """Test that the pkg to be installed can be specified by fname glob."""
+         self.base.install("*/there")
+         (installed, _) = self.installed_removed(self.base)
+-        self.assertCountEqual(map(str, installed), ('trampoline-2.1-1.noarch',))
++        self.assertCountEqual(map(str, installed),
++                              ('trampoline-2.1-1.noarch',))
++
++        self.base.install("/all/*/there")
++        (installed, _) = self.installed_removed(self.base)
++        self.assertCountEqual(map(str, installed),
++                              ('trampoline-2.1-1.noarch',))
++
++    def test_install_provide_glob(self):
++        self.base.install("php(a/b)")
++        (installed, _) = self.installed_removed(self.base)
++        self.assertCountEqual(map(str, installed),
++                              ('trampoline-2.1-1.noarch',))
+ 
+     def test_install_name(self):
+         """Test that the package to be installed can be specified by name."""
+-- 
+2.4.3
+
