@@ -1,0 +1,102 @@
+diff --git a/AUTHORS b/AUTHORS
+index 3e6495b..a0ab5d2 100644
+--- a/AUTHORS
++++ b/AUTHORS
+@@ -63,6 +63,7 @@ DNF CONTRIBUTORS
+     Haïkel Guémar <haikel.guemar@gmail.com>
+     Kevin Kofler <kevin.kofler@chello.at>
+     Kushal Das <kushaldas@gmail.com>
++    Matthew Miller
+     Padraig Brady <P@draigBrady.com>
+     Peter Hjalmarsson <kanelxake@gmail.com>
+     Peter Simonyi
+diff --git a/dnf.spec b/dnf.spec
+index aff444f..070c8ee 100644
+--- a/dnf.spec
++++ b/dnf.spec
+@@ -11,7 +11,7 @@
+ 
+ Name:		dnf
+ Version:	1.0.2
+-Release:	2%{?snapshot}%{?dist}
++Release:	3%{?snapshot}%{?dist}
+ Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
+ # For a breakdown of the licensing, see PACKAGE-LICENSING
+ License:	GPLv2+ and GPLv2 and GPL
+@@ -250,6 +250,11 @@ exit 0
+ %systemd_postun_with_restart dnf-automatic.timer
+ 
+ %changelog
++* Fri Jul 31 2015 Michal Luscon <mluscon@redhat.com> 1.0.2-3
++- Fix regression in group list command introduced by 02c3cc3 (Adam Salih)
++- AUTHORS: updated (Jan Silhan)
++- stop saying "experimental" (Matthew Miller)
++
+ * Tue Jul 21 2015 Jan Silhan <jsilhan@redhat.com> 1.0.2-2
+ - fixed python3 syntax error from f427aa2 (Jan Silhan)
+ 
+diff --git a/dnf/cli/commands/group.py b/dnf/cli/commands/group.py
+index fed75fe..de55610 100644
+--- a/dnf/cli/commands/group.py
++++ b/dnf/cli/commands/group.py
+@@ -164,14 +164,15 @@ class GroupCommand(commands.Command):
+             userlist = None # Match everything...
+ 
+         errs = False
+-        for group in userlist:
+-            in_group = len(self.base.comps.groups_by_pattern(group)) > 0
+-            in_environment = len(self.base.comps.environments_by_pattern(group)) > 0
+-            if not in_group and not in_environment:
+-                logger.error(_('Warning: No groups match:\n   %s'), group)
+-                errs = True
+-        if errs:
+-            return 0, []
++        if userlist is not None:
++            for group in userlist:
++                in_group = len(self.base.comps.groups_by_pattern(group)) > 0
++                in_environment = len(self.base.comps.environments_by_pattern(group)) > 0
++                if not in_group and not in_environment:
++                    logger.error(_('Warning: No groups match:\n   %s'), group)
++                    errs = True
++            if errs:
++                return 0, []
+ 
+         env_inst, env_avail = self._environment_lists(userlist)
+         installed, available = self._group_lists(uservisible, userlist)
+diff --git a/doc/index.rst b/doc/index.rst
+index e3f246d..d023efc 100644
+--- a/doc/index.rst
++++ b/doc/index.rst
+@@ -15,9 +15,9 @@
+   License and may only be used or replicated with the express permission of
+   Red Hat, Inc.
+ 
+-###################################
+- DNF, Experimental Yum Replacement
+-###################################
++#############################################
++ DNF, the next-generation replacement for Yum
++#############################################
+ 
+ Contents:
+ 
+diff --git a/rel-eng/packages/dnf b/rel-eng/packages/dnf
+index 35bf379..d616dda 100644
+--- a/rel-eng/packages/dnf
++++ b/rel-eng/packages/dnf
+@@ -1 +1 @@
+-1.0.2-2 ./
++1.0.2-3 ./
+diff --git a/rel-eng/tito.props b/rel-eng/tito.props
+index 5ddebd5..cdb345a 100644
+--- a/rel-eng/tito.props
++++ b/rel-eng/tito.props
+@@ -1,6 +1,6 @@
+ [buildconfig]
+-builder = tito.builder.Builder
+-tagger = tito.tagger.VersionTagger
++builder = tito.distributionbuilder.DistributionBuilder
++tagger =  tito.tagger.ReleaseTagger
+ changelog_do_not_remove_cherrypick = 1
+ changelog_format = %s (%an)
+ 

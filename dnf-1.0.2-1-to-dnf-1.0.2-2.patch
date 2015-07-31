@@ -1,0 +1,44 @@
+diff --git a/dnf.spec b/dnf.spec
+index 93adc0d..aff444f 100644
+--- a/dnf.spec
++++ b/dnf.spec
+@@ -11,7 +11,7 @@
+ 
+ Name:		dnf
+ Version:	1.0.2
+-Release:	1%{?snapshot}%{?dist}
++Release:	2%{?snapshot}%{?dist}
+ Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
+ # For a breakdown of the licensing, see PACKAGE-LICENSING
+ License:	GPLv2+ and GPLv2 and GPL
+@@ -250,6 +250,9 @@ exit 0
+ %systemd_postun_with_restart dnf-automatic.timer
+ 
+ %changelog
++* Tue Jul 21 2015 Jan Silhan <jsilhan@redhat.com> 1.0.2-2
++- fixed python3 syntax error from f427aa2 (Jan Silhan)
++
+ * Fri Jul 17 2015 Michal Luscon <mluscon@redhat.com> 1.0.2-1
+ - give --allowerasing hint when error occurs during resolution (RhBug:1148630)
+   (Jan Silhan)
+diff --git a/dnf/cli/output.py b/dnf/cli/output.py
+index c24de7c..2b1ba45 100644
+--- a/dnf/cli/output.py
++++ b/dnf/cli/output.py
+@@ -929,7 +929,8 @@ class Output(object):
+         return '\n'.join(out)
+ 
+     def _skipped_conflicts(self):
+-        def is_better_version((pkg1, pkg2)):
++        def is_better_version(same_name_pkgs):
++            pkg1, pkg2 = same_name_pkgs
+             if not pkg2 or (pkg1 and pkg1 > pkg2):
+                 return False
+             return True
+diff --git a/rel-eng/packages/dnf b/rel-eng/packages/dnf
+index 062f380..35bf379 100644
+--- a/rel-eng/packages/dnf
++++ b/rel-eng/packages/dnf
+@@ -1 +1 @@
+-1.0.2-1 ./
++1.0.2-2 ./

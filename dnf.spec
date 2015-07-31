@@ -11,7 +11,7 @@
 
 Name:		dnf
 Version:	1.0.2
-Release:	2%{?snapshot}%{?dist}
+Release:	3%{?snapshot}%{?dist}
 Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:	GPLv2+ and GPLv2 and GPL
@@ -22,6 +22,8 @@ URL:		https://github.com/rpm-software-management/dnf
 # ./archive
 # tarball will be generated in $HOME/rpmbuild/sources/
 Source0:    http://rpm-software-management.fedorapeople.org/dnf-%{version}.tar.gz
+Patch0: dnf-1.0.2-1-to-dnf-1.0.2-2.patch
+Patch1: dnf-1.0.2-2-to-dnf-1.0.2-3.patch
 BuildArch:  noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -119,6 +121,8 @@ Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
 %setup -q -n dnf-%{version}
+%patch0 -p1
+%patch1 -p1
 rm -rf py3
 mkdir ../py3
 cp -a . ../py3/
@@ -250,6 +254,10 @@ exit 0
 %systemd_postun_with_restart dnf-automatic.timer
 
 %changelog
+* Fri Jul 31 2015 Michal Luscon <mluscon@redhat.com> 1.0.2-3
+- Fix regression in group list command introduced by 02c3cc3 (Adam Salih)
+- stop saying "experimental" (Matthew Miller)
+
 * Tue Jul 21 2015 Jan Silhan <jsilhan@redhat.com> 1.0.2-2
 - fixed python3 syntax error from f427aa2 (Jan Silhan)
 
