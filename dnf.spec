@@ -1,4 +1,4 @@
-%global hawkey_version 0.5.9
+%global hawkey_version 0.6.0
 %global librepo_version 1.7.16
 %global libcomps_version 0.1.6
 %global rpm_version 4.12.0
@@ -10,8 +10,8 @@
 %global py3pluginpath %{python3_sitelib}/dnf-plugins
 
 Name:		dnf
-Version:	1.0.2
-Release:	3%{?snapshot}%{?dist}
+Version:	1.1.0
+Release:	1%{?snapshot}%{?dist}
 Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:	GPLv2+ and GPLv2 and GPL
@@ -22,8 +22,6 @@ URL:		https://github.com/rpm-software-management/dnf
 # ./archive
 # tarball will be generated in $HOME/rpmbuild/sources/
 Source0:    http://rpm-software-management.fedorapeople.org/dnf-%{version}.tar.gz
-Patch0: dnf-1.0.2-1-to-dnf-1.0.2-2.patch
-Patch1: dnf-1.0.2-2-to-dnf-1.0.2-3.patch
 BuildArch:  noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -121,8 +119,6 @@ Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
 %setup -q -n dnf-%{version}
-%patch0 -p1
-%patch1 -p1
 rm -rf py3
 mkdir ../py3
 cp -a . ../py3/
@@ -254,8 +250,53 @@ exit 0
 %systemd_postun_with_restart dnf-automatic.timer
 
 %changelog
+* Mon Aug 10 2015 Michal Luscon <mluscon@redhat.com> 1.1.0-1
+- print skipped pkg with broken deps too (Related:RhBug:1210445) (Jan Silhan)
+- history: set commands output as default (RhBug:1218401) (Michal Luscon)
+- Update es.po. save:guardar -> save:ahorrar (Máximo Castañeda)
+- cosmetic: option arg in Base.*install is replaced with strict (Jan Silhan)
+- group: don't fail on first non-existing group (Jan Silhan)
+- install: skips local pkgs of lower version when strict=0
+  (Related:RhBug:1227952) (Jan Silhan)
+- install: skip broken/conflicting packages in groups when strict=0 (Jan
+  Silhan)
+- install: skip broken/conflicting packages when strict=0 (Jan Silhan)
+- implemented `strict` config option working in install cmd (RhBug:1197456)
+  (Jan Silhan)
+- fixed 'dnf --quiet repolist' lack of output (RhBug:1236310) (Nick Coghlan)
+- Add support for MIPS architecture (Michal Toman)
+- package: respect baseurl attribute in localPkg() (RhBug:1219638) (Michal
+  Luscon)
+- Download error message is not written on the same line as progress bar
+  anymore (RhBug: 1224248) (Adam Salih)
+- dnf downgrade does not try to downgrade not installed packages (RhBug:
+  1243501) (max9631)
+- pkgs not installed due to rpm error are reported (RhBug:1207981) (Adam Salih)
+- dnf install checks availability of all given packages (RhBug:1208918) (Adam
+  Salih)
+- implemented install_weak_deps config option (RhBug:1221635) (Jan Silhan)
+- ignore SIGPIPE (RhBug:1236306) (Michael Mraka)
+- always add LoggingTransactionDisplay to the list of transaction displays
+  (RhBug:1234639) (Radek Holy)
+- Add missing FILES section (RhBug: 1225237) (Adam Salih)
+- doc: Add yum vs dnf hook information (RhBug:1244486) (Parag Nemade)
+- doc: clarify the expected type of the do_transactions's display parameter
+  (Radek Holy)
+- apichange: add dnf.cli.demand.DemandSheet.transaction_display (Radek Holy)
+- apichange: add dnf.callback.TransactionProgress (Radek Holy)
+- move the error output from TransactionDisplay into a separate class (Radek
+  Holy)
+- rename TransactionDisplay.errorlog to TransactionDisplay.error (Radek Holy)
+- report package verification as a regular RPM transaction event (Radek Holy)
+- rename TransactionDisplay.event to TransactionDisplay.progress (Radek Holy)
+- apichange: deprecate dnf.callback.LoggingTransactionDisplay (Radek Holy)
+- use both CliTransactionDisplay and demands.transaction_display (Radek Holy)
+- apichange: accept multiple displays in do_transaction (Radek Holy)
+- support multiple displays in RPMTransaction (Radek Holy)
+
 * Fri Jul 31 2015 Michal Luscon <mluscon@redhat.com> 1.0.2-3
 - Fix regression in group list command introduced by 02c3cc3 (Adam Salih)
+- AUTHORS: updated (Jan Silhan)
 - stop saying "experimental" (Matthew Miller)
 
 * Tue Jul 21 2015 Jan Silhan <jsilhan@redhat.com> 1.0.2-2
