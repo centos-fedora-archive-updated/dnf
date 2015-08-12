@@ -1,0 +1,169 @@
+diff --git a/dnf.spec b/dnf.spec
+index a47b119..7f89d04 100644
+--- a/dnf.spec
++++ b/dnf.spec
+@@ -11,7 +11,7 @@
+ 
+ Name:		dnf
+ Version:	1.1.0
+-Release:	1%{?snapshot}%{?dist}
++Release:	2%{?snapshot}%{?dist}
+ Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
+ # For a breakdown of the licensing, see PACKAGE-LICENSING
+ License:	GPLv2+ and GPLv2 and GPL
+@@ -250,6 +250,16 @@ exit 0
+ %systemd_postun_with_restart dnf-automatic.timer
+ 
+ %changelog
++* Wed Aug 12 2015 Michal Luscon <mluscon@redhat.com> 1.1.0-2
++- update: installonly pkgs are not shown in both install and skipped section
++  (RhBug:1252415) (Jan Silhan)
++- output: sort skipped packages (Jan Silhan)
++- output: skipped conflicts are set (RhBug:1252032) (Jan Silhan)
++- keep the dwongrading package installed if transaction fails (RhBug:1249379)
++  (Jan Silhan)
++- don't store empty attributes (RhBug:1246928) (Michael Mraka)
++- doc: correct dnf.conf man section (RhBug:1245349) (Michal Luscon)
++
+ * Mon Aug 10 2015 Michal Luscon <mluscon@redhat.com> 1.1.0-1
+ - print skipped pkg with broken deps too (Related:RhBug:1210445) (Jan Silhan)
+ - history: set commands output as default (RhBug:1218401) (Michal Luscon)
+diff --git a/dnf/cli/output.py b/dnf/cli/output.py
+index 3e2a01c..c765098 100644
+--- a/dnf/cli/output.py
++++ b/dnf/cli/output.py
+@@ -932,17 +932,22 @@ class Output(object):
+         return '\n'.join(out)
+ 
+     def _skipped_conflicts(self):
++        """returns set of packages that would be additionally installed
++           when --best and --allowerasing is set"""
+         def is_better_version(same_name_pkgs):
+             pkg1, pkg2 = same_name_pkgs
+             if not pkg2 or (pkg1 and pkg1 > pkg2):
+                 return False
+             return True
+ 
+-        return map(lambda t: t[1], filter(is_better_version,
+-                   self.base._goal.best_run_diff()))
++        return set(map(lambda t: t[1], filter(is_better_version,
++                   self.base._goal.best_run_diff())))
+ 
+     def _skipped_broken_deps(self, skipped_conflicts):
+-        goal_diff = self.base._goal.available_updates_diff(self.base.sack.query())
++        """returns set of packages that are available updates
++           but cannot be upgraded"""
++        goal_diff = self.base._goal.available_updates_diff(
++            self.base.sack.query())
+         if skipped_conflicts:
+             goal_diff -= skipped_conflicts
+         return goal_diff
+@@ -1011,7 +1016,7 @@ class Output(object):
+         if not self.conf.best and forward_actions & self.base._goal.actions:
+             lines = []
+             skipped_conflicts = self._skipped_conflicts()
+-            for pkg in skipped_conflicts:
++            for pkg in sorted(skipped_conflicts):
+                 a_wid = _add_line(lines, data, a_wid, pkg, [])
+             skip_str = _("Skipping packages with conflicts:\n"
+                          "(add '%s' to command line "
+@@ -1021,7 +1026,7 @@ class Output(object):
+         # show skipped packages with broken dependencies
+         if hawkey.UPGRADE_ALL in self.base._goal.actions:
+             lines = []
+-            for pkg in self._skipped_broken_deps(skipped_conflicts):
++            for pkg in sorted(self._skipped_broken_deps(skipped_conflicts)):
+                 a_wid = _add_line(lines, data, a_wid, pkg, [])
+             skip_str = _("Skipping packages with broken dependencies")
+             pkglist_lines.append((skip_str, lines))
+diff --git a/dnf/goal.py b/dnf/goal.py
+index 0bb6d2c..6330e3c 100644
+--- a/dnf/goal.py
++++ b/dnf/goal.py
+@@ -80,4 +80,7 @@ class Goal(hawkey.Goal):
+         return res
+ 
+     def available_updates_diff(self, query):
+-        return set(query.upgrades().latest().run()) - set(self.list_upgrades())
++        available_updates = set(query.upgrades().latest().run())
++        installable_updates = set(self.list_upgrades())
++        installs = set(self.list_installs())
++        return (available_updates - installable_updates) - installs
+diff --git a/dnf/transaction.py b/dnf/transaction.py
+index 08055df..5cec604 100644
+--- a/dnf/transaction.py
++++ b/dnf/transaction.py
+@@ -176,7 +176,7 @@ class Transaction(object):
+             if tsi.op_type == DOWNGRADE:
+                 ts.addErase(tsi.erased.idx)
+                 hdr = tsi.installed.header
+-                ts.addInstall(hdr, tsi, 'i')
++                ts.addInstall(hdr, tsi, 'u')
+             elif tsi.op_type == ERASE:
+                 ts.addErase(tsi.erased.idx)
+             elif tsi.op_type == INSTALL:
+diff --git a/dnf/yum/rpmsack.py b/dnf/yum/rpmsack.py
+index 840168f..dcfdced 100644
+--- a/dnf/yum/rpmsack.py
++++ b/dnf/yum/rpmsack.py
+@@ -292,7 +292,8 @@ class RPMDBAdditionalDataPackage(object):
+ 
+     def __setattr__(self, attr, value):
+         if not attr.startswith('_'):
+-            self._write(attr, value)
++            if value is not None:
++                self._write(attr, value)
+         else:
+             object.__setattr__(self, attr, value)
+ 
+diff --git a/doc/command_ref.rst b/doc/command_ref.rst
+index 04d2e8e..c0fc381 100644
+--- a/doc/command_ref.rst
++++ b/doc/command_ref.rst
+@@ -453,7 +453,7 @@ Makecache Command
+     Like plain ``makecache`` but instructs DNF to be more resource-aware,
+     meaning will not do anything if running on battery power and will terminate
+     immediately if it's too soon after the last successful ``makecache`` run
+-    (see :manpage:`dnf.conf(8)`, :ref:`metadata_timer_sync
++    (see :manpage:`dnf.conf(5)`, :ref:`metadata_timer_sync
+     <metadata_timer_sync-label>`).
+ 
+ ----------------
+@@ -743,7 +743,7 @@ the most recent transaction.
+ Metadata Synchronization
+ ========================
+ 
+-Correct operation of DNF depends on having access to up-to-date data from all enabled repositories but contacting remote mirrors on every operation considerably slows it down and costs bandwidth for both the client and the repository provider. The :ref:`metadata_expire <metadata_expire-label>` (see :manpage:`dnf.conf(8)`) repo config option is used by DNF to determine whether particular local copy of repository data is due to be re-synced. It is crucial that the repository providers set the option well, namely to a value where it is guaranteed that if particular metadata was available in time ``T`` on the server, then all packages it references will still be available for download from the server in time ``T + metadata_expire``.
++Correct operation of DNF depends on having access to up-to-date data from all enabled repositories but contacting remote mirrors on every operation considerably slows it down and costs bandwidth for both the client and the repository provider. The :ref:`metadata_expire <metadata_expire-label>` (see :manpage:`dnf.conf(5)`) repo config option is used by DNF to determine whether particular local copy of repository data is due to be re-synced. It is crucial that the repository providers set the option well, namely to a value where it is guaranteed that if particular metadata was available in time ``T`` on the server, then all packages it references will still be available for download from the server in time ``T + metadata_expire``.
+ 
+ To further reduce the bandwidth load, some of the commands where having up-to-date metadata is not critical (e.g. the ``list`` command) do not look at whether a repository is expired and whenever any version of it is locally available, it will be used. Note that in all situations the user can force synchronization of all enabled repositories with the ``--refresh`` switch.
+ 
+@@ -771,7 +771,7 @@ Files
+ See Also
+ ========
+ 
+-* :manpage:`dnf.conf(8)`, :ref:`DNF Configuration Reference <conf_ref-label>`
++* :manpage:`dnf.conf(5)`, :ref:`DNF Configuration Reference <conf_ref-label>`
+ * :manpage:`dnf.plugin.*(8)`, assorted DNF plugins that might be installed on the system.
+ * `DNF`_ project homepage (https://github.com/rpm-software-management/dnf/)
+ * How to report a bug (https://github.com/rpm-software-management/dnf/wiki/Bug-Reporting)
+diff --git a/rel-eng/packages/dnf b/rel-eng/packages/dnf
+index 11c4a8a..7cbf6fa 100644
+--- a/rel-eng/packages/dnf
++++ b/rel-eng/packages/dnf
+@@ -1 +1 @@
+-1.1.0-1 ./
++1.1.0-2 ./
+diff --git a/rel-eng/tito.props b/rel-eng/tito.props
+index 5ddebd5..273454a 100644
+--- a/rel-eng/tito.props
++++ b/rel-eng/tito.props
+@@ -1,6 +1,6 @@
+ [buildconfig]
+-builder = tito.builder.Builder
+-tagger = tito.tagger.VersionTagger
++builder =   tito.distributionbuilder.DistributionBuilder
++tagger = tito.tagger.ReleaseTagger
+ changelog_do_not_remove_cherrypick = 1
+ changelog_format = %s (%an)
+ 

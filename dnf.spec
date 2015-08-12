@@ -11,7 +11,7 @@
 
 Name:		dnf
 Version:	1.1.0
-Release:	1%{?snapshot}%{?dist}
+Release:	2%{?snapshot}%{?dist}
 Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:	GPLv2+ and GPLv2 and GPL
@@ -22,6 +22,7 @@ URL:		https://github.com/rpm-software-management/dnf
 # ./archive
 # tarball will be generated in $HOME/rpmbuild/sources/
 Source0:    http://rpm-software-management.fedorapeople.org/dnf-%{version}.tar.gz
+Patch0: dnf-1.1.0-1-to-dnf-1.1.0-2.patch
 BuildArch:  noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -119,6 +120,7 @@ Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
 %setup -q -n dnf-%{version}
+%patch0 -p1
 rm -rf py3
 mkdir ../py3
 cp -a . ../py3/
@@ -250,6 +252,16 @@ exit 0
 %systemd_postun_with_restart dnf-automatic.timer
 
 %changelog
+* Wed Aug 12 2015 Michal Luscon <mluscon@redhat.com> 1.1.0-2
+- update: installonly pkgs are not shown in both install and skipped section
+  (RhBug:1252415) (Jan Silhan)
+- output: sort skipped packages (Jan Silhan)
+- output: skipped conflicts are set (RhBug:1252032) (Jan Silhan)
+- keep the dwongrading package installed if transaction fails (RhBug:1249379)
+  (Jan Silhan)
+- don't store empty attributes (RhBug:1246928) (Michael Mraka)
+- doc: correct dnf.conf man section (RhBug:1245349) (Michal Luscon)
+
 * Mon Aug 10 2015 Michal Luscon <mluscon@redhat.com> 1.1.0-1
 - print skipped pkg with broken deps too (Related:RhBug:1210445) (Jan Silhan)
 - history: set commands output as default (RhBug:1218401) (Michal Luscon)
