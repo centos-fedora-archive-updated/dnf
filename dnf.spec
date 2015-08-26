@@ -11,7 +11,7 @@
 
 Name:		dnf
 Version:	0.6.4
-Release:	5%{?snapshot}%{?dist}
+Release:	6%{?snapshot}%{?dist}
 Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:	GPLv2+ and GPLv2 and GPL
@@ -26,6 +26,7 @@ Patch0: dnf-0.6.4-1-to-dnf-0.6.4-2.patch
 Patch1: dnf-0.6.4-2-to-dnf-0.6.4-3.patch
 Patch2: dnf-0.6.4-3-to-dnf-0.6.4-4.patch
 Patch3: dnf-0.6.4-4-to-dnf-0.6.4-5.patch
+Patch4: dnf-0.6.4-5-to-dnf-0.6.4-6.patch
 BuildArch:	noarch
 BuildRequires:	cmake
 BuildRequires:	pygpgme
@@ -108,6 +109,7 @@ Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 rm -rf py3
 mkdir ../py3
 cp -a . ../py3/
@@ -133,6 +135,7 @@ mkdir -p $RPM_BUILD_ROOT%{pluginconfpath}
 mkdir -p $RPM_BUILD_ROOT%{py2pluginpath}
 mkdir -p $RPM_BUILD_ROOT%{py3pluginpath}/__pycache__
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log
+mkdir -p $RPM_BUILD_ROOT%{_var}/cache/dnf
 touch $RPM_BUILD_ROOT%{_localstatedir}/log/%{name}.log
 ln -sr $RPM_BUILD_ROOT%{_bindir}/dnf $RPM_BUILD_ROOT%{_bindir}/yum
 
@@ -195,6 +198,13 @@ popd
 %postun
 %systemd_postun_with_restart dnf-makecache.timer
 
+%posttrans
+# cleanup pre-1.0.2 style cache
+for arch in armv7hl i686 x86_64 ; do
+    rm -rf /var/cache/dnf/$arch
+done
+exit 0
+
 %post automatic
 %systemd_post dnf-automatic.timer
 
@@ -205,12 +215,17 @@ popd
 %systemd_postun_with_restart dnf-automatic.timer
 
 %changelog
+* Wed Aug 26 2015 Michal Luscon <mluscon@redhat.com> 0.6.4-6
+- cleanup old cache in posttrans (Michael Mraka)
+- include /var/cache/dnf into rpm (Michael Mraka)
+- do not use releasever in cache path (related to RhBug:1173107) (Michael Mraka)
+
 * Thu Apr 16 2015 Michal Luscon <mluscon@redhat.com> 0.6.4-5
 - Revert "completion: work with just python(3)-dnf"
 - Revert "bash-completion: use python method to get commands (RhBug:1187579)"
 
 * Thu Apr 16 2015 Michal Luscon <mluscon@redhat.com> 0.6.4-4
-- upload correct source archive 0.6.4 
+- upload correct source archive 0.6.4
 
 * Mon Apr 13 2015 Michal Luscon <mluscon@redhat.com> 0.6.4-3
 - rel-eng: use distro releaser

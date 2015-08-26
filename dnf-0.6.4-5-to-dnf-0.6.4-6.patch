@@ -1,0 +1,363 @@
+diff --git a/dnf.spec b/dnf.spec
+index 2deea95..00025db 100644
+--- a/dnf.spec
++++ b/dnf.spec
+@@ -11,7 +11,7 @@
+ 
+ Name:		dnf
+ Version:	0.6.4
+-Release:	5%{?snapshot}%{?dist}
++Release:	6%{?snapshot}%{?dist}
+ Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
+ # For a breakdown of the licensing, see PACKAGE-LICENSING
+ License:	GPLv2+ and GPLv2 and GPL
+@@ -125,6 +125,7 @@ mkdir -p $RPM_BUILD_ROOT%{pluginconfpath}
+ mkdir -p $RPM_BUILD_ROOT%{py2pluginpath}
+ mkdir -p $RPM_BUILD_ROOT%{py3pluginpath}/__pycache__
+ mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log
++mkdir -p $RPM_BUILD_ROOT%{_var}/cache/dnf
+ touch $RPM_BUILD_ROOT%{_localstatedir}/log/%{name}.log
+ ln -sr $RPM_BUILD_ROOT%{_bindir}/dnf $RPM_BUILD_ROOT%{_bindir}/yum
+ 
+@@ -152,6 +153,7 @@ popd
+ %{_mandir}/man5/dnf.conf.5.gz
+ %{_unitdir}/dnf-makecache.service
+ %{_unitdir}/dnf-makecache.timer
++%{_var}/cache/dnf
+ %{_tmpfilesdir}/dnf.conf
+ %exclude %{python_sitelib}/dnf/automatic
+ %{python_sitelib}/dnf/
+@@ -187,6 +189,13 @@ popd
+ %postun
+ %systemd_postun_with_restart dnf-makecache.timer
+ 
++%posttrans
++# cleanup pre-1.0.2 style cache
++for arch in armv7hl i686 x86_64 ; do
++    rm -rf /var/cache/dnf/$arch
++done
++exit 0
++
+ %post automatic
+ %systemd_post dnf-automatic.timer
+ 
+@@ -197,12 +206,19 @@ popd
+ %systemd_postun_with_restart dnf-automatic.timer
+ 
+ %changelog
++* Wed Aug 26 2015 Michal Luscon <mluscon@redhat.com> 0.6.4-6
++- test: don't compute hash from absolute local file path (introduced in
++  10518b6) 
++- cleanup old cache in posttrans 
++- include /var/cache/dnf into rpm 
++- do not use releasever in cache path (related to RhBug:1173107)
++
+ * Thu Apr 16 2015 Michal Luscon <mluscon@redhat.com> 0.6.4-5
+ - Revert "completion: work with just python(3)-dnf"
+ - Revert "bash-completion: use python method to get commands (RhBug:1187579)"
+ 
+ * Thu Apr 16 2015 Michal Luscon <mluscon@redhat.com> 0.6.4-4
+-- upload correct source archive 0.6.4 
++- upload correct source archive 0.6.4
+ 
+ * Mon Apr 13 2015 Michal Luscon <mluscon@redhat.com> 0.6.4-3
+ - rel-eng: use distro releaser
+diff --git a/dnf/base.py b/dnf/base.py
+index 725937b..f3df45c 100644
+--- a/dnf/base.py
++++ b/dnf/base.py
+@@ -127,9 +127,8 @@ class Base(object):
+         subst = conf.substitutions
+         if 'releasever' not in subst:
+             subst['releasever'] = \
+-                dnf.rpm.detect_releasever(conf.installroot) or ''
+-        suffix = dnf.conf.parser.substitute(dnf.const.CACHEDIR_SUFFIX, subst)
+-        cache_dirs = dnf.conf.CliCache(conf.cachedir, suffix)
++                dnf.rpm.detect_releasever(conf.installroot)
++        cache_dirs = dnf.conf.CliCache(conf.cachedir)
+ 
+         conf.cachedir = cache_dirs.cachedir
+         return conf
+diff --git a/dnf/cli/cli.py b/dnf/cli/cli.py
+index 2c6c40e..0bbd337 100644
+--- a/dnf/cli/cli.py
++++ b/dnf/cli/cli.py
+@@ -101,9 +101,7 @@ def _list_cmd_calc_columns(output, ypl):
+ 
+ 
+ def cachedir_fit(conf):
+-    subst = conf.substitutions
+-    suffix = dnf.conf.parser.substitute(dnf.const.CACHEDIR_SUFFIX, subst)
+-    cli_cache = dnf.conf.CliCache(conf.cachedir, suffix)
++    cli_cache = dnf.conf.CliCache(conf.cachedir)
+     return cli_cache.cachedir, cli_cache.system_cachedir
+ 
+ 
+@@ -1021,10 +1019,6 @@ class Cli(object):
+         conf.read(path)
+         if releasever is None:
+             releasever = dnf.rpm.detect_releasever(root)
+-            if releasever is None:
+-                msg = _('releasever not given and can not be detected '
+-                        'from the installroot.')
+-                raise dnf.exceptions.ConfigError(msg)
+         conf.releasever = releasever
+         subst = conf.substitutions
+         subst.update_from_etc(root)
+@@ -1039,12 +1033,6 @@ class Cli(object):
+ 
+         self.base.logging.setup_from_dnf_conf(conf)
+ 
+-        # repos are ver/arch specific so add $basearch/$releasever
+-        conf._repos_persistdir = os.path.normpath(
+-            '%s/repos/%s/%s/' % (conf.persistdir,
+-                                 subst.get('basearch', '$basearch'),
+-                                 subst.get('releasever', '$releasever')))
+-
+         timer()
+         return conf
+ 
+diff --git a/dnf/conf/__init__.py b/dnf/conf/__init__.py
+index f26f81b..ec03229 100644
+--- a/dnf/conf/__init__.py
++++ b/dnf/conf/__init__.py
+@@ -49,10 +49,9 @@ logger = logging.getLogger('dnf')
+ 
+ 
+ class CliCache(object):
+-    def __init__(self, prefix, suffix):
++    def __init__(self, prefix):
+         # set from the client, at most once:
+         self.prefix = prefix
+-        self.suffix = suffix
+         # internal:
+         self._ready = False
+         self._cachedir = None
+@@ -63,19 +62,16 @@ class CliCache(object):
+             return
+ 
+         self._ready = True
+-        self._system_cachedir = self._retdir(self.prefix)
++        self._system_cachedir = self.prefix
+         if util.am_i_root():
+             self._cachedir = self._system_cachedir
+         else:
+             try:
+                 user_prefix = misc.getCacheDir()
+-                self._cachedir = self._retdir(user_prefix)
++                self._cachedir = user_prefix
+             except (IOError, OSError) as e:
+                 logger.critical(_('Could not set cachedir: %s'), ucd(e))
+ 
+-    def _retdir(self, dir):
+-        return os.path.join(dir, self.suffix)
+-
+     @property
+     def cachedir(self):
+         self._make_ready()
+diff --git a/dnf/const.py.in b/dnf/const.py.in
+index 3c498c9..652ec62 100644
+--- a/dnf/const.py.in
++++ b/dnf/const.py.in
+@@ -21,7 +21,6 @@
+ from __future__ import unicode_literals
+ import distutils.sysconfig
+ 
+-CACHEDIR_SUFFIX='$basearch/$releasever'
+ CONF_FILENAME='/etc/dnf/dnf.conf' # :api
+ CONF_AUTOMATIC_FILENAME='/etc/dnf/automatic.conf'
+ DISTROVERPKG=('system-release(releasever)', 'redhat-release')
+diff --git a/dnf/repo.py b/dnf/repo.py
+index 5b9bddf..d0c6f33 100644
+--- a/dnf/repo.py
++++ b/dnf/repo.py
+@@ -33,6 +33,7 @@ import dnf.util
+ import dnf.yum.config
+ import dnf.yum.misc
+ import functools
++import hashlib
+ import hawkey
+ import logging
+ import librepo
+@@ -447,7 +448,14 @@ class Repo(dnf.yum.config.RepoConf):
+ 
+     @property
+     def cachedir(self):
+-        return os.path.join(self.basecachedir, self.id)
++        url = self.metalink or self.mirrorlist \
++              or (self.baseurl and self.baseurl[0])
++        if url:
++            digest = hashlib.sha256(url.encode('utf8')).hexdigest()[:16]
++            repodir = "%s-%s" % (self.id, digest)
++        else:
++            repodir = self.id
++        return os.path.join(self.basecachedir, repodir)
+ 
+     @property
+     def filelists_fn(self):
+diff --git a/rel-eng/packages/dnf b/rel-eng/packages/dnf
+index 126e3e7..40ad0fa 100644
+--- a/rel-eng/packages/dnf
++++ b/rel-eng/packages/dnf
+@@ -1 +1 @@
+-0.6.4-5 ./
++0.6.4-6 ./
+diff --git a/tests/test_base.py b/tests/test_base.py
+index 4014c95..c56f94f 100644
+--- a/tests/test_base.py
++++ b/tests/test_base.py
+@@ -42,7 +42,7 @@ class BaseTest(support.TestCase):
+         base = dnf.Base()
+         self.assertIsNotNone(base.conf)
+         self.assertIsNotNone(base.conf.cachedir)
+-        reg = re.compile('/var/cache/dnf/[a-zA-Z0-9_]+/x')
++        reg = re.compile('/var/cache/dnf')
+         self.assertIsNotNone(reg.match(base.conf.cachedir))
+ 
+     @mock.patch('dnf.rpm.detect_releasever', lambda x: 'x')
+@@ -51,7 +51,7 @@ class BaseTest(support.TestCase):
+         base = dnf.Base()
+         self.assertIsNotNone(base.conf)
+         self.assertIsNotNone(base.conf.cachedir)
+-        reg = re.compile('/var/tmp/dnf-[a-zA-Z0-9_-]+/[a-zA-Z0-9_]+/x')
++        reg = re.compile('/var/tmp/dnf-[a-zA-Z0-9_-]+')
+         self.assertIsNotNone(reg.match(base.conf.cachedir))
+ 
+     def test_reset(self):
+diff --git a/tests/test_cli.py b/tests/test_cli.py
+index b51a64f..34409da 100644
+--- a/tests/test_cli.py
++++ b/tests/test_cli.py
+@@ -194,7 +194,7 @@ class ConfigureTest(TestCase):
+     def test_configure_user(self):
+         """ Test Cli.configure as user."""
+         self.cli.configure(['update', '-c', self.conffile])
+-        reg = re.compile('^/var/tmp/dnf-[a-zA-Z0-9_-]+/[a-zA-Z0-9_]+/[0-9]+$')
++        reg = re.compile('^/var/tmp/dnf-[a-zA-Z0-9_-]+$')
+         self.assertIsNotNone(reg.match(self.base.conf.cachedir))
+         self.assertEqual(self.cli.cmdstring, "dnf update -c %s " % self.conffile)
+ 
+@@ -202,7 +202,7 @@ class ConfigureTest(TestCase):
+     def test_configure_root(self):
+         """ Test Cli.configure as root."""
+         self.cli.configure(['update', '-c', self.conffile])
+-        reg = re.compile('^/var/cache/dnf/[a-zA-Z0-9_]+/[0-9]+$')
++        reg = re.compile('^/var/cache/dnf$')
+         self.assertIsNotNone(reg.match(self.base.conf.cachedir))
+         self.assertEqual(self.cli.cmdstring, "dnf update -c %s " % self.conffile)
+ 
+diff --git a/tests/test_config.py b/tests/test_config.py
+index 7f8d380..c59270e 100644
+--- a/tests/test_config.py
++++ b/tests/test_config.py
+@@ -39,23 +39,26 @@ class OptionTest(unittest.TestCase):
+             self.fail("option should be deleted now.")
+ 
+ class CacheTest(TestCase):
+-     @mock.patch('dnf.util.am_i_root', return_value=True)
+-     def test_root(self, unused_am_i_root):
+-         cache = CliCache('/var/lib/spinning', 'i286/20')
+-         self.assertEqual(cache.system_cachedir, '/var/lib/spinning/i286/20')
+-         self.assertEqual(cache.cachedir, '/var/lib/spinning/i286/20')
+ 
+-     @mock.patch('dnf.yum.misc.getCacheDir', return_value="/notmp/dnf-walr-yeAH")
+-     @mock.patch('dnf.util.am_i_root', return_value=False)
+-     def test_noroot(self, fn_root, fn_getcachedir):
+-         cache = CliCache('/var/lib/spinning', 'i286/20')
+-         self.assertEqual(fn_getcachedir.call_count, 0)
+-         self.assertEqual(cache.cachedir, '/notmp/dnf-walr-yeAH/i286/20')
+-         self.assertEqual(fn_getcachedir.call_count, 1)
++    @mock.patch('dnf.util.am_i_root', return_value=True)
++    def test_root(self, unused_am_i_root):
++        cache = CliCache('/var/lib/spinning')
++        self.assertEqual(cache.system_cachedir, '/var/lib/spinning')
++        self.assertEqual(cache.cachedir, '/var/lib/spinning')
++
++    @mock.patch('dnf.yum.misc.getCacheDir',
++                return_value="/notmp/dnf-walr-yeAH")
++    @mock.patch('dnf.util.am_i_root', return_value=False)
++    def test_noroot(self, fn_root, fn_getcachedir):
++        cache = CliCache('/var/lib/spinning')
++        self.assertEqual(fn_getcachedir.call_count, 0)
++        self.assertEqual(cache.cachedir, '/notmp/dnf-walr-yeAH')
++        self.assertEqual(fn_getcachedir.call_count, 1)
++
++        # the cachedirs are cached now, getCacheDir is not called again:
++        self.assertEqual(cache.cachedir, '/notmp/dnf-walr-yeAH')
++        self.assertEqual(fn_getcachedir.call_count, 1)
+ 
+-         # the cachedirs are cached now, getCacheDir is not called again:
+-         self.assertEqual(cache.cachedir, '/notmp/dnf-walr-yeAH/i286/20')
+-         self.assertEqual(fn_getcachedir.call_count, 1)
+ 
+ class YumConfTest(TestCase):
+     def test_bugtracker(self):
+diff --git a/tests/test_package.py b/tests/test_package.py
+index e30a2e5..225749c 100644
+--- a/tests/test_package.py
++++ b/tests/test_package.py
+@@ -74,7 +74,8 @@ class PackageTest(support.TestCase):
+         self.assertEquals(self.pkg.localPkg(), '/mnt/cd/f/foo.rpm')
+         self.pkg.repo.baseurl = ['http://remote']
+         self.assertFalse(self.pkg.repo.local)
+-        self.assertEquals(self.pkg.localPkg(), '/cachedir/main/packages/foo.rpm')
++        self.assertEquals(self.pkg.localPkg(),
++                          self.pkg.repo.cachedir + '/packages/foo.rpm')
+ 
+     def test_verify(self):
+         with mock.patch.object(self.pkg, 'localPkg',
+diff --git a/tests/test_repo.py b/tests/test_repo.py
+index 5677ea9..a9bd4fc 100644
+--- a/tests/test_repo.py
++++ b/tests/test_repo.py
+@@ -142,9 +142,13 @@ class RepoTest(RepoTestMixin, support.TestCase):
+     def setUp(self):
+         self.repo = self.build_repo('r', 'r for riot')
+ 
++    def tearDown(self):
++        dnf.util.rm_rf(self.repo.cachedir)
++
+     def test_cachedir(self):
++        self.repo.baseurl = ["http://download.repo.org/r"]
+         self.assertEqual(self.repo.cachedir,
+-                         os.path.join(self.TMP_CACHEDIR, self.repo.id))
++                         os.path.join(self.TMP_CACHEDIR, 'r-0824b1db602c8695'))
+ 
+     def test_dump(self):
+         dump = self.repo.dump()
+@@ -198,6 +202,7 @@ class RepoTest(RepoTestMixin, support.TestCase):
+         # the second time we only hit the cache:
+         del self.repo
+         self.repo = dnf.repo.Repo("r", self.TMP_CACHEDIR)
++        self.repo.baseurl = [BASEURL]
+         self.assertFalse(self.repo.load())
+         self.assertIsNotNone(self.repo.metadata)
+ 
+@@ -206,7 +211,7 @@ class RepoTest(RepoTestMixin, support.TestCase):
+         self.assertIsNone(repo.metadata)
+         self.assertTrue(repo.load())
+         self.assertIsNotNone(repo.metadata)
+-        repomd = os.path.join(self.TMP_CACHEDIR, "r/repodata/repomd.xml")
++        repomd = os.path.join(self.repo.cachedir, "repodata/repomd.xml")
+         self.assertTrue(os.path.isfile(repomd))
+         self.assertTrue(repo.metadata.fresh)
+ 
+@@ -339,7 +344,8 @@ class LocalRepoTest(support.TestCase):
+                         ('sha1', 'd5f18c856e765cd88a50dbf1bfaea51de3b5e516'),
+                         ('sha256', 'ead48d5c448a481bd66a4413d7be28bd44ce5de1ee59ecb723c78dcf4e441696'),
+                         ('sha512', '9a3131485c0c0a3f65bb5f25155e89d2d6b09e74ffdaa1c3339d3874885d160d8b4667a4a83dbd7d2702a5d41a4e1bc5622c4783b77dcf1f69626c68975202ce')]}
+-        self.assertTrue(self.repo.load())
++        with mock.patch('dnf.repo.Repo.cachedir', REPOS + "/rpm"):
++            self.assertTrue(self.repo.load())
+         self.assertTrue(remote_handle_m.fetchmirrors)
+         self.assertFalse(self.repo._expired)
+         reset_age_m.assert_called()
+@@ -422,7 +428,7 @@ class DownloadPayloadsTest(RepoTestMixin, support.TestCase):
+         errs = dnf.repo.download_payloads([pload], drpm)
+         self.assertEmpty(errs.recoverable)
+         self.assertEmpty(errs.irrecoverable)
+-        path = os.path.join(self.TMP_CACHEDIR, 'r/packages/tour-4-4.noarch.rpm')
++        path = os.path.join(repo.cachedir, 'packages/tour-4-4.noarch.rpm')
+         self.assertFile(path)
+ 
+ 
