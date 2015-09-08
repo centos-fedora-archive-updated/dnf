@@ -11,7 +11,7 @@
 
 Name:		dnf
 Version:	1.1.1
-Release:	1%{?snapshot}%{?dist}
+Release:	2%{?snapshot}%{?dist}
 Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:	GPLv2+ and GPLv2 and GPL
@@ -22,6 +22,7 @@ URL:		https://github.com/rpm-software-management/dnf
 # ./archive
 # tarball will be generated in $HOME/rpmbuild/sources/
 Source0:    http://rpm-software-management.fedorapeople.org/dnf-%{version}.tar.gz
+Patch0: dnf-1.1.1-1-to-dnf-1.1.1-2.patch
 BuildArch:  noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -119,6 +120,7 @@ Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
 %setup -q -n dnf-%{version}
+%patch0 -p1
 rm -rf py3
 mkdir ../py3
 cp -a . ../py3/
@@ -250,6 +252,10 @@ exit 0
 %systemd_postun_with_restart dnf-automatic.timer
 
 %changelog
+* Tue Sep 08 2015 Michal Luscon <mluscon@redhat.com> 1.1.1-2
+- fix access to demands (RhBug:1259194) (Jan Silhan)
+- make clean_requiremets_on_remove=True (RhBug:1260280) (Jan Silhan)
+
 * Mon Aug 31 2015 Michal Luscon <mluscon@redhat.com> 1.1.1-1
 - Fixed typo (RhBug:1249319) (Adam Salih)
 - fixed downgrade with wildcard (RhBug:1234763) (Adam Salih)

@@ -1,0 +1,139 @@
+From 4eb28cc1090567c72217105368767d2f7948f65d Mon Sep 17 00:00:00 2001
+From: Jan Silhan <jsilhan@redhat.com>
+Date: Mon, 7 Sep 2015 14:33:54 +0200
+Subject: [PATCH 1/4] make clean_requiremets_on_remove=True (RhBug:1260280)
+
+---
+ dnf/yum/config.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dnf/yum/config.py b/dnf/yum/config.py
+index 9c961e4..9ce446f 100644
+--- a/dnf/yum/config.py
++++ b/dnf/yum/config.py
+@@ -818,7 +818,7 @@ class YumConf(BaseConfig):
+
+     rpmverbosity = Option('info')
+     strict = BoolOption(True)  # :api
+-    clean_requirements_on_remove = BoolOption(False)
++    clean_requirements_on_remove = BoolOption(True)
+     history_list_view = SelectionOption('commands',
+                                         ('single-user-commands', 'users',
+                                          'commands'),
+--
+2.4.3
+
+From 5f8c0396b3bca9b741c7d655289535510d941541 Mon Sep 17 00:00:00 2001
+From: Jan Silhan <jsilhan@redhat.com>
+Date: Tue, 8 Sep 2015 13:31:48 +0200
+Subject: [PATCH 2/4] fix access to demands (RhBug:1259194)
+
+---
+ dnf/cli/main.py | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/dnf/cli/main.py b/dnf/cli/main.py
+index f2dd64d..9a8954c 100644
+--- a/dnf/cli/main.py
++++ b/dnf/cli/main.py
+@@ -90,11 +90,6 @@ def main(args):
+         logger.critical(e.value)
+         return 1
+     except dnf.exceptions.DepsolveError as e:
+-        ex_Error(e)
+-        demands = self.cli.demands
+-        if not demands.allow_erasing:
+-            logger.info(_("(try to add '--allowerasing' to command line to "
+-                          "replace conflicting packages)"))
+         return 1
+     except dnf.exceptions.Error as e:
+         return ex_Error(e)
+@@ -145,7 +140,15 @@ def _main(base, args):
+         return ex_IOError(e)
+
+     if cli.demands.resolving:
+-        ret = resolving(cli, base)
++        try:
++            ret = resolving(cli, base)
++        except dnf.exceptions.DepsolveError as e:
++            ex_Error(e)
++            if not cli.demands.allow_erasing:
++                logger.info(_("(try to add '%s' to command line to"
++                              " replace conflicting packages)"),
++                            "--allowerasing")
++            raise
+         if ret:
+             return ret
+
+--
+2.4.3
+
+From 14e9987fbb87283077a1714a3bead1386672233a Mon Sep 17 00:00:00 2001
+From: Jan Silhan <jsilhan@redhat.com>
+Date: Tue, 8 Sep 2015 13:34:22 +0200
+Subject: [PATCH 3/4] AUTHORS updated
+
+reverting patch -> erasing author
+---
+ AUTHORS | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/AUTHORS b/AUTHORS
+index 8423d9d..f4f14d5 100644
+--- a/AUTHORS
++++ b/AUTHORS
+@@ -57,7 +57,6 @@ DNF CONTRIBUTORS
+     Adam Salih <salih.max@gmail.com>
+     Albert Uchytil <auchytil@redhat.com>
+     Alberto Ruiz <aruiz@redhat.com>
+-    Christian Stadelmann <dev@genodeftest.de>
+     Christopher Meng <cickumqt@gmail.com>
+     Daniel Mach <dmach@redhat.com>
+     Frank Dana
+--
+2.4.3
+
+From 41bebbb40af5363dd4e77ee9b8821e92f1fae452 Mon Sep 17 00:00:00 2001
+From: Michal Luscon <mluscon@redhat.com>
+Date: Tue, 8 Sep 2015 13:58:30 +0200
+Subject: [PATCH 5/5] Automatic commit of package [dnf] minor release
+ [1.1.1-2].
+
+---
+ dnf.spec             | 6 +++++-
+ rel-eng/packages/dnf | 2 +-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/dnf.spec b/dnf.spec
+index 60a1a77..b4a8daf 100644
+--- a/dnf.spec
++++ b/dnf.spec
+@@ -11,7 +11,7 @@
+
+ Name:		dnf
+ Version:	1.1.1
+-Release:	1%{?snapshot}%{?dist}
++Release:	2%{?snapshot}%{?dist}
+ Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
+ # For a breakdown of the licensing, see PACKAGE-LICENSING
+ License:	GPLv2+ and GPLv2 and GPL
+@@ -250,6 +250,10 @@ exit 0
+ %systemd_postun_with_restart dnf-automatic.timer
+
+ %changelog
++* Tue Sep 08 2015 Michal Luscon <mluscon@redhat.com> 1.1.1-2
++- fix access to demands (RhBug:1259194) (Jan Silhan)
++- make clean_requiremets_on_remove=True (RhBug:1260280) (Jan Silhan)
++
+ * Mon Aug 31 2015 Michal Luscon <mluscon@redhat.com> 1.1.1-1
+ - Fixed typo (RhBug:1249319) (Adam Salih)
+ - fixed downgrade with wildcard (RhBug:1234763) (Adam Salih)
+diff --git a/rel-eng/packages/dnf b/rel-eng/packages/dnf
+index 2cd79c0..62324fc 100644
+--- a/rel-eng/packages/dnf
++++ b/rel-eng/packages/dnf
+@@ -1 +1 @@
+-1.1.1-1 ./
++1.1.1-2 ./
+--
+2.4.3
