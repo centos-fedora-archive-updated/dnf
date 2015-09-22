@@ -10,19 +10,14 @@
 %global py3pluginpath %{python3_sitelib}/dnf-plugins
 
 Name:		dnf
-Version:	1.1.1
-Release:	2%{?snapshot}%{?dist}
+Version:	1.1.2
+Release:	1%{?snapshot}%{?dist}
 Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:	GPLv2+ and GPLv2 and GPL
 URL:		https://github.com/rpm-software-management/dnf
-# The Source0 tarball can be generated using following commands:
-# git clone http://github.com/rpm-software-management/dnf.git
-# cd dnf/package
-# ./archive
-# tarball will be generated in $HOME/rpmbuild/sources/
-Source0:    http://rpm-software-management.fedorapeople.org/dnf-%{version}.tar.gz
-Patch0: dnf-1.1.1-1-to-dnf-1.1.1-2.patch
+# Into distgit it is always uploaded only -1 release of sources
+Source0:    https://github.com/rpm-software-management/dnf/archive/%{name}-%{version}-1.tar.gz
 BuildArch:  noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -32,11 +27,32 @@ BuildRequires:  systemd
 %if 0%{?fedora} >= 23
 Requires:   python3-dnf = %{version}-%{release}
 %else
-Requires:   python-dnf = %{version}-%{release}
+Requires:   python2-dnf = %{version}-%{release}
 %endif
 Requires(post):     systemd
 Requires(preun):    systemd
 Requires(postun):   systemd
+Provides:       dnf-command(autoremove)
+Provides:       dnf-command(check-update)
+Provides:       dnf-command(clean)
+Provides:       dnf-command(distro-sync)
+Provides:       dnf-command(downgrade)
+Provides:       dnf-command(group)
+Provides:       dnf-command(history)
+Provides:       dnf-command(info)
+Provides:       dnf-command(install)
+Provides:       dnf-command(list)
+Provides:       dnf-command(makecache)
+Provides:       dnf-command(mark)
+Provides:       dnf-command(provides)
+Provides:       dnf-command(reinstall)
+Provides:       dnf-command(remove)
+Provides:       dnf-command(repolist)
+Provides:       dnf-command(repository-packages)
+Provides:       dnf-command(search)
+Provides:       dnf-command(updateinfo)
+Provides:       dnf-command(upgrade)
+Provides:       dnf-command(upgrade-to)
 %description
 Package manager forked from Yum, using libsolv as a dependency resolver.
 
@@ -53,8 +69,9 @@ Summary:    As a Yum CLI compatibility layer, supplies /usr/bin/yum redirecting 
 %description -n dnf-yum
 As a Yum CLI compatibility layer, supplies /usr/bin/yum redirecting to DNF.
 
-%package -n python-dnf
+%package -n python2-dnf
 Summary:    Python 2 interface to DNF.
+%{?python_provide:%python_provide python2-dnf}
 BuildRequires:  pygpgme
 BuildRequires:  pyliblzma
 BuildRequires:  python2
@@ -78,11 +95,12 @@ Requires:   python-librepo >= %{librepo_version}
 Requires:   rpm-plugin-systemd-inhibit
 Requires:   rpm-python >= %{rpm_version}
 Obsoletes:  dnf <= 0.6.4
-%description -n python-dnf
+%description -n python2-dnf
 Python 2 interface to DNF.
 
 %package -n python3-dnf
 Summary:    Python 3 interface to DNF.
+%{?python_provide:%python_provide python3-dnf}
 BuildRequires:  python3
 BuildRequires:  python3-devel
 BuildRequires:  python3-hawkey >= %{hawkey_version}
@@ -120,7 +138,6 @@ Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
 %setup -q -n dnf-%{version}
-%patch0 -p1
 rm -rf py3
 mkdir ../py3
 cp -a . ../py3/
@@ -197,7 +214,7 @@ popd
 %{_bindir}/yum
 %{_mandir}/man8/yum.8.gz
 
-%files -n python-dnf
+%files -n python2-dnf
 %{_bindir}/dnf-2
 %doc AUTHORS README.rst COPYING PACKAGE-LICENSING
 %exclude %{python_sitelib}/dnf/automatic
@@ -252,6 +269,35 @@ exit 0
 %systemd_postun_with_restart dnf-automatic.timer
 
 %changelog
+* Tue Sep 22 2015 Michal Luscon <mluscon@redhat.com> 1.1.2-1
+- doc: release notes 1.1.2 (Michal Luscon)
+- sanitize non Unicode command attributes (RhBug:1262082) (Jan Silhan)
+- don't redirect confirmation to stderr RhBug(1258364) (Vladan Kudlac)
+- clean: add rpmdb to usage (Vladan Kudlac)
+- completion_helper: don't get IndexError (RhBug:1250038) (Vladan Kudlac)
+- add --downloadonly switch (RhBug:1048433) (Adam Salih)
+- Add globbing support to base.by_provides() (RhBug:11259650) (Valentina
+  Mukhamedzhanova)
+- spec: packaging python(3)-dnf according to new Fedora guidelines
+  (RhBug:1260198) (Jaroslav Mracek)
+- Bug in Source0: URL in dnf.spec fixed (RhBug:126255) (Jaroslav Mracek)
+- To dnf.spec added provides dnf-command(command name) for 21 dnf commands
+  (RhBug:1259657) (jmracek)
+- Expire repo cache on failed package download (Valentina Mukhamedzhanova)
+- cosmetic: ci: fix the Copr name in the README (Radek Holy)
+- Add the continuous integration script (Radek Holy)
+- Set proper charset on email in dnf-automatic (RhBug:1254982) (Valentina
+  Mukhamedzhanova)
+- doc: improve configuration description (RhBug:1261766) (Michal Luscon)
+- remove: show from which repo a package is (Vladan Kudlac)
+- list: show from which repo a package is (RhBug:1234491) (Vladan Kudlac)
+- Spelling/grammar fixes (Ville Skyttä)
+- install: fix crash when terminal window is small (RhBug:1256531) (Vladan
+  Kudlac)
+- install: mark unification of the progress bar (Vladan Kudlac)
+- fix translations in python3 (RhBug:1254687) (Michal Luscon)
+- group: CompsQuery now returns group ids (RhBug:1261656) (Michal Luscon)
+
 * Tue Sep 08 2015 Michal Luscon <mluscon@redhat.com> 1.1.1-2
 - fix access to demands (RhBug:1259194) (Jan Silhan)
 - make clean_requiremets_on_remove=True (RhBug:1260280) (Jan Silhan)
