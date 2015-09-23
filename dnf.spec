@@ -11,7 +11,7 @@
 
 Name:		dnf
 Version:	0.6.4
-Release:	6%{?snapshot}%{?dist}
+Release:	7%{?snapshot}%{?dist}
 Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:	GPLv2+ and GPLv2 and GPL
@@ -27,6 +27,7 @@ Patch1: dnf-0.6.4-2-to-dnf-0.6.4-3.patch
 Patch2: dnf-0.6.4-3-to-dnf-0.6.4-4.patch
 Patch3: dnf-0.6.4-4-to-dnf-0.6.4-5.patch
 Patch4: dnf-0.6.4-5-to-dnf-0.6.4-6.patch
+Patch5: dnf-0.6.4-6-to-dnf-0.6.4-7.patch
 BuildArch:	noarch
 BuildRequires:	cmake
 BuildRequires:	pygpgme
@@ -110,6 +111,7 @@ Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 rm -rf py3
 mkdir ../py3
 cp -a . ../py3/
@@ -215,6 +217,10 @@ exit 0
 %systemd_postun_with_restart dnf-automatic.timer
 
 %changelog
+* Wed Sep 23 2015 Michal Luscon <mluscon@redhat.com> 0.6.4-7
+- don't store empty attributes (RhBug:1246928)
+- conf: change minrate threshold to librepo default (RhBug:1212320)
+
 * Wed Aug 26 2015 Michal Luscon <mluscon@redhat.com> 0.6.4-6
 - cleanup old cache in posttrans (Michael Mraka)
 - include /var/cache/dnf into rpm (Michael Mraka)
