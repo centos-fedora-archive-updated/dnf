@@ -28,7 +28,7 @@ BuildRequires:  systemd
 %if 0%{?fedora} >= 23
 Requires:   python3-dnf = %{version}-%{release}
 %else
-Requires:   python2-dnf = %{version}-%{release}
+Requires:   python-dnf = %{version}-%{release}
 %endif
 Requires(post):     systemd
 Requires(preun):    systemd
@@ -70,9 +70,8 @@ Summary:    As a Yum CLI compatibility layer, supplies /usr/bin/yum redirecting 
 %description -n dnf-yum
 As a Yum CLI compatibility layer, supplies /usr/bin/yum redirecting to DNF.
 
-%package -n python2-dnf
+%package -n python-dnf
 Summary:    Python 2 interface to DNF.
-%{?python_provide:%python_provide python2-dnf}
 BuildRequires:  pygpgme
 BuildRequires:  pyliblzma
 BuildRequires:  python2
@@ -96,12 +95,11 @@ Requires:   python-librepo >= %{librepo_version}
 Requires:   rpm-plugin-systemd-inhibit
 Requires:   rpm-python >= %{rpm_version}
 Obsoletes:  dnf <= 0.6.4
-%description -n python2-dnf
+%description -n python-dnf
 Python 2 interface to DNF.
 
 %package -n python3-dnf
 Summary:    Python 3 interface to DNF.
-%{?python_provide:%python_provide python3-dnf}
 BuildRequires:  python3
 BuildRequires:  python3-devel
 BuildRequires:  python3-hawkey >= %{hawkey_version}
@@ -217,7 +215,7 @@ popd
 %{_bindir}/yum
 %{_mandir}/man8/yum.8.gz
 
-%files -n python2-dnf
+%files -n python-dnf
 %{_bindir}/dnf-2
 %doc AUTHORS README.rst COPYING PACKAGE-LICENSING
 %exclude %{python_sitelib}/dnf/automatic
@@ -274,6 +272,8 @@ exit 0
 %changelog
 * Tue Sep 22 2015 Michal Luscon <mluscon@redhat.com> 1.1.2-3
 - Revert "completion_helper: don't get IndexError (RhBug:1250038)"
+- Revert "spec: packaging python(3)-dnf according to new Fedora guidelines
+  (RhBug:1260198) (Jaroslav Mracek)"
 
 * Tue Sep 22 2015 Michal Luscon <mluscon@redhat.com> 1.1.2-2
 - add hawkey version requirement

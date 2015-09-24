@@ -1,13 +1,76 @@
-From ba21747031cac8abb690de907f226b78cc7a7cb0 Mon Sep 17 00:00:00 2001
-From: Michal Luscon <mluscon@redhat.com>
-Date: Thu, 24 Sep 2015 11:22:49 +0200
-Subject: [PATCH] Automatic commit of package [dnf] release [1.1.2-3].
-
-Revert "completion_helper: don't get IndexError (RhBug:1250038)"
 ---
+ dnf.spec       | 17 ++++++++++-------
  dnf/cli/cli.py | 12 +-----------
- 1 file changed, 1 insertion(+), 11 deletions(-)
+ 2 files changed, 11 insertions(+), 18 deletions(-)
 
+diff --git a/dnf.spec b/dnf.spec
+index ad516fa..0994bf9 100644
+--- a/dnf.spec
++++ b/dnf.spec
+@@ -11,7 +11,7 @@
+ 
+ Name:		dnf
+ Version:	1.1.2
+-Release:	2%{?snapshot}%{?dist}
++Release:	3%{?snapshot}%{?dist}
+ Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
+ # For a breakdown of the licensing, see PACKAGE-LICENSING
+ License:	GPLv2+ and GPLv2 and GPL
+@@ -26,7 +26,7 @@ BuildRequires:  systemd
+ %if 0%{?fedora} >= 23
+ Requires:   python3-dnf = %{version}-%{release}
+ %else
+-Requires:   python2-dnf = %{version}-%{release}
++Requires:   python-dnf = %{version}-%{release}
+ %endif
+ Requires(post):     systemd
+ Requires(preun):    systemd
+@@ -68,9 +68,8 @@ Summary:    As a Yum CLI compatibility layer, supplies /usr/bin/yum redirecting
+ %description -n dnf-yum
+ As a Yum CLI compatibility layer, supplies /usr/bin/yum redirecting to DNF.
+ 
+-%package -n python2-dnf
++%package -n python-dnf
+ Summary:    Python 2 interface to DNF.
+-%{?python_provide:%python_provide python2-dnf}
+ BuildRequires:  pygpgme
+ BuildRequires:  pyliblzma
+ BuildRequires:  python2
+@@ -94,12 +93,11 @@ Requires:   python-librepo >= %{librepo_version}
+ Requires:   rpm-plugin-systemd-inhibit
+ Requires:   rpm-python >= %{rpm_version}
+ Obsoletes:  dnf <= 0.6.4
+-%description -n python2-dnf
++%description -n python-dnf
+ Python 2 interface to DNF.
+ 
+ %package -n python3-dnf
+ Summary:    Python 3 interface to DNF.
+-%{?python_provide:%python_provide python3-dnf}
+ BuildRequires:  python3
+ BuildRequires:  python3-devel
+ BuildRequires:  python3-hawkey >= %{hawkey_version}
+@@ -213,7 +211,7 @@ popd
+ %{_bindir}/yum
+ %{_mandir}/man8/yum.8.gz
+ 
+-%files -n python2-dnf
++%files -n python-dnf
+ %{_bindir}/dnf-2
+ %doc AUTHORS README.rst COPYING PACKAGE-LICENSING
+ %exclude %{python_sitelib}/dnf/automatic
+@@ -268,6 +266,11 @@ exit 0
+ %systemd_postun_with_restart dnf-automatic.timer
+ 
+ %changelog
++* Tue Sep 22 2015 Michal Luscon <mluscon@redhat.com> 1.1.2-3
++- Revert "completion_helper: don't get IndexError (RhBug:1250038)"
++- Revert "spec: packaging python(3)-dnf according to new Fedora guidelines
++  (RhBug:1260198) (Jaroslav Mracek)"
++
+ * Tue Sep 22 2015 Michal Luscon <mluscon@redhat.com> 1.1.2-2
+ - add hawkey version requirement
+ - revert commit #70956
 diff --git a/dnf/cli/cli.py b/dnf/cli/cli.py
 index 034c28a..277176e 100644
 --- a/dnf/cli/cli.py
@@ -33,4 +96,3 @@ index 034c28a..277176e 100644
          return self.optparser.print_usage()
 -- 
 2.4.3
-
