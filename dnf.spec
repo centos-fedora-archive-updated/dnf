@@ -11,13 +11,14 @@
 
 Name:		dnf
 Version:	1.1.2
-Release:	2%{?snapshot}%{?dist}
+Release:	3%{?snapshot}%{?dist}
 Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:	GPLv2+ and GPLv2 and GPL
 URL:		https://github.com/rpm-software-management/dnf
 Source0:    https://github.com/rpm-software-management/dnf/archive/%{name}-%{version}.tar.gz
 Patch0:    dnf-1.1.2-1-to-dnf-1.1.2-2.patch
+Patch1:    dnf-1.1.2-2-to-dnf-1.1.2-3.patch
 BuildArch:  noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -139,6 +140,7 @@ Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 %prep
 %setup -q -n dnf-%{version}
 %patch0 -p1
+%patch1 -p1
 rm -rf py3
 mkdir ../py3
 cp -a . ../py3/
@@ -270,6 +272,9 @@ exit 0
 %systemd_postun_with_restart dnf-automatic.timer
 
 %changelog
+* Tue Sep 22 2015 Michal Luscon <mluscon@redhat.com> 1.1.2-3
+- Revert "completion_helper: don't get IndexError (RhBug:1250038)"
+
 * Tue Sep 22 2015 Michal Luscon <mluscon@redhat.com> 1.1.2-2
 - add hawkey version requirement
 - revert commit #70956
