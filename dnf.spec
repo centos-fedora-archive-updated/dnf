@@ -11,12 +11,13 @@
 
 Name:		dnf
 Version:	1.1.4
-Release:	1%{?snapshot}%{?dist}
+Release:	2%{?snapshot}%{?dist}
 Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:	GPLv2+ and GPLv2 and GPL
 URL:		https://github.com/rpm-software-management/dnf
 Source0:    https://github.com/rpm-software-management/dnf/archive/%{name}-%{version}.tar.gz
+Patch0:     stdin-fix.patch
 BuildArch:  noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -135,6 +136,7 @@ Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
 %setup -q -n dnf-%{version}
+%patch0 -p1
 rm -rf py3
 mkdir ../py3
 cp -a . ../py3/
@@ -266,6 +268,9 @@ exit 0
 %systemd_postun_with_restart dnf-automatic.timer
 
 %changelog
+* Fri Nov 27 2015 Michal Luscon <mluscon@redhat.com> 1.1.4-2
+- cli: don't crash if y/n and sys.stdin is None (RhBug:1278382) (Adam Williamson)
+
 * Mon Nov 16 2015 Michal Luscon <mluscon@redhat.com> 1.1.4-1
 - AUTHORS: updated (Jan Silhan)
 - query: add compatibility methods (Michal Luscon)
