@@ -10,14 +10,13 @@
 %global py3pluginpath %{python3_sitelib}/dnf-plugins
 
 Name:		dnf
-Version:	1.1.4
-Release:	2%{?snapshot}%{?dist}
+Version:	1.1.5
+Release:	1%{?snapshot}%{?dist}
 Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:	GPLv2+ and GPLv2 and GPL
 URL:		https://github.com/rpm-software-management/dnf
 Source0:    https://github.com/rpm-software-management/dnf/archive/%{name}-%{version}.tar.gz
-Patch0:     stdin-fix.patch
 BuildArch:  noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -136,7 +135,6 @@ Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
 %setup -q -n dnf-%{version}
-%patch0 -p1
 rm -rf py3
 mkdir ../py3
 cp -a . ../py3/
@@ -181,7 +179,9 @@ make ARGS="-V" test
 popd
 
 %files -f %{name}.lang
-%doc AUTHORS README.rst COPYING PACKAGE-LICENSING
+%{!?_licensedir:%global license %doc}
+%license COPYING PACKAGE-LICENSING
+%doc AUTHORS README.rst
 %{_bindir}/dnf
 %{_mandir}/man8/dnf.8.gz
 %{_mandir}/man8/yum2dnf.8.gz
@@ -190,7 +190,8 @@ popd
 %{_var}/cache/dnf
 
 %files conf
-%doc AUTHORS README.rst COPYING PACKAGE-LICENSING
+%license COPYING PACKAGE-LICENSING
+%doc AUTHORS README.rst
 %dir %{confdir}
 %dir %{pluginconfpath}
 %dir %{confdir}/protected.d
@@ -209,19 +210,22 @@ popd
 %{_sysconfdir}/libreport/events.d/collect_dnf.conf
 
 %files -n dnf-yum
-%doc AUTHORS README.rst COPYING PACKAGE-LICENSING
+%license COPYING PACKAGE-LICENSING
+%doc AUTHORS README.rst
 %{_bindir}/yum
 %{_mandir}/man8/yum.8.gz
 
 %files -n python-dnf
+%license COPYING PACKAGE-LICENSING
+%doc AUTHORS README.rst
 %{_bindir}/dnf-2
-%doc AUTHORS README.rst COPYING PACKAGE-LICENSING
 %exclude %{python_sitelib}/dnf/automatic
 %{python_sitelib}/dnf/
 %dir %{py2pluginpath}
 
 %files -n python3-dnf
-%doc AUTHORS README.rst COPYING PACKAGE-LICENSING
+%license COPYING PACKAGE-LICENSING
+%doc AUTHORS README.rst
 %{_bindir}/dnf-3
 %exclude %{python3_sitelib}/dnf/automatic
 %{python3_sitelib}/dnf/
@@ -229,7 +233,8 @@ popd
 %dir %{py3pluginpath}/__pycache__
 
 %files automatic
-%doc AUTHORS COPYING PACKAGE-LICENSING
+%license COPYING PACKAGE-LICENSING
+%doc AUTHORS
 %{_bindir}/dnf-automatic
 %config(noreplace) %{confdir}/automatic.conf
 %{_mandir}/man8/dnf.automatic.8.gz
@@ -268,8 +273,30 @@ exit 0
 %systemd_postun_with_restart dnf-automatic.timer
 
 %changelog
-* Fri Nov 27 2015 Michal Luscon <mluscon@redhat.com> 1.1.4-2
-- cli: don't crash if y/n and sys.stdin is None (RhBug:1278382) (Adam Williamson)
+* Thu Dec 17 2015 Michal Luscon <mluscon@redhat.com> 1.1.5-1
+- base: save group persistor only after successful transaction (RhBug:1229046)
+  (Michal Luscon)
+- base: do not clean tempfiles after remove transaction (RhBug:1282250) (Michal
+  Luscon)
+- base: clean packages that do not belong to any trans (Michal Luscon)
+- upgrade: allow group upgrade via @ syntax (RhBug:1265391) (Michal Luscon)
+- spec: Mark license files as %%license where available (Ville Skyttä)
+- Remove unused imports (Ville Skyttä)
+- Spelling fixes (Ville Skyttä)
+- Fix typos in documentation (Rob Cutmore)
+- parser: add support for braces in substitution (RhBug:1283017) (Dave
+  Johansen)
+- completion_helper: Don't omit "packages" from clean completions (Ville
+  Skyttä)
+- bash-completion: Avoid unnecessary python invocation per _dnf_helper (Ville
+  Skyttä)
+- repo: Download drpms early (RhBug:1260421) (Ville Skyttä)
+- clean: Don't hardcode list of args in two places (Ville Skyttä)
+- cli: don't crash if y/n and sys.stdin is None (RhBug:1278382) (Adam
+  Williamson)
+- sp err "environement" -> "environment" (Michael Goodwin)
+- Remove -OO from #!/usr/bin/python (RhBug:1230820) (Jaroslav Mracek)
+- cli: warn if plugins are disabled (RhBug:1280240) (Michal Luscon)
 
 * Mon Nov 16 2015 Michal Luscon <mluscon@redhat.com> 1.1.4-1
 - AUTHORS: updated (Jan Silhan)
@@ -352,7 +379,7 @@ exit 0
 - fixed downgrade with wildcard (RhBug:1234763) (Adam Salih)
 - reorganize logic of get_best_selector(s) and query (RhBug:1242946) (Adam
   Salih)
-- completion_helper: don't crash if exception was occured (RhBug:1225225) (Igor
+- completion_helper: don't crash if exception occurred (RhBug:1225225) (Igor
   Gnatenko)
 - base: expire cache if repo is not available (Michal Luscon)
 - Don't suggest --allowerasing if it is enabled (Christian Stadelmann)
@@ -432,7 +459,7 @@ exit 0
 * Fri Jul 17 2015 Michal Luscon <mluscon@redhat.com> 1.0.2-1
 - give --allowerasing hint when error occurs during resolution (RhBug:1148630)
   (Jan Silhan)
-- show --best hint with skipped packages everytime (RhBug:1176351) (Jan Silhan)
+- show --best hint with skipped packages every time (RhBug:1176351) (Jan Silhan)
 - notify about skipped packages when upgrade (RhBug:1210445) (Jan Silhan)
 - dnf-automatic: Document apply_updates=no behavior wrt keepcache (Ville
   Skyttä)
@@ -894,7 +921,7 @@ exit 0
 - cli: sort packages in the transaction summary. (Ales Kozumplik)
 - refactor: cli: massively simplify how errors are propagated from do_transaction(). (Ales Kozumplik)
 - groups: rearrange things in CLI so user has to confirm the group changes. (Ales Kozumplik)
-- groups: commiting the persistor data should only happen at one place. (Ales Kozumplik)
+- groups: committing the persistor data should only happen at one place. (Ales Kozumplik)
 - groups: visualizing the groups transactions. (Ales Kozumplik)
 - Add dnf.util.get_in() to navigate nested dicts with sequences of keys. (Ales Kozumplik)
 - group persistor: generate diffs between old and new DBs. (Ales Kozumplik)
