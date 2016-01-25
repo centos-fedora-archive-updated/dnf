@@ -10,7 +10,7 @@
 %global py3pluginpath %{python3_sitelib}/dnf-plugins
 
 Name:		dnf
-Version:	1.1.5
+Version:	1.1.6
 Release:	1%{?snapshot}%{?dist}
 Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
@@ -23,6 +23,7 @@ BuildRequires:  gettext
 BuildRequires:  python-bugzilla
 BuildRequires:  python-sphinx
 BuildRequires:  systemd
+BuildRequires:  pkgconfig(bash-completion)
 %if 0%{?fedora} >= 23
 Requires:   python3-dnf = %{version}-%{release}
 %else
@@ -183,6 +184,9 @@ popd
 %license COPYING PACKAGE-LICENSING
 %doc AUTHORS README.rst
 %{_bindir}/dnf
+%dir %{_datadir}/bash-completion
+%dir %{_datadir}/bash-completion/completions
+%{_datadir}/bash-completion/completions/dnf
 %{_mandir}/man8/dnf.8.gz
 %{_mandir}/man8/yum2dnf.8.gz
 %{_unitdir}/dnf-makecache.service
@@ -198,13 +202,15 @@ popd
 %config(noreplace) %{confdir}/dnf.conf
 %config(noreplace) %{confdir}/protected.d/dnf.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
-%ghost %{_localstatedir}/%{_lib}/dnf
 %ghost %{_localstatedir}/log/hawkey.log
 %ghost %{_localstatedir}/log/%{name}.log
 %ghost %{_localstatedir}/log/%{name}.librepo.log
 %ghost %{_localstatedir}/log/%{name}.rpm.log
 %ghost %{_localstatedir}/log/%{name}.plugin.log
-%config %{_sysconfdir}/bash_completion.d/dnf-completion.bash
+%ghost %{_sharedstatedir}/dnf
+%ghost %{_sharedstatedir}/dnf/groups.json
+%ghost %{_sharedstatedir}/dnf/yumdb
+%ghost %{_sharedstatedir}/dnf/history
 %{_mandir}/man5/dnf.conf.5.gz
 %{_tmpfilesdir}/dnf.conf
 %{_sysconfdir}/libreport/events.d/collect_dnf.conf
@@ -273,6 +279,22 @@ exit 0
 %systemd_postun_with_restart dnf-automatic.timer
 
 %changelog
+* Mon Jan 25 2016 Michal Luscon <mluscon@redhat.com> 1.1.6-1
+- history: don't fail if there is no history (RhBug:1291895) (Michal Luscon)
+- Allow dnf to use a socks5 proxy, since curl support it (RhBug:1256587)
+  (Michael Scherer)
+- output: do not log rpm info twice (RhBug:1287221) (Michal Luscon)
+- dnf owns /var/lib/dnf dir (RhBug:1294241) (Jan Silhan)
+- Fix handling of repo that never expire (RhBug:1289166) (Jaroslav Mracek)
+- Filter out .src packages when multilib_proto=all (Jeff Smith)
+- Enable string for translation (RhBug:1294355) (Parag Nemade)
+- Let logging format messages on demand (Ville Skyttä)
+- clean: include metadata of local repos (RhBug:1226322) (Michal Domonkos)
+- completion: Install to where bash-completion.pc says (Ville Skyttä)
+- spec: bash completion is not a %%config file (Ville Skyttä)
+- Change assertion handling for rpmsack.py (RhBug:1275878) (Jaroslav Mracek)
+- cli: fix storing arguments in history (RhBug:1239274) (Ting-Wei Lan)
+
 * Thu Dec 17 2015 Michal Luscon <mluscon@redhat.com> 1.1.5-1
 - base: save group persistor only after successful transaction (RhBug:1229046)
   (Michal Luscon)
