@@ -11,12 +11,14 @@
 
 Name:		dnf
 Version:	1.1.6
-Release:	1%{?snapshot}%{?dist}
+Release:	2%{?snapshot}%{?dist}
 Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:	GPLv2+ and GPLv2 and GPL
 URL:		https://github.com/rpm-software-management/dnf
 Source0:    https://github.com/rpm-software-management/dnf/archive/%{name}-%{version}.tar.gz
+Patch0:     fix-dnf-history-traceback.patch
+Patch1:     zanata-update.patch
 BuildArch:  noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -136,6 +138,8 @@ Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
 %setup -q -n dnf-%{version}
+%patch0 -p1
+%patch1 -p1
 rm -rf py3
 mkdir ../py3
 cp -a . ../py3/
@@ -279,6 +283,10 @@ exit 0
 %systemd_postun_with_restart dnf-automatic.timer
 
 %changelog
+* Wed Feb 03 2016 Michal Luscon <mluscon@redhat.com> 1.1.6-2
+- fix dnf history traceback (RhBug:1303149)
+- zanata update (RhBug:1302934)
+
 * Mon Jan 25 2016 Michal Luscon <mluscon@redhat.com> 1.1.6-1
 - history: don't fail if there is no history (RhBug:1291895) (Michal Luscon)
 - Allow dnf to use a socks5 proxy, since curl support it (RhBug:1256587)

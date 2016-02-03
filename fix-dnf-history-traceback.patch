@@ -1,0 +1,27 @@
+From c9217ab14cc5bee85d5a93d8a8b740651cc99aee Mon Sep 17 00:00:00 2001
+From: Jan Silhan <jsilhan@redhat.com>
+Date: Tue, 2 Feb 2016 18:18:34 +0100
+Subject: [PATCH 1/3] fix dnf history traceback (RhBug:1303149)
+
+fixed regression introduced in 2731b00
+---
+ dnf/yum/history.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/dnf/yum/history.py b/dnf/yum/history.py
+index 3eb1246..c0bc5f4 100644
+--- a/dnf/yum/history.py
++++ b/dnf/yum/history.py
+@@ -163,7 +163,8 @@ class YumHistoryPackage(object):
+     def __le__(self, other):
+         """Test whether the *self* is less than or equal to the *other*."""
+         s = self.to_nevra()
+-        o = other.to_nevra()
++        o = hawkey.NEVRA(other.name, int(other.epoch), other.version,
++                         other.release, other.arch)
+         if s != o:
+             return s < o
+ 
+-- 
+2.7.0
+

@@ -1,0 +1,1831 @@
+From e8e77a945bea52a25218769873be9adb827f6c91 Mon Sep 17 00:00:00 2001
+From: Jan Silhan <jsilhan@redhat.com>
+Date: Tue, 2 Feb 2016 19:08:15 +0100
+Subject: [PATCH 3/3] zanata update (RhBug:1302934)
+
+---
+ po/bg.po    |  8 ++++----
+ po/bn_IN.po |  8 ++++----
+ po/ca.po    | 12 ++++++------
+ po/cs.po    | 14 +++++++-------
+ po/da.po    | 12 ++++++------
+ po/de.po    | 10 +++++-----
+ po/dnf.pot  |  6 +++---
+ po/el.po    |  8 ++++----
+ po/en_GB.po |  8 ++++----
+ po/es.po    |  8 ++++----
+ po/eu.po    | 12 ++++++------
+ po/fi.po    |  8 ++++----
+ po/fr.po    | 20 ++++++++++----------
+ po/gu.po    |  8 ++++----
+ po/he.po    |  8 ++++----
+ po/hu.po    | 10 +++++-----
+ po/id.po    |  8 ++++----
+ po/it.po    | 12 ++++++------
+ po/ja.po    | 14 +++++++-------
+ po/ka.po    |  8 ++++----
+ po/kk.po    |  8 ++++----
+ po/ko.po    |  8 ++++----
+ po/lt.po    | 10 +++++-----
+ po/mr.po    |  8 ++++----
+ po/ms.po    |  8 ++++----
+ po/nb.po    | 10 +++++-----
+ po/pa.po    |  8 ++++----
+ po/pl.po    | 35 ++++++++++++++++++-----------------
+ po/pt.po    |  8 ++++----
+ po/pt_BR.po |  8 ++++----
+ po/ru.po    |  8 ++++----
+ po/sk.po    | 12 ++++++------
+ po/sr.po    |  8 ++++----
+ po/sv.po    | 14 +++++++-------
+ po/th.po    |  8 ++++----
+ po/tr.po    |  8 ++++----
+ po/uk.po    | 13 +++++++------
+ po/zh_CN.po |  8 ++++----
+ po/zh_TW.po |  8 ++++----
+ 39 files changed, 201 insertions(+), 199 deletions(-)
+
+diff --git a/po/bg.po b/po/bg.po
+index e9a5700..2631fff 100644
+--- a/po/bg.po
++++ b/po/bg.po
+@@ -3,7 +3,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-06-28 01:56-0400\n"
+ "Last-Translator: Valentin Laskov <laskov@festa.bg>\n"
+ "Language-Team: Bulgarian\n"
+@@ -12,7 +12,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: bg\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1)\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -151,12 +151,12 @@ msgstr ""
+ msgid "Verifying"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr ""
+diff --git a/po/bn_IN.po b/po/bn_IN.po
+index a039a04..0c0f69c 100644
+--- a/po/bn_IN.po
++++ b/po/bn_IN.po
+@@ -8,7 +8,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-03-16 12:46-0400\n"
+ "Last-Translator: Jan silhan <jsilhan@redhat.com>\n"
+ "Language-Team: Bengali (India) (http://www.transifex.com/projects/p/dnf/language/bn_IN/)\n"
+@@ -17,7 +17,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: bn-IN\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -156,12 +156,12 @@ msgstr ""
+ msgid "Verifying"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr ""
+diff --git a/po/ca.po b/po/ca.po
+index 8b5c9a6..62badd2 100644
+--- a/po/ca.po
++++ b/po/ca.po
+@@ -11,8 +11,8 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
+-"PO-Revision-Date: 2016-01-24 02:51-0500\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
++"PO-Revision-Date: 2016-01-26 07:39-0500\n"
+ "Last-Translator: Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>\n"
+ "Language-Team: Catalan (https://fedora.zanata.org/language/view/ca) <fedora@llistes.softcatala.org>\n"
+ "MIME-Version: 1.0\n"
+@@ -20,7 +20,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: ca\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -52,7 +52,7 @@ msgstr "Ha fallat la suma de verificació de la reconstrucció delta RPM"
+ 
+ #: ../dnf/drpm.py:140
+ msgid "done"
+-msgstr ""
++msgstr "fet"
+ 
+ #: ../dnf/comps.py:92
+ msgid "skipping."
+@@ -167,12 +167,12 @@ msgstr "Actualitzar"
+ msgid "Verifying"
+ msgstr "Verificar"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "No s'ha pogut inicialitzar l'històric de la base de dades de DNF: %s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "No s'ha pogut crear la base de dades de l'històric a «%s»."
+diff --git a/po/cs.po b/po/cs.po
+index 460f757..0f6173b 100644
+--- a/po/cs.po
++++ b/po/cs.po
+@@ -18,7 +18,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-11-11 05:18-0500\n"
+ "Last-Translator: Michal Pohorely <michal@pohorely.cz>\n"
+ "Language-Team: Czech (http://www.transifex.com/projects/p/dnf/language/cs/)\n"
+@@ -27,7 +27,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: cs\n"
+ "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -169,12 +169,12 @@ msgstr "Aktualizace"
+ msgid "Verifying"
+ msgstr "Ověřuji"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "Není možné inicializovat historii DB DNF: %s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "Nelze vytvořit databázi historie v '%s'."
+@@ -612,7 +612,7 @@ msgstr "Vel."
+ 
+ #: ../dnf/cli/output.py:473
+ msgid "Repo"
+-msgstr "Repozitářzitářzitářzitář"
++msgstr "Repozitář"
+ 
+ #: ../dnf/cli/output.py:475
+ msgid "From repo"
+@@ -1759,11 +1759,11 @@ msgstr "Spustit příkazy pro všechny balíčky v daném repositáři"
+ 
+ #: ../dnf/cli/commands/__init__.py:919
+ msgid "REPO"
+-msgstr "REPOZITÁŘZITÁŘZITÁŘZITÁŘ"
++msgstr "REPOZITÁŘ"
+ 
+ #: ../dnf/cli/commands/__init__.py:919
+ msgid "ARG"
+-msgstr "ARGUMENTUMENTUMENTUMENT"
++msgstr "ARGUMENT"
+ 
+ #: ../dnf/cli/commands/__init__.py:964
+ msgid "Error: Requires a repo ID and a valid sub-command"
+diff --git a/po/da.po b/po/da.po
+index 7a360b7..ec1982e 100644
+--- a/po/da.po
++++ b/po/da.po
+@@ -10,7 +10,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-03-16 12:46-0400\n"
+ "Last-Translator: Jan silhan <jsilhan@redhat.com>\n"
+ "Language-Team: Danish (http://www.transifex.com/projects/p/dnf/language/da/)\n"
+@@ -19,7 +19,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: da\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -158,12 +158,12 @@ msgstr "Opgrader"
+ msgid "Verifying"
+ msgstr "Bekræfter"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr ""
+@@ -836,7 +836,7 @@ msgstr ""
+ #: ../dnf/cli/output.py:1077 ../dnf/cli/output.py:1708
+ #: ../dnf/cli/output.py:1709
+ msgid "Install"
+-msgstr "Installérérérér"
++msgstr "Installér"
+ 
+ #: ../dnf/cli/output.py:1078 ../dnf/cli/output.py:1717
+ msgid "Upgrade"
+@@ -1917,7 +1917,7 @@ msgstr "opdateringer"
+ 
+ #: ../dnf/cli/commands/updateinfo.py:334
+ msgid "all"
+-msgstr "alleeee"
++msgstr "alle"
+ 
+ #: ../dnf/cli/commands/updateinfo.py:339
+ msgid "available"
+diff --git a/po/de.po b/po/de.po
+index 937598d..2ea6479 100644
+--- a/po/de.po
++++ b/po/de.po
+@@ -20,7 +20,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2016-01-17 03:27-0500\n"
+ "Last-Translator: Mario Blättermann <mario.blaettermann@gmail.com>\n"
+ "Language-Team: German (http://www.transifex.com/projects/p/dnf/language/de/)\n"
+@@ -29,7 +29,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: de\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -175,12 +175,12 @@ msgstr "Aktualisieren"
+ msgid "Verifying"
+ msgstr "Überprüfung läuft"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "DNF-Datenbankchronik konnte nicht initialisiert werden: %s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "Chronik-Datenbank kann nicht in »%s« erstellt werden."
+@@ -874,7 +874,7 @@ msgstr ""
+ #: ../dnf/cli/output.py:1077 ../dnf/cli/output.py:1708
+ #: ../dnf/cli/output.py:1709
+ msgid "Install"
+-msgstr "Installierenierenierenieren"
++msgstr "Installieren"
+ 
+ #: ../dnf/cli/output.py:1078 ../dnf/cli/output.py:1717
+ msgid "Upgrade"
+diff --git a/po/dnf.pot b/po/dnf.pot
+index 963b0a7..3c10c92 100644
+--- a/po/dnf.pot
++++ b/po/dnf.pot
+@@ -8,7 +8,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+ "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+ "Language-Team: LANGUAGE <LL@li.org>\n"
+@@ -156,12 +156,12 @@ msgstr ""
+ msgid "Verifying"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr ""
+diff --git a/po/el.po b/po/el.po
+index f2e8dda..715ab8a 100644
+--- a/po/el.po
++++ b/po/el.po
+@@ -9,7 +9,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-03-16 12:46-0400\n"
+ "Last-Translator: Jan silhan <jsilhan@redhat.com>\n"
+ "Language-Team: Greek (http://www.transifex.com/projects/p/dnf/language/el/)\n"
+@@ -18,7 +18,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: el\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -157,12 +157,12 @@ msgstr ""
+ msgid "Verifying"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr ""
+diff --git a/po/en_GB.po b/po/en_GB.po
+index 0fec211..8819b85 100644
+--- a/po/en_GB.po
++++ b/po/en_GB.po
+@@ -9,7 +9,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-03-16 12:46-0400\n"
+ "Last-Translator: Jan silhan <jsilhan@redhat.com>\n"
+ "Language-Team: English (United Kingdom) (http://www.transifex.com/projects/p/dnf/language/en_GB/)\n"
+@@ -18,7 +18,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: en-GB\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -157,12 +157,12 @@ msgstr ""
+ msgid "Verifying"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr ""
+diff --git a/po/es.po b/po/es.po
+index c5dc5f2..ca65df8 100644
+--- a/po/es.po
++++ b/po/es.po
+@@ -19,7 +19,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-11-10 12:09-0500\n"
+ "Last-Translator: Gerardo Rosales <grosale86@gmail.com>\n"
+ "Language-Team: Spanish (http://www.transifex.com/projects/p/dnf/language/es/)\n"
+@@ -28,7 +28,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: es\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -171,12 +171,12 @@ msgstr "Actualizando"
+ msgid "Verifying"
+ msgstr "Verificando"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "Incapaz de inicializar base de datos histórica de DNF: %s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "No se puede crear la base de datos del historial en: %s"
+diff --git a/po/eu.po b/po/eu.po
+index 2a40b13..b8e4d80 100644
+--- a/po/eu.po
++++ b/po/eu.po
+@@ -11,7 +11,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-10-23 01:20-0400\n"
+ "Last-Translator: Asier Sarasua Garmendia <asier.sarasua@gmail.com>\n"
+ "Language-Team: Basque (http://www.transifex.com/projects/p/dnf/language/eu/)\n"
+@@ -20,7 +20,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: eu\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -161,12 +161,12 @@ msgstr "Eguneratzen"
+ msgid "Verifying"
+ msgstr "Egiaztatzen"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "Ezin da DNF DB historia hasieratu: %s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "Ezin izan da historiaren datu-basea sortu '%s'(e)n."
+@@ -635,7 +635,7 @@ msgstr "Laburpena"
+ 
+ #: ../dnf/cli/output.py:500
+ msgid "URL"
+-msgstr "URLaaaa"
++msgstr "URLa"
+ 
+ #: ../dnf/cli/output.py:501
+ msgid "License"
+@@ -952,7 +952,7 @@ msgstr "Saioa hasteko erabiltzailea"
+ 
+ #: ../dnf/cli/output.py:1407 ../dnf/cli/output.py:1911
+ msgid "ID"
+-msgstr "IDaaaa"
++msgstr "IDa"
+ 
+ #: ../dnf/cli/output.py:1409
+ msgid "Date and time"
+diff --git a/po/fi.po b/po/fi.po
+index ce6c2f7..025b057 100644
+--- a/po/fi.po
++++ b/po/fi.po
+@@ -10,7 +10,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-10-24 08:09-0400\n"
+ "Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>\n"
+ "Language-Team: Finnish (http://www.transifex.com/projects/p/dnf/language/fi/)\n"
+@@ -19,7 +19,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: fi\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -158,12 +158,12 @@ msgstr ""
+ msgid "Verifying"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr ""
+diff --git a/po/fr.po b/po/fr.po
+index 2bba391..d5e0d03 100644
+--- a/po/fr.po
++++ b/po/fr.po
+@@ -18,7 +18,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-12-02 05:15-0500\n"
+ "Last-Translator: Jérôme Fenal <jfenal@gmail.com>\n"
+ "Language-Team: French (http://www.transifex.com/projects/p/dnf/language/fr/)\n"
+@@ -27,7 +27,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: fr\n"
+ "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -171,12 +171,12 @@ msgstr "Mise à jour"
+ msgid "Verifying"
+ msgstr "Vérifie"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "Impossible d'initialiser l'historique DNF DB : %s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "Impossible de créer la base de donnée d'historiques '%s'"
+@@ -611,7 +611,7 @@ msgstr "Nom"
+ 
+ #: ../dnf/cli/output.py:467 ../dnf/cli/output.py:1050
+ msgid "Arch"
+-msgstr "Architectureitectureitectureitecture"
++msgstr "Architecture"
+ 
+ #: ../dnf/cli/output.py:469
+ msgid "Epoch"
+@@ -683,7 +683,7 @@ msgstr "n"
+ 
+ #: ../dnf/cli/output.py:623
+ msgid "no"
+-msgstr "nonnnn"
++msgstr "non"
+ 
+ #: ../dnf/cli/output.py:626
+ msgid "Is this ok [y/N]: "
+@@ -820,7 +820,7 @@ msgstr "Marqué pour être supprimé :"
+ 
+ #: ../dnf/cli/output.py:931
+ msgid "Group"
+-msgstr "Groupeeee"
++msgstr "Groupe"
+ 
+ #: ../dnf/cli/output.py:931
+ msgid "Packages"
+@@ -874,7 +874,7 @@ msgstr ""
+ #: ../dnf/cli/output.py:1077 ../dnf/cli/output.py:1708
+ #: ../dnf/cli/output.py:1709
+ msgid "Install"
+-msgstr "Installationationationation"
++msgstr "Installation"
+ 
+ #: ../dnf/cli/output.py:1078 ../dnf/cli/output.py:1717
+ msgid "Upgrade"
+@@ -1382,7 +1382,7 @@ msgstr "Affiche ou utilise les informations des groupes"
+ 
+ #: ../dnf/cli/commands/group.py:61
+ msgid "GROUP"
+-msgstr "GROUPEEEE"
++msgstr "GROUPE"
+ 
+ #: ../dnf/cli/commands/group.py:99
+ msgid "No group data available for configured repositories."
+@@ -1800,7 +1800,7 @@ msgstr "Affiche un message d'aide à l'utilisation"
+ 
+ #: ../dnf/cli/commands/__init__.py:992
+ msgid "COMMAND"
+-msgstr "COMMANDEEEE"
++msgstr "COMMANDE"
+ 
+ #: ../dnf/cli/commands/__init__.py:1024
+ #, python-format
+diff --git a/po/gu.po b/po/gu.po
+index 3d0af0a..4b10e25 100644
+--- a/po/gu.po
++++ b/po/gu.po
+@@ -9,7 +9,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-03-16 12:46-0400\n"
+ "Last-Translator: Jan silhan <jsilhan@redhat.com>\n"
+ "Language-Team: Gujarati (http://www.transifex.com/projects/p/dnf/language/gu/)\n"
+@@ -18,7 +18,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: gu\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -157,12 +157,12 @@ msgstr ""
+ msgid "Verifying"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr ""
+diff --git a/po/he.po b/po/he.po
+index d821506..a26a003 100644
+--- a/po/he.po
++++ b/po/he.po
+@@ -9,7 +9,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-03-16 12:46-0400\n"
+ "Last-Translator: Jan silhan <jsilhan@redhat.com>\n"
+ "Language-Team: Hebrew (http://www.transifex.com/projects/p/dnf/language/he/)\n"
+@@ -18,7 +18,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: he\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -157,12 +157,12 @@ msgstr "משדרג"
+ msgid "Verifying"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr ""
+diff --git a/po/hu.po b/po/hu.po
+index 91aa4fb..93ad476 100644
+--- a/po/hu.po
++++ b/po/hu.po
+@@ -13,7 +13,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-07-19 03:29-0400\n"
+ "Last-Translator: Kardos László <kardiweb@protonmail.ch>\n"
+ "Language-Team: Hungarian (http://www.transifex.com/projects/p/dnf/language/hu/)\n"
+@@ -22,7 +22,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: hu\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -163,12 +163,12 @@ msgstr "Frissítés"
+ msgid "Verifying"
+ msgstr "Ellenőrzés"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "Nem sikerült előzmény-adatbázist készíteni a következőnél: '%s'"
+@@ -595,7 +595,7 @@ msgstr "Arch"
+ 
+ #: ../dnf/cli/output.py:469
+ msgid "Epoch"
+-msgstr "Epochaaaa"
++msgstr "Epocha"
+ 
+ #: ../dnf/cli/output.py:470 ../dnf/cli/output.py:1051
+ msgid "Version"
+diff --git a/po/id.po b/po/id.po
+index 972e5a7..1fbe962 100644
+--- a/po/id.po
++++ b/po/id.po
+@@ -11,7 +11,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-12-10 11:33-0500\n"
+ "Last-Translator: Teguh Dwicaksana <dheche@fedoraproject.org>\n"
+ "Language-Team: Indonesian (http://www.transifex.com/projects/p/dnf/language/id/)\n"
+@@ -20,7 +20,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: id\n"
+ "Plural-Forms: nplurals=1; plural=0;\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -159,12 +159,12 @@ msgstr ""
+ msgid "Verifying"
+ msgstr "Verifikasi"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "Tidak dapat membuat database riwayat di '%s'."
+diff --git a/po/it.po b/po/it.po
+index d003f12..ad4ce40 100644
+--- a/po/it.po
++++ b/po/it.po
+@@ -12,7 +12,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-09-23 08:24-0400\n"
+ "Last-Translator: Andrea Masala <andrea.masala87@gmail.com>\n"
+ "Language-Team: Italian (http://www.transifex.com/projects/p/dnf/language/it/)\n"
+@@ -21,7 +21,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: it\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -163,12 +163,12 @@ msgstr "Aggiornamento in corso"
+ msgid "Verifying"
+ msgstr "Verifica in corso"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, fuzzy, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "Impossibile inizializzare lo storico di DNF DB: %s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "Impossibile creare history database a '%s'."
+@@ -596,7 +596,7 @@ msgstr ""
+ 
+ #: ../dnf/cli/output.py:470 ../dnf/cli/output.py:1051
+ msgid "Version"
+-msgstr "Versioneeee"
++msgstr "Versione"
+ 
+ #: ../dnf/cli/output.py:471
+ msgid "Release"
+@@ -902,7 +902,7 @@ msgstr ""
+ 
+ #: ../dnf/cli/output.py:1226
+ msgid "Total"
+-msgstr "Totaleeee"
++msgstr "Totale"
+ 
+ #: ../dnf/cli/output.py:1247
+ msgid "I"
+diff --git a/po/ja.po b/po/ja.po
+index 9663960..84c63a3 100644
+--- a/po/ja.po
++++ b/po/ja.po
+@@ -10,12 +10,13 @@
+ # Hajime Taira <htaira@fedoraproject.org>, 2015. #zanata
+ # Jan Silhan <jsilhan@redhat.com>, 2015. #zanata
+ # Ooyama Yosiyuki <qqke6wd9k@apricot.ocn.ne.jp>, 2015. #zanata
++# Ooyama Yosiyuki <qqke6wd9k@apricot.ocn.ne.jp>, 2016. #zanata
+ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
+-"PO-Revision-Date: 2015-12-12 07:32-0500\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
++"PO-Revision-Date: 2016-02-02 09:03-0500\n"
+ "Last-Translator: Ooyama Yosiyuki <qqke6wd9k@apricot.ocn.ne.jp>\n"
+ "Language-Team: Japanese (http://www.transifex.com/projects/p/dnf/language/ja/)\n"
+ "MIME-Version: 1.0\n"
+@@ -23,7 +24,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: ja\n"
+ "Plural-Forms: nplurals=1; plural=0;\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -164,12 +165,12 @@ msgstr "アップグレード"
+ msgid "Verifying"
+ msgstr "検証中"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "DNF DB 履歴を初期化することができません: %s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "'%s' で履歴データベースを作成できません。"
+@@ -813,7 +814,6 @@ msgstr "依存性の破損のためスキップされるパッケージ"
+ 
+ #: ../dnf/cli/output.py:1050 ../dnf/cli/output.py:1090
+ #: ../dnf/cli/output.py:1106 ../dnf/cli/output.py:1913
+-#, fuzzy
+ msgid "Package"
+ msgid_plural "Packages"
+ msgstr[0] "パッケージ"
+@@ -862,7 +862,7 @@ msgstr "スキップ"
+ #: ../dnf/cli/output.py:1108
+ msgid "Dependent package"
+ msgid_plural "Dependent packages"
+-msgstr[0] ""
++msgstr[0] "依存パッケージ"
+ 
+ #: ../dnf/cli/output.py:1167
+ msgid "Reinstalled"
+diff --git a/po/ka.po b/po/ka.po
+index b9cc6ef..da661af 100644
+--- a/po/ka.po
++++ b/po/ka.po
+@@ -7,7 +7,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-06-03 07:40-0400\n"
+ "Last-Translator: George Machitidze <giomac@gmail.com>\n"
+ "Language-Team: Georgian <trans-ka (at) lists.fedoraproject.org>\n"
+@@ -16,7 +16,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: ka\n"
+ "Plural-Forms: nplurals=1; plural=0;\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -155,12 +155,12 @@ msgstr ""
+ msgid "Verifying"
+ msgstr "შემოწმება"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr ""
+diff --git a/po/kk.po b/po/kk.po
+index fc9322b..fa80d60 100644
+--- a/po/kk.po
++++ b/po/kk.po
+@@ -3,7 +3,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-11-17 04:27-0500\n"
+ "Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>\n"
+ "Language-Team: Kazakh\n"
+@@ -12,7 +12,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: kk\n"
+ "Plural-Forms: nplurals=1; plural=0;\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -151,12 +151,12 @@ msgstr "Жаңарту"
+ msgid "Verifying"
+ msgstr "Тексерілуде"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr ""
+diff --git a/po/ko.po b/po/ko.po
+index 740f831..c06b337 100644
+--- a/po/ko.po
++++ b/po/ko.po
+@@ -3,7 +3,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-11-05 05:12-0500\n"
+ "Last-Translator: MinWoo Joh <igtzhsou@naver.com>\n"
+ "Language-Team: Korean\n"
+@@ -12,7 +12,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: ko\n"
+ "Plural-Forms: nplurals=1; plural=0\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -153,12 +153,12 @@ msgstr ""
+ msgid "Verifying"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "DNF DB 기록을 초기화할 수 없습니다: %s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "'%s'에 기록 데이터베이스를 생성할 수 없습니다."
+diff --git a/po/lt.po b/po/lt.po
+index fbc28ca..96de667 100644
+--- a/po/lt.po
++++ b/po/lt.po
+@@ -10,7 +10,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-03-16 12:46-0400\n"
+ "Last-Translator: Jan silhan <jsilhan@redhat.com>\n"
+ "Language-Team: Lithuanian (http://www.transifex.com/projects/p/dnf/language/lt/)\n"
+@@ -19,7 +19,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: lt\n"
+ "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -158,12 +158,12 @@ msgstr "Atnaujinama"
+ msgid "Verifying"
+ msgstr "Tikrinama"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "Nepavyksta sukurti istorijos duomenų bazės „%s“."
+@@ -579,7 +579,7 @@ msgstr ""
+ 
+ #: ../dnf/cli/output.py:467 ../dnf/cli/output.py:1050
+ msgid "Arch"
+-msgstr "Architektūraitektūraitektūraitektūra"
++msgstr "Architektūra"
+ 
+ #: ../dnf/cli/output.py:469
+ msgid "Epoch"
+diff --git a/po/mr.po b/po/mr.po
+index 2db8293..8f07f21 100644
+--- a/po/mr.po
++++ b/po/mr.po
+@@ -3,7 +3,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-08-18 02:57-0400\n"
+ "Last-Translator: Abhijeet Kasurde <akasurde@redhat.com>\n"
+ "Language-Team: Marathi\n"
+@@ -12,7 +12,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: mr\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1)\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -151,12 +151,12 @@ msgstr ""
+ msgid "Verifying"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr ""
+diff --git a/po/ms.po b/po/ms.po
+index b10e1db..012527b 100644
+--- a/po/ms.po
++++ b/po/ms.po
+@@ -8,7 +8,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-03-16 12:46-0400\n"
+ "Last-Translator: Jan silhan <jsilhan@redhat.com>\n"
+ "Language-Team: Malay (http://www.transifex.com/projects/p/dnf/language/ms/)\n"
+@@ -17,7 +17,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: ms\n"
+ "Plural-Forms: nplurals=1; plural=0;\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -156,12 +156,12 @@ msgstr ""
+ msgid "Verifying"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr ""
+diff --git a/po/nb.po b/po/nb.po
+index f923d50..f009a43 100644
+--- a/po/nb.po
++++ b/po/nb.po
+@@ -8,7 +8,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-03-16 12:46-0400\n"
+ "Last-Translator: Jan silhan <jsilhan@redhat.com>\n"
+ "Language-Team: Norwegian Bokmål (http://www.transifex.com/projects/p/dnf/language/nb/)\n"
+@@ -17,7 +17,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: nb\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -156,12 +156,12 @@ msgstr ""
+ msgid "Verifying"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr ""
+@@ -884,7 +884,7 @@ msgstr ""
+ 
+ #: ../dnf/cli/output.py:1226
+ msgid "Total"
+-msgstr "Totaltttt"
++msgstr "Totalt"
+ 
+ #: ../dnf/cli/output.py:1247
+ msgid "I"
+diff --git a/po/pa.po b/po/pa.po
+index 560facc..1fb91fe 100644
+--- a/po/pa.po
++++ b/po/pa.po
+@@ -10,7 +10,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-10-20 12:11-0400\n"
+ "Last-Translator: A S Alam <aalam@fedoraproject.org>\n"
+ "Language-Team: Panjabi (Punjabi) (http://www.transifex.com/projects/p/dnf/language/pa/)\n"
+@@ -19,7 +19,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: pa\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -158,12 +158,12 @@ msgstr "ਅੱਪਗਰੇਡ ਕਰਦਾ ਹੈ"
+ msgid "Verifying"
+ msgstr "ਜਾਂਚ ਜਾਰੀ"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr ""
+diff --git a/po/pl.po b/po/pl.po
+index 6418cf2..24c5216 100644
+--- a/po/pl.po
++++ b/po/pl.po
+@@ -6,12 +6,13 @@
+ # Piotr Drąg <piotrdrag@gmail.com>, 2011,2014,2015
+ # Jan Silhan <jsilhan@redhat.com>, 2015. #zanata
+ # Piotr Drąg <piotrdrag@gmail.com>, 2015. #zanata
++# Piotr Drąg <piotrdrag@gmail.com>, 2016. #zanata
+ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
+-"PO-Revision-Date: 2015-12-22 11:32-0500\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
++"PO-Revision-Date: 2016-01-28 10:28-0500\n"
+ "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
+ "Language-Team: Polish (http://www.transifex.com/projects/p/dnf/language/pl/)\n"
+ "MIME-Version: 1.0\n"
+@@ -19,7 +20,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: pl\n"
+ "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -50,7 +51,7 @@ msgstr "Suma kontrolna pakietu RPM przebudowanego z delty się nie powiodła"
+ 
+ #: ../dnf/drpm.py:140
+ msgid "done"
+-msgstr ""
++msgstr "ukończono"
+ 
+ #: ../dnf/comps.py:92
+ msgid "skipping."
+@@ -164,12 +165,12 @@ msgstr "Aktualizowanie"
+ msgid "Verifying"
+ msgstr "Sprawdzanie"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "Nie można zainicjować historii DNF DB: %s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "Nie można utworzyć bazy danych historii w „%s”."
+@@ -374,12 +375,12 @@ msgstr "    Stan       : %s"
+ #: ../dnf/cli/cli.py:129
+ #, python-format
+ msgid "  Installed: %s-%s at %s"
+-msgstr "  Zainstalowane: %s-%s o %s"
++msgstr "  Zainstalowane: %s-%s w dniu %s"
+ 
+ #: ../dnf/cli/cli.py:131
+ #, python-format
+ msgid "  Built    : %s at %s"
+-msgstr "  Zbudowane    : %s o %s"
++msgstr "  Zbudowane    : %s w dniu %s"
+ 
+ #: ../dnf/cli/cli.py:201
+ msgid "Operation aborted."
+@@ -593,7 +594,7 @@ msgstr "Nazwa"
+ 
+ #: ../dnf/cli/output.py:467 ../dnf/cli/output.py:1050
+ msgid "Arch"
+-msgstr "Arch...."
++msgstr "Arch."
+ 
+ #: ../dnf/cli/output.py:469
+ msgid "Epoch"
+@@ -613,7 +614,7 @@ msgstr "Rozm."
+ 
+ #: ../dnf/cli/output.py:473
+ msgid "Repo"
+-msgstr "Repoz.z.z.z."
++msgstr "Repo."
+ 
+ #: ../dnf/cli/output.py:475
+ msgid "From repo"
+@@ -825,9 +826,9 @@ msgstr "Pomijanie pakietów z uszkodzonymi zależnościami"
+ #: ../dnf/cli/output.py:1106 ../dnf/cli/output.py:1913
+ msgid "Package"
+ msgid_plural "Packages"
+-msgstr[0] "Pakiet"
+-msgstr[1] "Pakiety"
+-msgstr[2] "Pakietów"
++msgstr[0] "pakiet"
++msgstr[1] "pakiety"
++msgstr[2] "pakietów"
+ 
+ #: ../dnf/cli/output.py:1051
+ msgid "Repository"
+@@ -873,9 +874,9 @@ msgstr "Pominięcie"
+ #: ../dnf/cli/output.py:1108
+ msgid "Dependent package"
+ msgid_plural "Dependent packages"
+-msgstr[0] "Zależny pakiet"
+-msgstr[1] "Zależne pakiety"
+-msgstr[2] "Zależnych pakietów"
++msgstr[0] "zależny pakiet"
++msgstr[1] "zależne pakiety"
++msgstr[2] "zależnych pakietów"
+ 
+ #: ../dnf/cli/output.py:1167
+ msgid "Reinstalled"
+@@ -1772,7 +1773,7 @@ msgstr "Wykonuje polecenia na wszystkich pakietach w podanym repozytorium"
+ 
+ #: ../dnf/cli/commands/__init__.py:919
+ msgid "REPO"
+-msgstr "REPOZYTORIUMZYTORIUMZYTORIUMZYTORIUM"
++msgstr "REPOZYTORIUM"
+ 
+ #: ../dnf/cli/commands/__init__.py:919
+ msgid "ARG"
+diff --git a/po/pt.po b/po/pt.po
+index df76b7d..354b14d 100644
+--- a/po/pt.po
++++ b/po/pt.po
+@@ -9,7 +9,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-10-28 10:32-0400\n"
+ "Last-Translator: Miguel Sousa <migueljorgesousa@gmail.com>\n"
+ "Language-Team: Portuguese (http://www.transifex.com/projects/p/dnf/language/pt/)\n"
+@@ -18,7 +18,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: pt\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -159,12 +159,12 @@ msgstr "Upgrading"
+ msgid "Verifying"
+ msgstr "Verificar"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "Incapaz de iniciar histórico de BD DNF: %s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "Incapaz de criar base de dados de histórico em '%s'"
+diff --git a/po/pt_BR.po b/po/pt_BR.po
+index 0b5e42d..2484a93 100644
+--- a/po/pt_BR.po
++++ b/po/pt_BR.po
+@@ -12,7 +12,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-09-15 09:12-0400\n"
+ "Last-Translator: Marco Aurélio Krause <ouesten@me.com>\n"
+ "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/dnf/language/pt_BR/)\n"
+@@ -21,7 +21,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: pt-BR\n"
+ "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -160,12 +160,12 @@ msgstr "Atualizando"
+ msgid "Verifying"
+ msgstr "Verificando"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr ""
+diff --git a/po/ru.po b/po/ru.po
+index c2c127f..076196a 100644
+--- a/po/ru.po
++++ b/po/ru.po
+@@ -14,7 +14,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2016-01-20 11:39-0500\n"
+ "Last-Translator: Ilyas B Arinov <arinov.ilyas@gmail.com>\n"
+ "Language-Team: Russian (http://www.transifex.com/projects/p/dnf/language/ru/)\n"
+@@ -23,7 +23,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: ru\n"
+ "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -168,12 +168,12 @@ msgstr "Обновление"
+ msgid "Verifying"
+ msgstr "Проверка"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "Невозможно инициализировать историю DNF DB: %s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "Невозможно создать базу данных истории в '%s'."
+diff --git a/po/sk.po b/po/sk.po
+index 30dd0b3..ae0a05c 100644
+--- a/po/sk.po
++++ b/po/sk.po
+@@ -3,7 +3,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-11-16 06:48-0500\n"
+ "Last-Translator: Dusan Kazik <prescott66@gmail.com>\n"
+ "Language-Team: Slovak\n"
+@@ -12,7 +12,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: sk\n"
+ "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -152,12 +152,12 @@ msgstr "Aktualizuje sa"
+ msgid "Verifying"
+ msgstr "Overuje sa"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "Nie je možné inicializovať históriu databázy DNF: %s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "Nedá sa vytvoriť databáza histórie v „%s“."
+@@ -573,7 +573,7 @@ msgstr "Názov"
+ 
+ #: ../dnf/cli/output.py:467 ../dnf/cli/output.py:1050
+ msgid "Arch"
+-msgstr "Architektúraitektúraitektúraitektúra"
++msgstr "Architektúra"
+ 
+ #: ../dnf/cli/output.py:469
+ msgid "Epoch"
+@@ -593,7 +593,7 @@ msgstr "Veľkosť"
+ 
+ #: ../dnf/cli/output.py:473
+ msgid "Repo"
+-msgstr "Repozitárzitárzitárzitár"
++msgstr "Repozitár"
+ 
+ #: ../dnf/cli/output.py:475
+ msgid "From repo"
+diff --git a/po/sr.po b/po/sr.po
+index 655dafb..17836ad 100644
+--- a/po/sr.po
++++ b/po/sr.po
+@@ -9,7 +9,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-11-16 06:48-0500\n"
+ "Last-Translator: Momcilo Medic <medicmomcilo@gmail.com>\n"
+ "Language-Team: Serbian (http://www.transifex.com/projects/p/dnf/language/sr/)\n"
+@@ -18,7 +18,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: sr\n"
+ "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -160,12 +160,12 @@ msgstr "Надоградња"
+ msgid "Verifying"
+ msgstr "Проверавам"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "Неуспела иницијализација базе података DNF историје: %s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "Не могу да направим базу података историје на '%s'."
+diff --git a/po/sv.po b/po/sv.po
+index cb20647..a9439f8 100644
+--- a/po/sv.po
++++ b/po/sv.po
+@@ -10,7 +10,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-08-31 01:41-0400\n"
+ "Last-Translator: Göran Uddeborg <goeran@uddeborg.se>\n"
+ "Language-Team: Swedish (http://www.transifex.com/projects/p/dnf/language/sv/)\n"
+@@ -19,7 +19,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: sv\n"
+ "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -160,12 +160,12 @@ msgstr "Uppgraderar"
+ msgid "Verifying"
+ msgstr "Verifierar"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "Kan inte initiera DNF DB-historiken: %s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "Kan inte skapa en historikdatabas i ”%s”."
+@@ -842,7 +842,7 @@ msgstr ""
+ #: ../dnf/cli/output.py:1077 ../dnf/cli/output.py:1708
+ #: ../dnf/cli/output.py:1709
+ msgid "Install"
+-msgstr "Installeraeraeraera"
++msgstr "Installera"
+ 
+ #: ../dnf/cli/output.py:1078 ../dnf/cli/output.py:1717
+ msgid "Upgrade"
+@@ -895,7 +895,7 @@ msgstr "Misslyckades"
+ 
+ #: ../dnf/cli/output.py:1226
+ msgid "Total"
+-msgstr "Totaltttt"
++msgstr "Totalt"
+ 
+ #: ../dnf/cli/output.py:1247
+ msgid "I"
+@@ -1931,7 +1931,7 @@ msgstr "uppdaterar"
+ 
+ #: ../dnf/cli/commands/updateinfo.py:334
+ msgid "all"
+-msgstr "allaaaa"
++msgstr "alla"
+ 
+ #: ../dnf/cli/commands/updateinfo.py:339
+ msgid "available"
+diff --git a/po/th.po b/po/th.po
+index 45bab96..620b09c 100644
+--- a/po/th.po
++++ b/po/th.po
+@@ -3,7 +3,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-08-03 12:17-0400\n"
+ "Last-Translator: Sukit Arseanrapoj <sukit.arseanrapoj@gmail.com>\n"
+ "Language-Team: Thai\n"
+@@ -12,7 +12,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: th\n"
+ "Plural-Forms: nplurals=1; plural=0\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -153,12 +153,12 @@ msgstr ""
+ msgid "Verifying"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "ไม่สามารถสร้างฐานข้อมูลเก็บประวัติ DNF ใหม่ได้: %s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "ไม่สามารถสร้างฐานข้อมูลเก็บประวัติได้ที่ '%s\""
+diff --git a/po/tr.po b/po/tr.po
+index bca545e..6fcff40 100644
+--- a/po/tr.po
++++ b/po/tr.po
+@@ -3,7 +3,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-11-16 06:48-0500\n"
+ "Last-Translator: Akın Ömeroğlu <akinomeroglu@gmail.com>\n"
+ "Language-Team: Turkish\n"
+@@ -12,7 +12,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: tr\n"
+ "Plural-Forms: nplurals=2; plural=(n>1)\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -151,12 +151,12 @@ msgstr "Güncelleniyor"
+ msgid "Verifying"
+ msgstr "Doğrulanıyor"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr ""
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr ""
+diff --git a/po/uk.po b/po/uk.po
+index 1e3d6b0..23a876f 100644
+--- a/po/uk.po
++++ b/po/uk.po
+@@ -6,12 +6,13 @@
+ # Yuri Chornoivan <yurchor@ukr.net>, 2011
+ # Jan Silhan <jsilhan@redhat.com>, 2015. #zanata
+ # Yuri Chornoivan <yurchor@ukr.net>, 2015. #zanata
++# Yuri Chornoivan <yurchor@ukr.net>, 2016. #zanata
+ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
+-"PO-Revision-Date: 2015-12-28 12:39-0500\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
++"PO-Revision-Date: 2016-01-27 06:21-0500\n"
+ "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
+ "Language-Team: Ukrainian (http://www.transifex.com/projects/p/dnf/language/uk/)\n"
+ "MIME-Version: 1.0\n"
+@@ -19,7 +20,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: uk\n"
+ "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -51,7 +52,7 @@ msgstr "Контрольна сума перезібраної RPM-різниц
+ 
+ #: ../dnf/drpm.py:140
+ msgid "done"
+-msgstr ""
++msgstr "виконано"
+ 
+ #: ../dnf/comps.py:92
+ msgid "skipping."
+@@ -164,12 +165,12 @@ msgstr "Оновлення"
+ msgid "Verifying"
+ msgstr "Перевіряємо"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "Не вдалося започаткувати журнал бази даних DNF: %s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "Не вдалося створити базу даних журналу на «%s»."
+diff --git a/po/zh_CN.po b/po/zh_CN.po
+index 9cfbc9d..5d87e31 100644
+--- a/po/zh_CN.po
++++ b/po/zh_CN.po
+@@ -13,7 +13,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-11-02 03:49-0500\n"
+ "Last-Translator: Tommy He <lovenemesis@fedoraproject.org>\n"
+ "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/dnf/language/zh_CN/)\n"
+@@ -22,7 +22,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: zh-CN\n"
+ "Plural-Forms: nplurals=1; plural=0;\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -163,12 +163,12 @@ msgstr "升级"
+ msgid "Verifying"
+ msgstr "验证"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "无法初始化 DNF 数据库历史：%s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr "无法在 '%s' 创建历史数据库。"
+diff --git a/po/zh_TW.po b/po/zh_TW.po
+index 1c3bda1..c60b8e3 100644
+--- a/po/zh_TW.po
++++ b/po/zh_TW.po
+@@ -3,7 +3,7 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: PACKAGE VERSION\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2016-01-25 16:00+0100\n"
++"POT-Creation-Date: 2016-02-02 19:06+0100\n"
+ "PO-Revision-Date: 2015-12-13 02:53-0500\n"
+ "Last-Translator: Cheng-Chia Tseng <pswo10680@gmail.com>\n"
+ "Language-Team: Chinese (Taiwan)\n"
+@@ -12,7 +12,7 @@ msgstr ""
+ "Content-Transfer-Encoding: 8bit\n"
+ "Language: zh-TW\n"
+ "Plural-Forms: nplurals=1; plural=0\n"
+-"X-Generator: Zanata 3.7.3\n"
++"X-Generator: Zanata 3.8.2\n"
+ 
+ #: ../dnf/persistor.py:314
+ msgid "Invalid groups database, clearing."
+@@ -151,12 +151,12 @@ msgstr "升級中"
+ msgid "Verifying"
+ msgstr "核驗中"
+ 
+-#: ../dnf/yum/history.py:744
++#: ../dnf/yum/history.py:745
+ #, python-format
+ msgid "Unable to initialize DNF DB history: %s"
+ msgstr "無法初始化 DNF DB 歷史：%s"
+ 
+-#: ../dnf/yum/history.py:1661
++#: ../dnf/yum/history.py:1662
+ #, python-format
+ msgid "Can not create history database at '%s'."
+ msgstr ""
+-- 
+2.7.0
+
