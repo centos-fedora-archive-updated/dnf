@@ -1,0 +1,25 @@
+From 84557105cc1253d49bdacf99226b89bcef4096ab Mon Sep 17 00:00:00 2001
+From: Michal Luscon <mluscon@redhat.com>
+Date: Mon, 7 Mar 2016 15:33:00 +0100
+Subject: [PATCH] history: fix empty history cmd (RhBug:1313215)
+
+---
+ dnf/cli/commands/__init__.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dnf/cli/commands/__init__.py b/dnf/cli/commands/__init__.py
+index e85f65f..d274e0c 100644
+--- a/dnf/cli/commands/__init__.py
++++ b/dnf/cli/commands/__init__.py
+@@ -1049,7 +1049,7 @@ class HistoryCommand(Command):
+ 
+     def configure(self, args):
+         demands = self.cli.demands
+-        if args[0] in ['redo', 'undo', 'rollback']:
++        if args and args[0] in ['redo', 'undo', 'rollback']:
+             demands.available_repos = True
+         else:
+             demands.fresh_metadata = False
+-- 
+2.7.0
+

@@ -1,0 +1,83 @@
+From c8c98c8b70577674b606e7b05430ac3c6cb4d15c Mon Sep 17 00:00:00 2001
+From: Michal Luscon <mluscon@redhat.com>
+Date: Thu, 3 Mar 2016 12:10:50 +0100
+Subject: [PATCH] arch: restore basearch needed by koji
+
+---
+ dnf/arch.py       | 33 +++++++++++++++++++++++++++++++++
+ dnf/exceptions.py |  4 ++++
+ dnf/logging.py    |  3 +++
+ 3 files changed, 40 insertions(+)
+ create mode 100644 dnf/arch.py
+
+diff --git a/dnf/arch.py b/dnf/arch.py
+new file mode 100644
+index 0000000..5df4753
+--- /dev/null
++++ b/dnf/arch.py
+@@ -0,0 +1,33 @@
++# arch.py
++# Manipulating the machine architecture string.
++#
++# Copyright (C) 2016  Red Hat, Inc.
++#
++# This copyrighted material is made available to anyone wishing to use,
++# modify, copy, or redistribute it subject to the terms and conditions of
++# the GNU General Public License v.2, or (at your option) any later version.
++# This program is distributed in the hope that it will be useful, but WITHOUT
++# ANY WARRANTY expressed or implied, including the implied warranties of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
++# Public License for more details.  You should have received a copy of the
++# GNU General Public License along with this program; if not, write to the
++# Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++# 02110-1301, USA.  Any Red Hat trademarks that are incorporated in the
++# source code or documentation are not subject to the GNU General Public
++# License and may only be used or replicated with the express permission of
++# Red Hat, Inc.
++#
++
++import dnf
++import sys
++
++def basearch(arch):
++    msg = 'The dnf.arch.basearch function is not a part of DNF API ' \
++          'and will be removed in the upcoming DNF release. ' \
++          'Please use dnf.rpm.basearch instead. ' \
++          'DNF API documentation is available at ' \
++          'https://dnf.readthedocs.org/en/latest/api.html.\n'
++    dnf.logging.nonapi(msg)
++    sys.stdout.write(msg)
++    sys.stderr.write(msg)
++    return dnf.rpm.basearch(arch)
+diff --git a/dnf/exceptions.py b/dnf/exceptions.py
+index aafb898..60b07a6 100644
+--- a/dnf/exceptions.py
++++ b/dnf/exceptions.py
+@@ -26,6 +26,10 @@ class DeprecationWarning(DeprecationWarning):
+     pass
+ 
+ 
++class NonApiWarning(DeprecationWarning):
++    pass
++
++
+ class Error(Exception):
+     """Base Error. All other Errors thrown by DNF should inherit from this.
+ 
+diff --git a/dnf/logging.py b/dnf/logging.py
+index 362ece4..e3ace6a 100644
+--- a/dnf/logging.py
++++ b/dnf/logging.py
+@@ -103,6 +103,9 @@ def _paint_mark(logger):
+ def depr(msg):
+     warnings.warn(msg, dnf.exceptions.DeprecationWarning, 2)
+ 
++def nonapi(msg):
++    warnings.warn(msg, dnf.exceptions.NonApiWarning, 2)
++
+ 
+ class Logging(object):
+     def __init__(self):
+-- 
+2.7.0
+

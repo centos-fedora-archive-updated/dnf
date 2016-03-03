@@ -11,12 +11,14 @@
 
 Name:		dnf
 Version:	1.1.7
-Release:	1%{?snapshot}%{?dist}
+Release:	2%{?snapshot}%{?dist}
 Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:	GPLv2+ and GPLv2 and GPL
 URL:		https://github.com/rpm-software-management/dnf
 Source0:    https://github.com/rpm-software-management/dnf/archive/%{name}-%{version}.tar.gz
+Patch0:  restore-basearch-needed-by-koji.patch
+Patch1:  fix-empty-history-cmd.patch
 BuildArch:  noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -136,6 +138,8 @@ Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
 %setup -q -n dnf-%{version}
+%patch0 -p1
+%patch1 -p1
 rm -rf py3
 mkdir ../py3
 cp -a . ../py3/
@@ -283,6 +287,10 @@ exit 0
 %systemd_postun_with_restart dnf-automatic.timer
 
 %changelog
+* Thu Mar 03 2016 Michal Luscon <mluscon@redhat.com> 1.1.7-2
+- restore basearch() needed by koji
+- fix empty history cmd
+
 * Thu Feb 25 2016 Michal Luscon <mluscon@redhat.com> 1.1.7-1
 - Add `/etc/distro.repos.d` as a path owned by the dnf package (Neal Gompa
   (ニール・ゴンパ))
