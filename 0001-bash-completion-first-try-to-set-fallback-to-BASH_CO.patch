@@ -1,0 +1,29 @@
+From b4ce001377b3aaead543b0a1e6da86305bf933c2 Mon Sep 17 00:00:00 2001
+From: Igor Gnatenko <ignatenko@redhat.com>
+Date: Tue, 12 Apr 2016 17:12:15 +0200
+Subject: [PATCH] bash-completion: first try to set fallback to
+ BASH_COMPLETION_COMPATDIR
+
+Signed-off-by: Igor Gnatenko <ignatenko@redhat.com>
+---
+ etc/bash_completion.d/CMakeLists.txt | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/etc/bash_completion.d/CMakeLists.txt b/etc/bash_completion.d/CMakeLists.txt
+index ebee298..be81310 100644
+--- a/etc/bash_completion.d/CMakeLists.txt
++++ b/etc/bash_completion.d/CMakeLists.txt
+@@ -1,5 +1,9 @@
+ find_package(bash-completion QUIET)
+ if(NOT BASH_COMPLETION_COMPLETIONSDIR)
+-	set(BASH_COMPLETION_COMPLETIONSDIR "${SYSCONFDIR}/bash_completion.d")
++    if(BASH_COMPLETION_COMPATDIR)
++        set(BASH_COMPLETION_COMPLETIONSDIR ${BASH_COMPLETION_COMPATDIR})
++    else()
++        set(BASH_COMPLETION_COMPLETIONSDIR "${SYSCONFDIR}/bash_completion.d")
++    endif()
+ endif()
+ install(FILES "dnf" DESTINATION ${BASH_COMPLETION_COMPLETIONSDIR})
+-- 
+2.7.3
+

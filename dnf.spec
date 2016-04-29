@@ -1,89 +1,122 @@
-%{!?gitrev: %global gitrev 07b4201}
-%{!?hawkey_version: %global hawkey_version 0.5.3}
-%{!?librepo_version: %global librepo_version 1.7.5}
-%{!?libcomps_version: %global libcomps_version 0.1.6}
+%global hawkey_version 0.6.1
+%global librepo_version 1.7.16
+%global libcomps_version 0.1.6
+%global rpm_version 4.11.3-14
 
-%global confdir %{_sysconfdir}/dnf
+%global confdir %{_sysconfdir}/%{name}
 
 %global pluginconfpath %{confdir}/plugins
-%global py2pluginpath %{python_sitelib}/dnf-plugins
-%global py3pluginpath %{python3_sitelib}/dnf-plugins
+%global py2pluginpath %{python2_sitelib}/%{name}-plugins
 
-%if 0%{?rhel} <= 7
+%if 0%{?rhel} && 0%{?rhel} <= 7
 %bcond_with python3
+%else
+%bcond_without python3
 %endif
 
-Name:		dnf
-Version:	0.6.4
-Release:	2%{?snapshot}%{?dist}
-Summary:	Package manager forked from Yum, using libsolv as a dependency resolver
+%if %{with python3}
+%global py3pluginpath %{python3_sitelib}/%{name}-plugins
+%endif
+
+# Use the same directory of the main package for subpackage licence and docs
+%global _docdir_fmt %{name}
+
+Name:           dnf
+Version:        1.1.8
+Release:        2%{?dist}
+Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
-License:	GPLv2+ and GPLv2 and GPL
-URL:		https://github.com/rpm-software-management/dnf
-# The Source0 tarball can be generated using following commands:
-# git clone http://github.com/rpm-software-management/dnf.git
-# cd dnf/package
-# ./archive
-# tarball will be generated in $HOME/rpmbuild/sources/
-Source0:    http://rpm-software-management.fedorapeople.org/dnf-%{gitrev}.tar.xz
-Patch0: better-file-pattern-recognition-RhBug-1195385.patch
-BuildArch:  noarch
+License:        GPLv2+ and GPLv2 and GPL
+URL:            https://github.com/rpm-software-management/dnf
+Source0:        %{url}/archive/%{name}-%{version}/%{name}-%{version}.tar.gz
+Patch0:         0001-bash-completion-first-try-to-set-fallback-to-BASH_CO.patch
+Patch1:         0001-Revert-using-ts.addReinstall-for-package-reinstallat.patch
+BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
 BuildRequires:  python-bugzilla
 BuildRequires:  python-sphinx
 BuildRequires:  systemd
-%if 0%{?fedora} >= 23
-Requires:   python3-dnf = %{version}-%{release}
-%else
-Requires:   python-dnf = %{version}-%{release}
-%endif
+BuildRequires:  bash-completion
+# We don't need to have python with specific version as we use %%python_provide
+Requires:       python-%{name} = %{version}-%{release}
 Requires(post):     systemd
 Requires(preun):    systemd
 Requires(postun):   systemd
+Provides:       dnf-command(autoremove)
+Provides:       dnf-command(check-update)
+Provides:       dnf-command(clean)
+Provides:       dnf-command(distro-sync)
+Provides:       dnf-command(downgrade)
+Provides:       dnf-command(group)
+Provides:       dnf-command(history)
+Provides:       dnf-command(info)
+Provides:       dnf-command(install)
+Provides:       dnf-command(list)
+Provides:       dnf-command(makecache)
+Provides:       dnf-command(mark)
+Provides:       dnf-command(provides)
+Provides:       dnf-command(reinstall)
+Provides:       dnf-command(remove)
+Provides:       dnf-command(repolist)
+Provides:       dnf-command(repository-packages)
+Provides:       dnf-command(search)
+Provides:       dnf-command(updateinfo)
+Provides:       dnf-command(upgrade)
+Provides:       dnf-command(upgrade-to)
+
 %description
 Package manager forked from Yum, using libsolv as a dependency resolver.
 
 %package conf
-Requires:   libreport-filesystem
-Summary:    Configuration files for DNF.
+Summary:        Configuration files for DNF
+Requires:       libreport-filesystem
+
 %description conf
 Configuration files for DNF.
 
-%package -n dnf-yum
-Conflicts:      yum
-Requires:   dnf = %{version}-%{release}
-Summary:    As a Yum CLI compatibility layer, supplies /usr/bin/yum redirecting to DNF.
-%description -n dnf-yum
+%package yum
+Conflicts:      yum < 3.4.3-505
+Requires:       %{name} = %{version}-%{release}
+Summary:        As a Yum CLI compatibility layer, supplies /usr/bin/yum redirecting to DNF
+
+%description yum
 As a Yum CLI compatibility layer, supplies /usr/bin/yum redirecting to DNF.
 
-%package -n python-dnf
-Summary:    Python 2 interface to DNF.
-BuildRequires:  pygpgme
-BuildRequires:  pyliblzma
-BuildRequires:  python2
+%package -n python2-%{name}
+Summary:        Python 2 interface to DNF
+%{?python_provide:%python_provide python2-%{name}}
+BuildRequires:  python2-devel
 BuildRequires:  python-hawkey >= %{hawkey_version}
 BuildRequires:  python-iniparse
 BuildRequires:  python-libcomps >= %{libcomps_version}
 BuildRequires:  python-librepo >= %{librepo_version}
 BuildRequires:  python-nose
-BuildRequires:  rpm-python
-Requires:   dnf-conf = %{version}-%{release}
-Requires:   deltarpm
-Requires:   pygpgme
-Requires:   pyliblzma
-Requires:   python-hawkey >= %{hawkey_version}
-Requires:   python-iniparse
-Requires:   python-libcomps >= %{libcomps_version}
-Requires:   python-librepo >= %{librepo_version}
-Requires:   rpm-python
-%description -n python-dnf
+BuildRequires:  pygpgme
+BuildRequires:  pyliblzma
+BuildRequires:  rpm-python >= %{rpm_version}
+%if 0%{?fedora}
+Recommends:     bash-completion
+%endif
+Requires:       pyliblzma
+Requires:       %{name}-conf = %{version}-%{release}
+Requires:       deltarpm
+Requires:       python-hawkey >= %{hawkey_version}
+Requires:       python-iniparse
+Requires:       python-libcomps >= %{libcomps_version}
+Requires:       python-librepo >= %{librepo_version}
+Requires:       pygpgme
+Requires:       rpm-plugin-systemd-inhibit
+Requires:       rpm-python >= %{rpm_version}
+Obsoletes:      %{name} <= 0.6.4
+
+%description -n python2-%{name}
 Python 2 interface to DNF.
 
 %if %{with python3}
-%package -n python3-dnf
-Summary:    Python 3 interface to DNF.
-BuildRequires:  python3
+%package -n python3-%{name}
+Summary:        Python 3 interface to DNF.
+%{?python_provide:%python_provide python3-%{name}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-hawkey >= %{hawkey_version}
 BuildRequires:  python3-iniparse
@@ -91,46 +124,55 @@ BuildRequires:  python3-libcomps >= %{libcomps_version}
 BuildRequires:  python3-librepo >= %{librepo_version}
 BuildRequires:  python3-nose
 BuildRequires:  python3-pygpgme
-BuildRequires:  rpm-python3
-Requires:   dnf-conf = %{version}-%{release}
-Requires:   deltarpm
-Requires:   python3-hawkey >= %{hawkey_version}
-Requires:   python3-iniparse
-Requires:   python3-libcomps >= %{libcomps_version}
-Requires:   python3-librepo >= %{librepo_version}
-Requires:   python3-pygpgme
-Requires:   rpm-python3
-Obsoletes:  dnf <= 0.6.4-1
-%description -n python3-dnf
+BuildRequires:  rpm-python3 >= %{rpm_version}
+%if 0%{?fedora}
+Recommends:     bash-completion
+%endif
+Requires:       %{name}-conf = %{version}-%{release}
+Requires:       deltarpm
+Requires:       python3-hawkey >= %{hawkey_version}
+Requires:       python3-iniparse
+Requires:       python3-libcomps >= %{libcomps_version}
+Requires:       python3-librepo >= %{librepo_version}
+Requires:       python3-pygpgme
+Requires:       rpm-plugin-systemd-inhibit
+Requires:       rpm-python3 >= %{rpm_version}
+Obsoletes:      %{name} <= 0.6.4
+
+%description -n python3-%{name}
 Python 3 interface to DNF.
 %endif
 
 %package automatic
-Summary:    Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
+Summary:        Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 BuildRequires:  systemd
-Requires:   dnf = %{version}-%{release}
-Requires(post):     systemd
-Requires(preun):    systemd
-Requires(postun):	systemd
+Requires:       %{name} = %{version}-%{release}
+Requires(post):   systemd
+Requires(preun):  systemd
+Requires(postun): systemd
+
 %description automatic
 Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
-%setup -q -n dnf
-
-%patch0 -p1
-
+%autosetup -p1
+mkdir build
 %if %{with python3}
-rm -rf py3
-mkdir ../py3
-cp -a . ../py3/
-mv ../py3 ./
+mkdir build-py3
 %endif
 
 %build
-%cmake .
-make %{?_smp_mflags}
-make doc-man
+pushd build
+  %cmake ..
+  %make_build
+  make doc-man
+popd
+%if %{with python3}
+pushd build-py3
+  %cmake .. -DPYTHON_DESIRED:str=3 -DWITH_MAN=0
+  %make_build
+popd
+%endif
 
 %if %{with python3}
 pushd py3
@@ -140,92 +182,45 @@ popd
 %endif
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
+pushd build
+  %make_install
+popd
+%if %{with python3}
+pushd build-py3
+  %make_install
+popd
+%endif
 %find_lang %{name}
 
+mkdir -p %{buildroot}%{pluginconfpath}/
+mkdir -p %{buildroot}%{py2pluginpath}/
 %if %{with python3}
-pushd py3
-make install DESTDIR=$RPM_BUILD_ROOT
-popd
-mkdir -p $RPM_BUILD_ROOT%{py3pluginpath}/__pycache__
+mkdir -p %{buildroot}%{py3pluginpath}/__pycache__/
 %endif
-
-mkdir -p $RPM_BUILD_ROOT%{pluginconfpath}
-mkdir -p $RPM_BUILD_ROOT%{py2pluginpath}
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log
-touch $RPM_BUILD_ROOT%{_localstatedir}/log/%{name}.log
-
-%if 0%{?fedora} >= 23
-ln -sr $RPM_BUILD_ROOT%{_bindir}/dnf-3 $RPM_BUILD_ROOT%{_bindir}/dnf
+mkdir -p %{buildroot}%{_localstatedir}/log/
+mkdir -p %{buildroot}%{_var}/cache/dnf/
+touch %{buildroot}%{_localstatedir}/log/%{name}.log
+%if %{with python3}
+ln -sr %{buildroot}%{_bindir}/dnf-3 %{buildroot}%{_bindir}/dnf
+mv %{buildroot}%{_bindir}/dnf-automatic-3 %{buildroot}%{_bindir}/dnf-automatic
 %else
-ln -sr $RPM_BUILD_ROOT%{_bindir}/dnf-2 $RPM_BUILD_ROOT%{_bindir}/dnf
+ln -sr %{buildroot}%{_bindir}/dnf-2 %{buildroot}%{_bindir}/dnf
+mv %{buildroot}%{_bindir}/dnf-automatic-2 %{buildroot}%{_bindir}/dnf-automatic
 %endif
+rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 
-ln -sr $RPM_BUILD_ROOT%{_bindir}/dnf $RPM_BUILD_ROOT%{_bindir}/yum
+# This will eventually be the new default location for repo files
+mkdir %{buildroot}%{_sysconfdir}/distro.repos.d/
 
 %check
-make ARGS="-V" test
-
+pushd build
+  ctest -VV
+popd
 %if %{with python3}
-pushd py3
-make ARGS="-V" test
+pushd build-py3
+  ctest -VV
 popd
 %endif
-
-%files -f %{name}.lang
-%doc AUTHORS README.rst COPYING PACKAGE-LICENSING
-%{_bindir}/dnf
-%{_mandir}/man8/dnf.8.gz
-%{_mandir}/man5/dnf.conf.5.gz
-%config %{_sysconfdir}/bash_completion.d/dnf-completion.bash
-%{_unitdir}/dnf-makecache.service
-%{_unitdir}/dnf-makecache.timer
-%{_tmpfilesdir}/dnf.conf
-
-%files conf
-%doc AUTHORS README.rst COPYING PACKAGE-LICENSING
-%dir %{confdir}
-%dir %{pluginconfpath}
-%dir %{confdir}/protected.d
-%config(noreplace) %{confdir}/dnf.conf
-%config(noreplace) %{confdir}/protected.d/dnf.conf
-%config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
-%ghost %{_localstatedir}/log/hawkey.log
-%ghost %{_localstatedir}/log/%{name}.log
-%ghost %{_localstatedir}/log/%{name}.rpm.log
-%ghost %{_localstatedir}/log/%{name}.plugin.log
-%config %{_sysconfdir}/bash_completion.d/dnf-completion.bash
-%{_sysconfdir}/libreport/events.d/collect_dnf.conf
-
-%files -n dnf-yum
-%doc AUTHORS README.rst COPYING PACKAGE-LICENSING
-%{_bindir}/yum
-
-%files -n python-dnf
-%{_bindir}/dnf-2
-%doc AUTHORS README.rst COPYING PACKAGE-LICENSING
-%exclude %{python_sitelib}/dnf/automatic
-%{python_sitelib}/dnf/
-%dir %{py2pluginpath}
-
-%if %{with python3}
-%files -n python3-dnf
-%doc AUTHORS README.rst COPYING PACKAGE-LICENSING
-%{_bindir}/dnf-3
-%exclude %{python3_sitelib}/dnf/automatic
-%{python3_sitelib}/dnf/
-%dir %{py3pluginpath}
-%dir %{py3pluginpath}/__pycache__
-%endif
-
-%files automatic
-%doc AUTHORS COPYING PACKAGE-LICENSING
-%{_bindir}/dnf-automatic
-%config(noreplace) %{confdir}/automatic.conf
-%{_mandir}/man8/dnf.automatic.8.gz
-%{_unitdir}/dnf-automatic.service
-%{_unitdir}/dnf-automatic.timer
-%{python_sitelib}/dnf/automatic
 
 %post
 %systemd_post dnf-makecache.timer
@@ -236,6 +231,13 @@ popd
 %postun
 %systemd_postun_with_restart dnf-makecache.timer
 
+%posttrans
+# cleanup pre-1.0.2 style cache
+for arch in %{ix86} x86_64 %{arm} aarch64 ppc %{sparc} %{alpha} s390 s390x %{power64} %{mips} ia64 ; do
+    rm -rf /var/cache/dnf/$arch
+done
+exit 0
+
 %post automatic
 %systemd_post dnf-automatic.timer
 
@@ -245,13 +247,553 @@ popd
 %postun automatic
 %systemd_postun_with_restart dnf-automatic.timer
 
-%changelog
-* Tue Jul 07 2015 Michal Luscon <mluscon@redhat.com> - 0.6.4-2
-- better file pattern recognition (RhBug:1195385) (Jan Silhan)
 
-* Fri Feb 27 2015 Jan Silhan <jsilhan@redhat.com> - 0.6.4-1
-- revert of e56dd41, does not fix BZ:1109927 now (Jan Silhan)
-- revert of 516aad9, does not fix BZ:1071854 now (Jan Silhan)
+%files -f %{name}.lang
+%{_bindir}/%{name}
+%if 0%{?rhel} && 0%{?rhel} <= 7
+%dir %{_sysconfdir}/bash_completion.d
+%{_sysconfdir}/bash_completion.d/%{name}
+%else
+%dir %{_datadir}/bash-completion
+%dir %{_datadir}/bash-completion/completions
+%{_datadir}/bash-completion/completions/%{name}
+%endif
+%{_mandir}/man8/%{name}.8*
+%{_mandir}/man8/yum2dnf.8*
+%{_unitdir}/%{name}-makecache.service
+%{_unitdir}/%{name}-makecache.timer
+%{_var}/cache/%{name}/
+%ghost %{_sysconfdir}/distro.repos.d
+
+%files conf
+%license COPYING PACKAGE-LICENSING
+%doc AUTHORS README.rst
+%dir %{confdir}
+%dir %{pluginconfpath}
+%dir %{confdir}/protected.d
+%config(noreplace) %{confdir}/%{name}.conf
+%config(noreplace) %{confdir}/protected.d/%{name}.conf
+%config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
+%ghost %{_localstatedir}/log/hawkey.log
+%ghost %{_localstatedir}/log/%{name}.log
+%ghost %{_localstatedir}/log/%{name}.librepo.log
+%ghost %{_localstatedir}/log/%{name}.rpm.log
+%ghost %{_localstatedir}/log/%{name}.plugin.log
+%ghost %{_sharedstatedir}/%{name}
+%ghost %{_sharedstatedir}/%{name}/groups.json
+%ghost %{_sharedstatedir}/%{name}/yumdb
+%ghost %{_sharedstatedir}/%{name}/history
+%{_mandir}/man5/%{name}.conf.5.gz
+%{_tmpfilesdir}/%{name}.conf
+%{_sysconfdir}/libreport/events.d/collect_dnf.conf
+
+%files yum
+%{_bindir}/yum
+%{_mandir}/man8/yum.8.gz
+
+%files -n python2-%{name}
+%{_bindir}/%{name}-2
+%exclude %{python2_sitelib}/%{name}/automatic
+%{python2_sitelib}/%{name}/
+%dir %{py2pluginpath}
+
+%if %{with python3}
+%files -n python3-%{name}
+%{_bindir}/%{name}-3
+%exclude %{python3_sitelib}/%{name}/automatic
+%{python3_sitelib}/%{name}/
+%dir %{py3pluginpath}
+%dir %{py3pluginpath}/__pycache__
+%endif
+
+%files automatic
+%{_bindir}/%{name}-automatic
+%config(noreplace) %{confdir}/automatic.conf
+%{_mandir}/man8/%{name}.automatic.8.gz
+%{_unitdir}/%{name}-automatic.service
+%{_unitdir}/%{name}-automatic.timer
+%if %{with python3}
+%{python3_sitelib}/%{name}/automatic/
+%else
+%{python2_sitelib}/%{name}/automatic/
+%endif
+
+%changelog
+* Tue Apr 12 2016 Igor Gnatenko <ignatenko@redhat.com> - 1.1.8-2
+- python3 builds conditionally
+- bash_completion dir for el7 is under /etc
+- builds out-of-tree without copying source
+- use %autosetup macro
+- other fixes
+
+* Tue Apr 05 2016 Michal Luscon <mluscon@redhat.com> 1.1.8-1
+- refactor: repo: add md_expired property (Michal Domonkos)
+- test: fix cachedir usage in LocalRepoTest (Michal Domonkos)
+- clean: operate on all cached repos (RhBug:1278225) (Michal Domonkos)
+- refactor: repo: globally define valid repoid chars (Michal Domonkos)
+- RepoPersistor: only write to disk when requested (Michal Domonkos)
+- clean: remove dead subcommands (Michal Domonkos)
+- doc: --best in case of problem (RhBug:1309408) (Jan Silhan)
+- Added fix for correct error message for group info (RhBug:1209649) (Abhijeet
+  Kasurde)
+- repo: don't get current timeout for librepo (RhBug:1272977) (Igor Gnatenko)
+- doc: fix default timeout value (Michal Luscon)
+- cli: inform only about nonzero md cache check interval (Michal Luscon)
+- base: report errors in batch at the end of md downloading (Michal Luscon)
+- repo: produce more sane error if md download fails (Michal Luscon)
+- zanata update (RhBug:1322226) (Jan Silhan)
+- doc: Fixed syntax of `assumeyes` and `defaultyes` ref lables in
+  `conf_ref.rst` (Matt Sturgeon)
+- Fix output headers for dnf history command (Michael Dunphy)
+- doc: change example of 'dnf-command(repoquery)' (Jaroslav Mracek)
+- makacache.service: shorten journal logs (RhBug:1315349) (Michal Luscon)
+- config: improve UX of error msg (Michal Luscon)
+- Added user friendly message for out of range value (RhBug:1214562) (Abhijeet
+  Kasurde)
+- doc: prefer repoquery to list (Jan Silhan)
+- history: fix empty history cmd (RhBug:1313215) (Michal Luscon)
+- Very minor tweak to the docs for `--assumeyes` and `--assumeno` (Matt
+  Sturgeon)
+
+* Thu Feb 25 2016 Michal Luscon <mluscon@redhat.com> 1.1.7-1
+- Add `/etc/distro.repos.d` as a path owned by the dnf package (Neal Gompa
+  (ニール・ゴンパ))
+- Change order of search and add new default repodirs (RhBug:1286477) (Neal
+  Gompa (ニール・ゴンパ))
+- group: don't mark available packages as installed (RhBug:1305356) (Jan
+  Silhan)
+- history: adjust demands for particular subcommands (RhBug:1258503) (Michal
+  Luscon)
+- Added extension command for group list (RhBug:1283432) (Abhijeet Kasurde)
+- perf: dnf repository-packages <repo> upgrade (RhBug:1306304) (Jan Silhan)
+- sack: Pass base.conf.substitutions["arch"] to sack in build_sack() function.
+  (Daniel Mach)
+- build: make python2/3 binaries at build time (Michal Domonkos)
+- fix dnf history traceback (RhBug:1303149) (Jan Silhan)
+- cli: truncate expiration msg (RhBug:1302217) (Michal Luscon)
+
+* Mon Jan 25 2016 Michal Luscon <mluscon@redhat.com> 1.1.6-1
+- history: don't fail if there is no history (RhBug:1291895) (Michal Luscon)
+- Allow dnf to use a socks5 proxy, since curl support it (RhBug:1256587)
+  (Michael Scherer)
+- output: do not log rpm info twice (RhBug:1287221) (Michal Luscon)
+- dnf owns /var/lib/dnf dir (RhBug:1294241) (Jan Silhan)
+- Fix handling of repo that never expire (RhBug:1289166) (Jaroslav Mracek)
+- Filter out .src packages when multilib_proto=all (Jeff Smith)
+- Enable string for translation (RhBug:1294355) (Parag Nemade)
+- Let logging format messages on demand (Ville Skyttä)
+- clean: include metadata of local repos (RhBug:1226322) (Michal Domonkos)
+- completion: Install to where bash-completion.pc says (Ville Skyttä)
+- spec: bash completion is not a %%config file (Ville Skyttä)
+- Change assertion handling for rpmsack.py (RhBug:1275878) (Jaroslav Mracek)
+- cli: fix storing arguments in history (RhBug:1239274) (Ting-Wei Lan)
+
+* Thu Dec 17 2015 Michal Luscon <mluscon@redhat.com> 1.1.5-1
+- base: save group persistor only after successful transaction (RhBug:1229046)
+  (Michal Luscon)
+- base: do not clean tempfiles after remove transaction (RhBug:1282250) (Michal
+  Luscon)
+- base: clean packages that do not belong to any trans (Michal Luscon)
+- upgrade: allow group upgrade via @ syntax (RhBug:1265391) (Michal Luscon)
+- spec: Mark license files as %%license where available (Ville Skyttä)
+- Remove unused imports (Ville Skyttä)
+- Spelling fixes (Ville Skyttä)
+- Fix typos in documentation (Rob Cutmore)
+- parser: add support for braces in substitution (RhBug:1283017) (Dave
+  Johansen)
+- completion_helper: Don't omit "packages" from clean completions (Ville
+  Skyttä)
+- bash-completion: Avoid unnecessary python invocation per _dnf_helper (Ville
+  Skyttä)
+- repo: Download drpms early (RhBug:1260421) (Ville Skyttä)
+- clean: Don't hardcode list of args in two places (Ville Skyttä)
+- cli: don't crash if y/n and sys.stdin is None (RhBug:1278382) (Adam
+  Williamson)
+- sp err "environement" -> "environment" (Michael Goodwin)
+- Remove -OO from #!/usr/bin/python (RhBug:1230820) (Jaroslav Mracek)
+- cli: warn if plugins are disabled (RhBug:1280240) (Michal Luscon)
+
+* Mon Nov 16 2015 Michal Luscon <mluscon@redhat.com> 1.1.4-1
+- AUTHORS: updated (Jan Silhan)
+- query: add compatibility methods (Michal Luscon)
+- query: add recent, extras and autoremove methods to Query (Michal Luscon)
+- query: add duplicated and latest-limit queries into api (Michal Luscon)
+- format the email message with its as_string method (Olivier Andrieu)
+- added dnf.i18n.ucd* functions as deprecated API (Jan Silhan)
+- i18n: unicode resulting translations (RhBug:1278031) (Jan Silhan)
+- po: get rid of new lines in translation (Jan Silhan)
+- output: add skip count to summary (RhBug:1264032) (Michal Domonkos)
+- groups: fix environment upgrade (Michal Luscon)
+- Fix plural strings extraction (RhBug:1209056) (Baurzhan Muftakhidinov)
+- po: fixed malformed beginning / ending (Jan Silhan)
+- zanata update (Jan Silhan)
+- cli: prevent tracebacks after C^ (RhBug:1274946) (Michal Luscon)
+
+* Wed Oct 14 2015 Michal Luscon <mluscon@redhat.com> 1.1.3-1
+- Update command_ref.rst (Jaroslav Mracek)
+- Change in automatic.conf email settings to prevent email error with default
+  sender name (Jaroslav Mracek)
+- Replace assert_called() with assert_called_with() for Py35 support (Neal
+  Gompa (ニール・ゴンパ))
+- doc: improve documentation (Jaroslav Mracek)
+- doc: update the instructions related to nightly builds (Radek Holy)
+- Revert "Add the continuous integration script" (Radek Holy)
+- Revert "cosmetic: ci: fix the Copr name in the README" (Radek Holy)
+- Fix typo in Command.canonical's doctring (Timo Wilken)
+- base: group_install is able to exclude mandatory packages
+  (Related:RhBug:1199868) (Jan Silhan)
+
+* Wed Sep 30 2015 Michal Luscon <mluscon@redhat.com> 1.1.2-4
+- don't import readline as it causes crashes in Anaconda
+  (related:RhBug:1258364)
+
+* Tue Sep 22 2015 Michal Luscon <mluscon@redhat.com> 1.1.2-3
+- Revert "completion_helper: don't get IndexError (RhBug:1250038)"
+
+* Tue Sep 22 2015 Michal Luscon <mluscon@redhat.com> 1.1.2-2
+- add hawkey version requirement
+- revert commit #70956
+
+* Tue Sep 22 2015 Michal Luscon <mluscon@redhat.com> 1.1.2-1
+- doc: release notes 1.1.2 (Michal Luscon)
+- sanitize non Unicode command attributes (RhBug:1262082) (Jan Silhan)
+- don't redirect confirmation to stderr RhBug(1258364) (Vladan Kudlac)
+- clean: add rpmdb to usage (Vladan Kudlac)
+- completion_helper: don't get IndexError (RhBug:1250038) (Vladan Kudlac)
+- add --downloadonly switch (RhBug:1048433) (Adam Salih)
+- Add globbing support to base.by_provides() (RhBug:11259650) (Valentina
+  Mukhamedzhanova)
+- spec: packaging python(3)-dnf according to new Fedora guidelines
+  (RhBug:1260198) (Jaroslav Mracek)
+- Bug in Source0: URL in dnf.spec fixed (RhBug:126255) (Jaroslav Mracek)
+- To dnf.spec added provides dnf-command(command name) for 21 dnf commands
+  (RhBug:1259657) (jmracek)
+- Expire repo cache on failed package download (Valentina Mukhamedzhanova)
+- cosmetic: ci: fix the Copr name in the README (Radek Holy)
+- Add the continuous integration script (Radek Holy)
+- Set proper charset on email in dnf-automatic (RhBug:1254982) (Valentina
+  Mukhamedzhanova)
+- doc: improve configuration description (RhBug:1261766) (Michal Luscon)
+- remove: show from which repo a package is (Vladan Kudlac)
+- list: show from which repo a package is (RhBug:1234491) (Vladan Kudlac)
+- Spelling/grammar fixes (Ville Skyttä)
+- install: fix crash when terminal window is small (RhBug:1256531) (Vladan
+  Kudlac)
+- install: mark unification of the progress bar (Vladan Kudlac)
+- fix translations in python3 (RhBug:1254687) (Michal Luscon)
+- group: CompsQuery now returns group ids (RhBug:1261656) (Michal Luscon)
+
+* Tue Sep 08 2015 Michal Luscon <mluscon@redhat.com> 1.1.1-2
+- fix access to demands (RhBug:1259194) (Jan Silhan)
+- make clean_requiremets_on_remove=True (RhBug:1260280) (Jan Silhan)
+
+* Mon Aug 31 2015 Michal Luscon <mluscon@redhat.com> 1.1.1-1
+- Fixed typo (RhBug:1249319) (Adam Salih)
+- fixed downgrade with wildcard (RhBug:1234763) (Adam Salih)
+- reorganize logic of get_best_selector(s) and query (RhBug:1242946) (Adam
+  Salih)
+- completion_helper: don't crash if exception occurred (RhBug:1225225) (Igor
+  Gnatenko)
+- base: expire cache if repo is not available (Michal Luscon)
+- Don't suggest --allowerasing if it is enabled (Christian Stadelmann)
+- translation works in python3 (RhBug:1254687) (Jan Silhan)
+- logrotate less often (RhBug:1247766) (Jan Silhan)
+- implement dnf mark command (RhBug:1125925) (Michal Luscon)
+- groups: use comps data to migrate persistor (Michal Luscon)
+- groups: preserve api compatibility (Michal Luscon)
+- groups: use persistor data for removing env/group (Michal Luscon)
+- persistor: add migration and bump version (Michal Luscon)
+- persistor: store name and ui_name of group (Michal Luscon)
+- show real metadata timestamp on the server in verbose mode (Jan Silhan)
+- lock: make rpmdb lock blocking (RhBug:1210289) (Michal Luscon)
+
+* Wed Aug 12 2015 Michal Luscon <mluscon@redhat.com> 1.1.0-2
+- update: installonly pkgs are not shown in both install and skipped section
+  (RhBug:1252415) (Jan Silhan)
+- output: sort skipped packages (Jan Silhan)
+- output: skipped conflicts are set (RhBug:1252032) (Jan Silhan)
+- keep the dwongrading package installed if transaction fails (RhBug:1249379)
+  (Jan Silhan)
+- don't store empty attributes (RhBug:1246928) (Michael Mraka)
+- doc: correct dnf.conf man section (RhBug:1245349) (Michal Luscon)
+
+* Mon Aug 10 2015 Michal Luscon <mluscon@redhat.com> 1.1.0-1
+- print skipped pkg with broken deps too (Related:RhBug:1210445) (Jan Silhan)
+- history: set commands output as default (RhBug:1218401) (Michal Luscon)
+- Update es.po. save:guardar -> save:ahorrar (Máximo Castañeda)
+- cosmetic: option arg in Base.*install is replaced with strict (Jan Silhan)
+- group: don't fail on first non-existing group (Jan Silhan)
+- install: skips local pkgs of lower version when strict=0
+  (Related:RhBug:1227952) (Jan Silhan)
+- install: skip broken/conflicting packages in groups when strict=0 (Jan
+  Silhan)
+- install: skip broken/conflicting packages when strict=0 (Jan Silhan)
+- implemented `strict` config option working in install cmd (RhBug:1197456)
+  (Jan Silhan)
+- fixed 'dnf --quiet repolist' lack of output (RhBug:1236310) (Nick Coghlan)
+- Add support for MIPS architecture (Michal Toman)
+- package: respect baseurl attribute in localPkg() (RhBug:1219638) (Michal
+  Luscon)
+- Download error message is not written on the same line as progress bar
+  anymore (RhBug: 1224248) (Adam Salih)
+- dnf downgrade does not try to downgrade not installed packages (RhBug:
+  1243501) (max9631)
+- pkgs not installed due to rpm error are reported (RhBug:1207981) (Adam Salih)
+- dnf install checks availability of all given packages (RhBug:1208918) (Adam
+  Salih)
+- implemented install_weak_deps config option (RhBug:1221635) (Jan Silhan)
+- ignore SIGPIPE (RhBug:1236306) (Michael Mraka)
+- always add LoggingTransactionDisplay to the list of transaction displays
+  (RhBug:1234639) (Radek Holy)
+- Add missing FILES section (RhBug: 1225237) (Adam Salih)
+- doc: Add yum vs dnf hook information (RhBug:1244486) (Parag Nemade)
+- doc: clarify the expected type of the do_transactions's display parameter
+  (Radek Holy)
+- apichange: add dnf.cli.demand.DemandSheet.transaction_display (Radek Holy)
+- apichange: add dnf.callback.TransactionProgress (Radek Holy)
+- move the error output from TransactionDisplay into a separate class (Radek
+  Holy)
+- rename TransactionDisplay.errorlog to TransactionDisplay.error (Radek Holy)
+- report package verification as a regular RPM transaction event (Radek Holy)
+- rename TransactionDisplay.event to TransactionDisplay.progress (Radek Holy)
+- apichange: deprecate dnf.callback.LoggingTransactionDisplay (Radek Holy)
+- use both CliTransactionDisplay and demands.transaction_display (Radek Holy)
+- apichange: accept multiple displays in do_transaction (Radek Holy)
+- support multiple displays in RPMTransaction (Radek Holy)
+
+* Fri Jul 31 2015 Michal Luscon <mluscon@redhat.com> 1.0.2-3
+- Fix regression in group list command introduced by 02c3cc3 (Adam Salih)
+- AUTHORS: updated (Jan Silhan)
+- stop saying "experimental" (Matthew Miller)
+
+* Tue Jul 21 2015 Jan Silhan <jsilhan@redhat.com> 1.0.2-2
+- fixed python3 syntax error from f427aa2 (Jan Silhan)
+
+* Fri Jul 17 2015 Michal Luscon <mluscon@redhat.com> 1.0.2-1
+- give --allowerasing hint when error occurs during resolution (RhBug:1148630)
+  (Jan Silhan)
+- show --best hint with skipped packages every time (RhBug:1176351) (Jan Silhan)
+- notify about skipped packages when upgrade (RhBug:1210445) (Jan Silhan)
+- dnf-automatic: Document apply_updates=no behavior wrt keepcache (Ville
+  Skyttä)
+- persistor: share functionality of JSONDB (Jan Silhan)
+- keepcache=0 persists packages till next successful transaction
+  (RhBug:1220074) (Jan Silhan)
+- do not use releasever in cache path (related to RhBug:1173107) (Michael
+  Mraka)
+- doc: add dnf list use case (Michal Luscon)
+- repo: allow ntlm proxy auth (RhBug:1219199) (Michal Luscon)
+- add a script which updates release notes (Radek Holy)
+- doc: reverse the order of release notes (Radek Holy)
+- completion_helper: fix tb if list XXX is not known arg (RhBug:1220040) (Igor
+  Gnatenko)
+- configurable maximum number of parallel downloads (RhBug:1230975) (Igor
+  Gnatenko)
+- add info to bash_completion (1nsan3)
+- dnf upgrade does not try to upgrade uninstalled packages (RhBug: 1234763)
+  (Adam Salih)
+- dnf group list now checks every package and prints out only invalid ones
+  (Adam Salih)
+- install: return zero exit code if group is already installed (RhBug:1232815)
+  (Michal Luscon)
+- doc: add -b which does the same as --best (Igor Gnatenko)
+- support category groups (Michael Mraka)
+- cli test update for repofrompath (Michael Mraka)
+- documentation for --repofrompath (Michael Mraka)
+- implemented --repofrompath option (RhBug:1113384) (Michael Mraka)
+- doc: document filter provides and obsoletes (Michal Luscon)
+- doc: extend --quiet explanation (RhBug:1133979) (Jan Silhan)
+- fixed dnf-automatic email emitter unicode error (RhBug:1238958) (Jan Silhan)
+- doc: be specific what 'available' means in list/info (Jan Silhan)
+- cosmetic: fixed typo (RhBug:1238252) (Jan Silhan)
+- groups: clean dependencies (Michal Luscon)
+- groups: fix removing of env that contains previously removed group (Michal
+  Luscon)
+- groups: fix removing of empty group (Michal Luscon)
+- AUTHORS: updated (Jan Silhan)
+- bash-completion: ignore sqlite3 user configuration (Peter Simonyi)
+- Fix package name for rawhide .repo files (Frank Dana)
+- Add 'transaction_display' to DemandSheet (Will Woods)
+- translation: update (Jan Silhan)
+- translation: use zanata instead of transifex (Jan Silhan)
+- Updated Polish translation (Piotr Drąg)
+- updated georgian translation (George Machitidze)
+- group: fixed installing of already installed environment (Jan Silhan)
+- conf: change minrate threshold to librepo default (RhBug:1212320) (Michal
+  Luscon)
+
+* Tue Jun 09 2015 Michal Luscon <mluscon@redhat.com> 1.0.1-2
+- conf: change minrate threshold to librepo default (RhBug:1212320)
+- group: fixed installation of already installed environments
+
+* Tue Jun 09 2015 Michal Luscon <mluscon@redhat.com> 1.0.1-1
+- doc: document variables in repo conf (Michal Luscon)
+- groups: temporary fix for group remove (RhBug:1214968) (Michal Luscon)
+- group: print summary of marked groups / environments together at the end (Jan
+  Silhan)
+- group: fixed marking as installed (RhBug:1222694) (Jan Silhan)
+- doc: Spelling fixes (Ville Skyttä)
+- dnf-automatic: Fix systemd service description (thanks Ville Skyttä) (Jan
+  Silhan)
+- doc: assumeyes added to Base.conf and config option (Jan Silhan)
+- optionparser: deleted --obsoletes option that conflicted with repoquery
+  plugin (Jan Silhan)
+- dnf-automatic: Document emit_via default (Ville Skyttä)
+- man: yum2dnf don;t show content (RhBug:1225246) (Thanks Adam Salih) (Jan
+  Silhan)
+- doc: allowed chars of repo ID (Jan Silhan)
+- doc: minimal repo config file (Jan Silhan)
+- doc: configuration files replacement policy (Jan Silhan)
+- fixed typo in man page (RhBug:1225168) (Michael Mraka)
+- Update authors (Michal Luscon)
+- dnf-automatic: add random_sleep option (RhBug:1213985) (Vladan Kudlac)
+- don't print bug report statement when rpmdb is corrupted
+  (Related:RhBug:1225277) (Jan Silhan)
+- comps: fix unicode issue (RhBug:1223932) (Thanks Parag) (Parag Nemade)
+- logging: setup librepo log in verbose mode (Michal Luscon)
+- doc: document the versioning scheme (Radek Holy)
+- groups: end up empty group removal before solving (Michal Luscon)
+- groups: end up empty installation before solving (RhBug:1223614) (Michal
+  Luscon)
+- doc: add support for transactions/packages/ranges in "dnf history list"
+  (Radek Holy)
+- doc: add support for transaction ranges in "dnf history info" (Radek Holy)
+- support ssl client certificates (RhBug:1203661) (Michael Mraka)
+- doc: document the "mirrorlist" configuration option (Radek Holy)
+- doc: document the "metalink" configuration option (Radek Holy)
+- doc: document the "baseurl" configuration option (Radek Holy)
+- doc: document the "enabled" configuration option (Radek Holy)
+- doc: document the "name" configuration option (Radek Holy)
+- Revert "spec: added sqlite requirement" (Jan Silhan)
+- spec: added sqlite requirement (Jan Silhan)
+- cosmetic: fixed typo in comment (Jan Silhan)
+- man: added reference to bug reporting guide (Jan Silhan)
+- test: ignore user terminal width (Jan Silhan)
+- cosmetic: base: import dnf.util.first (Jan Silhan)
+- base.upgrade: inform user when pkg not installed and skipped (RhBug:1187741)
+  (Jan Silhan)
+- disable buildtime c/c++ dependency (Michael Mraka)
+- doc: document the new virtual provides (Radek Holy)
+- AUTHORS: updated (Jan Silhan)
+- AUTHORS: distuinguish authors and contributors (Jan Silhan)
+- Create ka.po (George Machitidze)
+- Parser: fix path handling (Haikel Guemar)
+- doc: metadata_timer_sync checked every hour (Jan Silhan)
+
+* Wed Apr 29 2015 Michal Luscon <mluscon@redhat.com> 1.0.0-1
+- doc: release notes dnf-1.0.0 (Michal Luscon)
+- completion: don't do aliases (RhBug:1215289) (Jan Silhan)
+- use Sack.load_repo() instead of Sack.load_yum_repo() (Jan Silhan)
+- Repo.name has default value of repo ID (RhBug:1215560) (Jan Silhan)
+- cosmetic: get rid of user visible yum references (Jan Silhan)
+- moved install_or_skip to dnf.comps (Jan Silhan)
+- group: see already installed group during installation (RhBug:1199648) (Jan
+  Silhan)
+- group: install_or_skip returns num of packages to install (Jan Silhan)
+- group: made global function install_or_skip (Jan Silhan)
+- AUTHORS: updated (Radek Holy)
+- describe --refresh option in --help output (Pádraig Brady)
+- better no such command message (RhBug:1208773) (Jan Silhan)
+- doc: package-cleanup example doesn't print 'No match for argument:...'
+  garbage (Jan Silhan)
+- mention yum check replacement (Michael Mraka)
+- added ref to dnf list (Michael Mraka)
+- added package-cleanup to dnf translation table (Michael Mraka)
+- python3: Repo comparison (RhBug:1208018) (Jan Silhan)
+- python3: YumHistoryRpmdbProblem comparison (RhBug:1207861) (Jan Silhan)
+- python3: YumHistoryTransaction comparison (Jan Silhan)
+- tests: use packages in test_transaction (Radek Holy)
+- cosmetic: fix some Pylint errors (Radek Holy)
+- updated documentation wrt installonlypkgs and auto removal (Michael Mraka)
+- mark installonly packages always as userinstalled (RhBug:1201445) (Michael
+  Mraka)
+- mark username/password as api (Michael Mraka)
+- document username/password repo attributes (Michael Mraka)
+- support HTTP basic auth (RhBug:1210275) (Michael Mraka)
+- cli: better metadata timestamp info (Michal Luscon)
+- repo: add metadata mirror failure callback (Michal Luscon)
+- dnf-yum: cosmetic: lower case after comma (Jan Silhan)
+- dnf-yum: print how to install migrate plugin (Jan Silhan)
+- doc: show the real package for each tool in dnf-plugins-extras (Tim
+  Lauridsen)
+- doc: improve the documentation of repo costs (Radek Holy)
+- doc: fix debuginfo-install package name (Michal Luscon)
+- doc: release notes 0.6.5 (Michal Luscon)
+- bash-completion: allow only one subcmd for help (Igor Gnatenko)
+- bash-completion: add history completion (Igor Gnatenko)
+- bash-completion: add completion for help (Igor Gnatenko)
+- bash-completion: check where pointing bin/dnf (Igor Gnatenko)
+- bash-completion: implement completion for clean cmd (Igor Gnatenko)
+- bash_completion: implement downgrade command (Igor Gnatenko)
+- bash-completion: refactor to python helper (Igor Gnatenko)
+- command downgrade does downgrade_to (RhBug:1191275) (Jan Silhan)
+- AUTHORS: updated (Jan Silhan)
+- clean: 'dnf clean all' should also clean presto and updateinfo solvx files
+  (Parag Nemade)
+- dnf-yum: modified warning message (RhBug:1207965) (Jan Silhan)
+
+* Tue Mar 31 2015 Michal Luscon <mluscon@redhat.com> 0.6.5-1
+- subject: expand every glob name only once (RhBug:1203151) (Michal Luscon)
+- group mark: skips already installed groups (Jan Silhan)
+- Merge pull request #246 from mluscon/yum2dnf (mluscon)
+- Add yum2dnf man page (Michal Luscon)
+- doc: extend cli_vs_yum (Michal Luscon)
+- dnf-yum package does not conflict with yum 3.4.3-505+ (Jan Silhan)
+- fixed double set of demand from 0e4276f (Jan Silhan)
+- group: remove cmd don't load available_repos, see 04da412 (Jan Silhan)
+- spec: /var/lib/dnf owned by dnf-conf (Jan Silhan)
+- spec: apply the weak dependencies only on F21+ (Radek Holy)
+- dnf-automatic: fixed python_sitelib (RhBug:1199450) (Jan Silhan)
+- Add release instructions (Michal Luscon)
+- setup tito to bump version in VERSION.cmake (Michal Luscon)
+- initialize to use tito (Michal Luscon)
+- prepare repo for tito build system (Michal Luscon)
+- spec: recommends bash-completion (RhBug:1190671) (Jan Silhan)
+- completion: work with just python(3)-dnf (Jan Silhan)
+- spec: move necessary files inside python(3) subpackages (RhBug:1191579) (Jan Silhan)
+- bash-completion: use python method to get commands (RhBug:1187579) (Igor Gnatenko)
+- api: exposed pluginconfpath main config (RhBug:1195325) (Jan Silhan)
+- updated AUTHORS (Jan Silhan)
+- add reinstall to bash_completion (Alberto Ruiz)
+- added new packages to @System for duplicated query test (Michael Mraka)
+- test for duplicated, installonly and latest_limit pkgs (Michael Mraka)
+- tests for autoremove, extras and recent pkgs (Michael Mraka)
+- moved push_userinstalled from base to goal (Michael Mraka)
+- filter or skip 'n' latest packages (Michael Mraka)
+- moved recent to query (Michael Mraka)
+- moved autoremove to query (Michael Mraka)
+- moved extras list to query (Michael Mraka)
+- create query for installonly packages (Michael Mraka)
+- create query for duplicated packages (Michael Mraka)
+- cosmetic: base: fixed pylint warnings (Jan Silhan)
+- do transaction cleanup after plugin hook (RhBug:1185977) (Michal Luscon)
+- base: extend download lock (RhBug:1157233) (Michal Luscon)
+- lock: output meaningful error for malformed lock file (Michal Luscon)
+- util: fix race condition in ensure_dir() (Michal Luscon)
+- lock: switch metadata lock to blocking mode (Michal Luscon)
+- install nonmandatory group packages as optional (Related:RhBug:1167881) (Michal Luscon)
+- remove command deletes whole dependency tree (RhBug:1154202) (Jan Silhan)
+- cmd list takes <package-name-specs> as parameter, revert of 526e674 (Jan Silhan)
+- spec: own /var/lib/dnf directory (RhBug:1198999) (Jan Silhan)
+- transifex update (Jan Silhan)
+- doc: fixed systemd execution of dnf-automatic (Jan Silhan)
+- doc: how to run dnf-automatic (RhBug:1195240) (Jan Silhan)
+- cosmetic: added forgotten :api mark from 05b03fc (Jan Silhan)
+- api: exposed Repo.skip_if_unavailable config (RhBug:1189083) (Jan Silhan)
+- updated documentation for 'dnf list autoremove' (Michael Mraka)
+- reuse list_autoremove() in autoremove command (Michael Mraka)
+- function for autoremove package list (Michael Mraka)
+- implemented dnf list autoremove (Michael Mraka)
+- exclude not documented history subcommands (RhBug:1193914,1193915) (Jan Silhan)
+- better file pattern recognition (RhBug:1195385) (Jan Silhan)
+- spec: fix Obsoletes of the new DNF (Radek Holy)
+- remove boot only constraint and add missing download lock (Michal Luscon)
+- util: remove unused user_run_dir() function (Michal Luscon)
+- lock: change the destination folder of locks to allow suided programs work properly (RhBug:1195661) (Michal Luscon)
+- install dnf-3 only when python3 is enabled (thanks glensc) (Jan Silhan)
+- fixed unicode Download error (RhBug:1190458) (Jan Silhan)
+- log: print metadata age along with timestamp (Petr Spacek)
+- cli: fix double expansion of cachedir (RhBug:1194685) (Michal Luscon)
 - removed unused dnf-makecache.cron (Jan Silhan)
 - renamed erase command to remove (RhBug:1160806) (Jan Silhan)
 - spec: made python3-dnf package installed by default in f23 (Jan Silhan)
@@ -273,26 +815,8 @@ popd
 - option_parser: fixed splitting multiple values (RhBug:1186710) (Jan Silhan)
 - AUTHORS: updated (Jan Silhan)
 - Standardize words describing boolean data type (Christopher Meng)
-- build 0.6.4-1 (Jan Silhan)
-- Adapt to librepo-1.7.13, metalink and mirrorlist are not loaded anymore when the repo is local. (Radek Holy)
-- not raises value error when no metadata exist (Jan Silhan)
-- README: fixed formating 2 (Jan Silhan)
-- README: fixed formating (Jan Silhan)
-- README: expanded DNF installation options (Jan Silhan)
-- allow snapshot versions (Michael Mraka)
-- simple script to build test package (Michael Mraka)
-- more standard way to find out latest commit (Michael Mraka)
-- let package version be specified on commandline (Michael Mraka)
-- New version: 0.6.4 (Jan Silhan)
-- Remove lock files during boot (RhBug:1154476) (Michal Luscon)
-- doc: groups are ordered not categories (Jan Silhan)
-- doc: added Package attributes to API (Jan Silhan)
-- README: link to bug reporting guide (Jan Silhan)
-- README: the official documentation is on readthedoc (Jan Silhan)
-- i18n: unicode encoding does not throw error (RhBug:1155877) (Jan Silhan)
-- conf: added minrate repo option (Related:RhBug:1175466) (Jan Silhan)
-- conf: added timeout repo option (RhBug:1175466) (Jan Silhan)
-- doc: api_queries: add 'file' filter description (RhBug:1186461) (Igor Gnatenko)
+
+* Wed Feb 4 2015 Jan Silhan <jsilhan@redhat.com> - 0.6.4-1
 - Adapt to librepo-1.7.13, metalink and mirrorlist are not loaded anymore when the repo is local. (Radek Holy)
 - not raises value error when no metadata exist (Jan Silhan)
 - Remove lock files during boot (RhBug:1154476) (Michal Luscon)
@@ -510,7 +1034,7 @@ popd
 - cli: sort packages in the transaction summary. (Ales Kozumplik)
 - refactor: cli: massively simplify how errors are propagated from do_transaction(). (Ales Kozumplik)
 - groups: rearrange things in CLI so user has to confirm the group changes. (Ales Kozumplik)
-- groups: commiting the persistor data should only happen at one place. (Ales Kozumplik)
+- groups: committing the persistor data should only happen at one place. (Ales Kozumplik)
 - groups: visualizing the groups transactions. (Ales Kozumplik)
 - Add dnf.util.get_in() to navigate nested dicts with sequences of keys. (Ales Kozumplik)
 - group persistor: generate diffs between old and new DBs. (Ales Kozumplik)
@@ -931,4 +1455,3 @@ popd
 - refactor: Move MockBase methods to BaseStubMixin. (Radek Holy)
 - refactor: Move repo-pkgs info to a standalone class instead of reusing the InfoCommand. (Radek Holy)
 - refactor: Move InfoCommand._print_packages to BaseCli.output_packages. (Radek Holy)
-
