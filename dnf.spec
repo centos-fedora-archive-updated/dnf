@@ -22,16 +22,13 @@
 %global _docdir_fmt %{name}
 
 Name:           dnf
-Version:        1.1.9
-Release:        2%{?dist}
+Version:        1.1.10
+Release:        1%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{name}-%{version}/%{name}-%{version}.tar.gz
-Patch0:         enforce-api-reflect-changes-from-992475-in-completio.patch
-Patch1:         enforce-api-add-compatibility-methods-for-renamed-co.patch
-Patch2:         Revert-group-treat-mandatory-pkgs-as-mandatory-if-st.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -96,7 +93,11 @@ BuildRequires:  python-iniparse
 BuildRequires:  python-libcomps >= %{libcomps_version}
 BuildRequires:  python-librepo >= %{librepo_version}
 BuildRequires:  python-nose
+%if 0%{?rhel} && 0%{?rhel} <= 7
 BuildRequires:  pygpgme
+%else
+BuildRequires:  python2-pygpgme
+%endif
 BuildRequires:  pyliblzma
 BuildRequires:  rpm-python >= %{rpm_version}
 Recommends:     bash-completion
@@ -107,10 +108,13 @@ Requires:       python-hawkey >= %{hawkey_version}
 Requires:       python-iniparse
 Requires:       python-libcomps >= %{libcomps_version}
 Requires:       python-librepo >= %{librepo_version}
+%if 0%{?rhel} && 0%{?rhel} <= 7
 Requires:       pygpgme
+%else
+Requires:       python2-pygpgme
+%endif
 Requires:       rpm-plugin-systemd-inhibit
 Requires:       rpm-python >= %{rpm_version}
-Obsoletes:      %{name} <= 0.6.4
 
 %description -n python2-%{name}
 Python 2 interface to DNF.
@@ -137,7 +141,6 @@ Requires:       python3-librepo >= %{librepo_version}
 Requires:       python3-pygpgme
 Requires:       rpm-plugin-systemd-inhibit
 Requires:       rpm-python3 >= %{rpm_version}
-Obsoletes:      %{name} <= 0.6.4
 
 %description -n python3-%{name}
 Python 3 interface to DNF.
@@ -155,7 +158,7 @@ Requires(postun): systemd
 Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
-%autosetup -p1
+%autosetup
 mkdir build
 %if %{with python3}
 mkdir build-py3
@@ -312,6 +315,9 @@ exit 0
 %endif
 
 %changelog
+* Thu Aug 18 2016 Igor Gnatenko <ignatenko@redhat.com> - 1.1.10-1
+- Update to 1.1.10
+
 * Tue May 24 2016 Michal Luscon <mluscon@redhat.com> 1.1.9-2
 - Revert "group: treat mandatory pkgs as mandatory if strict=true" (RhBug:1337731)
 - enforce-api: reflect changes from #992475 in completion_helper (RhBug:1338504)
