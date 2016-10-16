@@ -25,7 +25,7 @@
 
 Name:           dnf
 Version:        1.1.10
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -33,6 +33,9 @@ URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{name}-%{version}-1.tar.gz
 # https://github.com/rpm-software-management/dnf/commit/61df26328ed819e4f220760a98ce31529c4ec609
 Patch0001:      0001-cli-repolist-fix-showing-repository-name-with-disabl.patch
+# https://github.com/rpm-software-management/dnf/pull/623
+# https://github.com/rpm-software-management/dnf/commit/d84aee9c5a6f4249e7418865a1bb24aed194e659
+Patch0002:      0001-Add-RISC-V-architectures.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -336,6 +339,9 @@ exit 0
 %endif
 
 %changelog
+* Sun Oct 16 2016 Richard W.M. Jones <rjones@redhat.com> - 1.1.10-3
+- Backport upstream support for the RISC-V architectures.
+
 * Thu Sep 08 2016 Igor Gnatenko <ignatenko@redhat.com> - 1.1.10-2
 - Obsolete dnf-langpacks
 - Backport patch for dnf repolist disabled
