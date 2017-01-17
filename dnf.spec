@@ -1,4 +1,4 @@
-%global hawkey_min_ver 0.6.1
+%global hawkey_min_ver 0.6.3-6.1
 %global hawkey_max_ver 0.7.0
 %global librepo_version 1.7.16
 %global libcomps_version 0.1.6
@@ -25,7 +25,7 @@
 
 Name:           dnf
 Version:        1.1.10
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -39,6 +39,7 @@ Patch0002:      0001-Add-RISC-V-architectures.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1401041
 # https://github.com/rpm-software-management/dnf/commit/fba7ae2890ddc725fdad3fd092278e36dd029a83
 Patch0003:      0001-SpacewalkRepo-object-has-no-attribute-repofile-RhBug.patch
+Patch0004:      0001-subject-prefer-obsoletes-RhBug-1096506-RhBug-1332830.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -342,6 +343,9 @@ exit 0
 %endif
 
 %changelog
+* Tue Jan 17 2017 Igor Gnatenko <ignatenko@redhat.com> - 1.1.10-5
+- Prefer obsoletes (RHBZ #1096506)
+
 * Fri Dec 02 2016 Igor Gnatenko <ignatenko@redhat.com> - 1.1.10-4
 - Backport upstream fix for dnf.Repo.repofile
 
