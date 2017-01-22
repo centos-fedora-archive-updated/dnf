@@ -1,4 +1,4 @@
-%global hawkey_min_ver 0.6.3-6.1
+%global hawkey_version 0.6.3-6.1
 %global librepo_version 1.7.16
 %global libcomps_version 0.1.6
 %global rpm_version 4.12.0
@@ -23,7 +23,7 @@
 
 Name:           dnf
 Version:        1.1.10
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -319,6 +319,9 @@ exit 0
 %endif
 
 %changelog
+* Sun Jan 22 2017 Igor Gnatenko <ignatenko@redhat.com> - 1.1.10-4
+- Fix min version for hawkey (RHBZ #1415441)
+
 * Tue Jan 17 2017 Igor Gnatenko <ignatenko@redhat.com> - 1.1.10-3
 - Prefer obsoletes (RHBZ #1096506)
 
