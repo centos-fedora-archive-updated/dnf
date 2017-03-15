@@ -25,7 +25,7 @@
 
 Name:           dnf
 Version:        1.1.10
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -40,6 +40,7 @@ Patch0002:      0001-Add-RISC-V-architectures.patch
 # https://github.com/rpm-software-management/dnf/commit/fba7ae2890ddc725fdad3fd092278e36dd029a83
 Patch0003:      0001-SpacewalkRepo-object-has-no-attribute-repofile-RhBug.patch
 Patch0004:      0001-subject-prefer-obsoletes-RhBug-1096506-RhBug-1332830.patch
+Patch0005:      0001-Add-new-API-add_new_repo-in-RepoDict-RhBug-1427132.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -343,6 +344,9 @@ exit 0
 %endif
 
 %changelog
+* Wed Mar 15 2017 Jaroslav Mracek <jmracek@redhat.com> - 1.1.10-6
+- Add new API add_new_repo in RepoDict (RhBug:1427132)
+
 * Tue Jan 17 2017 Igor Gnatenko <ignatenko@redhat.com> - 1.1.10-5
 - Prefer obsoletes (RHBZ #1096506)
 
