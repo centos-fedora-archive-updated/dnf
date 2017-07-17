@@ -1,0 +1,393 @@
+From 4815a88ac0c20d0e85c8dfb7f89c4d33e2e62902 Mon Sep 17 00:00:00 2001
+From: Daniel Mach <dmach@redhat.com>
+Date: Wed, 12 Jul 2017 03:32:48 -0400
+Subject: [PATCH 2/4] Add ModuleSubject class for pkg_spec matching.
+
+---
+ dnf/modules.py        | 123 ++++++++++++++++++++++++++
+ tests/test_modules.py | 235 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 358 insertions(+)
+ create mode 100644 tests/test_modules.py
+
+diff --git a/dnf/modules.py b/dnf/modules.py
+index dabd5441..7367b327 100644
+--- a/dnf/modules.py
++++ b/dnf/modules.py
+@@ -273,6 +273,40 @@ class RepoModuleDict(OrderedDict):
+         module.add(repo_module_version)
+         module.parent = self
+ 
++    def find_module_version(self, name, stream=None, version=None, arch=None):
++        try:
++            repo_module = self[name]
++
++            # if stream is not specified:
++            # - use the enabled stream
++            # - pick the default from system profile
++            # - return None if no suitable stream is found
++            if not stream:
++                if repo_module.conf and repo_module.conf.enabled:
++                    stream = repo_module.conf.stream
++
++            if not stream:
++                # TODO: read default stream from system profile
++                stream = "f26"
++
++            if not stream:
++                return None
++
++            repo_module_stream = repo_module[stream]
++
++            if version:
++                repo_module_version = repo_module_stream[version]
++            else:
++                # if version is not specified, pick the latest
++                repo_module_version = repo_module_stream.latest()
++
++            # TODO: arch
++
++            return repo_module_version
++        except KeyError:
++            pass
++        return None
++
+     def enable(self, module_ns, assumeyes, assumeno=False):
+         name, stream, version, _ = self.parse_module_nsvp(module_ns)
+         try:
+@@ -573,3 +607,92 @@ class ModuleTransactionProgress(TransactionProgress):
+                 conf.profiles = sorted(set(profiles))
+ 
+                 repo_module.write_conf_to_file()
++
++
++NSVAP_FIELDS = ["name", "stream", "version", "arch", "profile"]
++
++
++class NSVAP(object):
++    """
++    Represents module name, stream, version, arch, profile.
++    Returned by ModuleSubject.
++    """
++
++    def __init__(self, name, stream, version, arch, profile):
++        self.name = name
++        self.stream = stream
++        self.version = version is not None and int(version) or None
++        self.arch = arch
++        self.profile = profile
++
++    def __repr__(self):
++        values = [getattr(self, i) for i in NSVAP_FIELDS]
++        items = [(field, value) for field, value in zip(NSVAP_FIELDS, values) if value is not None]
++        items_str = ", ".join(["{}={}".format(field, value) for field, value in items])
++        return "<NSVAP: {}>".format(items_str)
++
++    def __eq__(self, other):
++        result = True
++        for field in NSVAP_FIELDS:
++            value_self = getattr(self, field)
++            value_other = getattr(other, field)
++            result &= value_self == value_other
++        return result
++
++
++class ModuleSubject(object):
++    """
++    Find matching modules for given user input (pkg_spec).
++    """
++
++    def __init__(self, pkg_spec):
++        self.pkg_spec = pkg_spec
++
++    def get_nsvap_possibilities(self, forms=None):
++        # split profile and then parse module NSVA as it was rpm NVRA
++
++        if "/" in self.pkg_spec:
++            nsva, profile = self.pkg_spec.rsplit("/", 1)
++            if not profile.strip():
++                profile = None
++        else:
++            nsva, profile = self.pkg_spec, None
++
++        subj = hawkey.Subject(nsva)
++        kwargs = {}
++        if forms:
++            kwargs["form"] = forms
++        possibilities = subj.nevra_possibilities(**kwargs)
++
++        result = []
++        for i in possibilities:
++            try:
++                if i.release is not None:
++                    i.release = str(int(i.release))
++            except ValueError:
++                # module version has to be integer
++                # if it is not -> invalid possibility -> skip
++                continue
++            args = {
++                "name": i.name,
++                "stream": i.version,
++                "version": i.release and int(i.release) or None,
++                "arch": i.arch,
++                "profile": profile
++            }
++            result.append(NSVAP(**args))
++        return result
++
++    def find_module_version(self, repo_module_dict):
++        """
++        Find module that matches self.pkg_spec in given repo_module_dict.
++        Return (RepoModuleVersion, NSVAP).
++        """
++
++        result = (None, None)
++        for nsvap in self.get_nsvap_possibilities():
++            module_version = repo_module_dict.find_module_version(nsvap.name, nsvap.stream, nsvap.version, nsvap.arch)
++            if module_version:
++                result = (module_version, nsvap)
++                break
++        return result
+diff --git a/tests/test_modules.py b/tests/test_modules.py
+new file mode 100644
+index 00000000..e9d04227
+--- /dev/null
++++ b/tests/test_modules.py
+@@ -0,0 +1,235 @@
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This copyrighted material is made available to anyone wishing to use,
++# modify, copy, or redistribute it subject to the terms and conditions of
++# the GNU General Public License v.2, or (at your option) any later version.
++# This program is distributed in the hope that it will be useful, but WITHOUT
++# ANY WARRANTY expressed or implied, including the implied warranties of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
++# Public License for more details.  You should have received a copy of the
++# GNU General Public License along with this program; if not, write to the
++# Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++# 02110-1301, USA.  Any Red Hat trademarks that are incorporated in the
++# source code or documentation are not subject to the GNU General Public
++# License and may only be used or replicated with the express permission of
++# Red Hat, Inc.
++#
++
++from __future__ import absolute_import
++from __future__ import unicode_literals
++
++import unittest
++
++import hawkey
++import modulemd
++
++from dnf.conf import ModuleConf
++from dnf.modules import RepoModuleDict, RepoModule, RepoModuleStream, RepoModuleVersion
++from dnf.modules import ModuleSubject, NSVAP
++
++
++# with profile
++MODULE_NSVAP = "module-name-stream-1.x86_64/profile"
++MODULE_NSVP = "module-name-stream-1/profile"
++MODULE_NSP = "module-name-stream/profile"
++MODULE_NP = "module-name/profile"
++MODULE_NAP = "module-name.x86_64/profile"
++
++# without profile
++MODULE_NSVA = "module-name-stream-1.x86_64"
++MODULE_NSV = "module-name-stream-1"
++MODULE_NS = "module-name-stream"
++MODULE_N = "module-name"
++MODULE_NA = "module-name.x86_64"
++
++
++class ModuleSubjectTest(unittest.TestCase):
++
++    def test_nsvap(self):
++        subj = ModuleSubject(MODULE_NSVAP)
++        result = list(subj.get_nsvap_possibilities(forms=hawkey.FORM_NEVRA))
++        self.assertEqual(len(result), 1)
++        actual = result[0]
++        expected = NSVAP(name="module-name", stream="stream", version="1", arch="x86_64", profile="profile")
++        self.assertEqual(actual, expected)
++
++    def test_nsva(self):
++        subj = ModuleSubject(MODULE_NSVA)
++        result = list(subj.get_nsvap_possibilities(forms=hawkey.FORM_NEVRA))
++        self.assertEqual(len(result), 1)
++        actual = result[0]
++        expected = NSVAP(name="module-name", stream="stream", version="1", arch="x86_64", profile=None)
++        self.assertEqual(actual, expected)
++
++        # empty profile spec -> no profile
++        subj = ModuleSubject(MODULE_NSVA + "/")
++        result = list(subj.get_nsvap_possibilities(forms=hawkey.FORM_NEVRA))
++        self.assertEqual(len(result), 1)
++        actual = result[0]
++        expected = NSVAP(name="module-name", stream="stream", version="1", arch="x86_64", profile=None)
++        self.assertEqual(actual, expected)
++
++    def test_nsvp(self):
++        subj = ModuleSubject(MODULE_NSVAP)
++        result = list(subj.get_nsvap_possibilities(forms=hawkey.FORM_NEVR))
++        self.assertEqual(len(result), 0)
++        # module version "1.x86_64" is not valid (while it is a valid RPM release)
++
++    def test_nsv(self):
++        subj = ModuleSubject(MODULE_NSVA)
++        result = list(subj.get_nsvap_possibilities(forms=hawkey.FORM_NEVR))
++        self.assertEqual(len(result), 0)
++        # module version "1.x86_64" is not valid (while it is a valid RPM release)
++
++    def test_nsp(self):
++        subj = ModuleSubject(MODULE_NSVAP)
++        result = list(subj.get_nsvap_possibilities(forms=hawkey.FORM_NEV))
++        self.assertEqual(len(result), 1)
++        actual = result[0]
++        expected = NSVAP(name="module-name-stream", stream="1.x86_64", version=None, arch=None, profile="profile")
++        self.assertEqual(actual, expected)
++
++        subj = ModuleSubject(MODULE_NSP)
++        result = list(subj.get_nsvap_possibilities(forms=hawkey.FORM_NEV))
++        self.assertEqual(len(result), 1)
++        actual = result[0]
++        expected = NSVAP(name="module-name", stream="stream", version=None, arch=None, profile="profile")
++        self.assertEqual(actual, expected)
++
++    def test_ns(self):
++        subj = ModuleSubject(MODULE_NSVA)
++        result = list(subj.get_nsvap_possibilities(forms=hawkey.FORM_NEV))
++        self.assertEqual(len(result), 1)
++        actual = result[0]
++        expected = NSVAP(name="module-name-stream", stream="1.x86_64", version=None, arch=None, profile=None)
++        self.assertEqual(actual, expected)
++
++        subj = ModuleSubject(MODULE_NS)
++        result = list(subj.get_nsvap_possibilities(forms=hawkey.FORM_NEV))
++        self.assertEqual(len(result), 1)
++        actual = result[0]
++        expected = NSVAP(name="module-name", stream="stream", version=None, arch=None, profile=None)
++        self.assertEqual(actual, expected)
++
++    def test_nap(self):
++        subj = ModuleSubject(MODULE_NAP)
++        result = list(subj.get_nsvap_possibilities(forms=hawkey.FORM_NA))
++        self.assertEqual(len(result), 1)
++        actual = result[0]
++        expected = NSVAP(name="module-name", stream=None, version=None, arch="x86_64", profile="profile")
++        self.assertEqual(actual, expected)
++
++    def test_na(self):
++        subj = ModuleSubject(MODULE_NA)
++        result = list(subj.get_nsvap_possibilities(forms=hawkey.FORM_NA))
++        self.assertEqual(len(result), 1)
++        actual = result[0]
++        expected = NSVAP(name="module-name", stream=None, version=None, arch="x86_64", profile=None)
++        self.assertEqual(actual, expected)
++
++    def test_np(self):
++        subj = ModuleSubject(MODULE_NP)
++        result = list(subj.get_nsvap_possibilities(forms=hawkey.FORM_NAME))
++        self.assertEqual(len(result), 1)
++        actual = result[0]
++        expected = NSVAP(name="module-name", stream=None, version=None, arch=None, profile="profile")
++        self.assertEqual(actual, expected)
++
++    def test_n(self):
++        subj = ModuleSubject(MODULE_N)
++        result = list(subj.get_nsvap_possibilities(forms=hawkey.FORM_NAME))
++        self.assertEqual(len(result), 1)
++        actual = result[0]
++        expected = NSVAP(name="module-name", stream=None, version=None, arch=None, profile=None)
++        self.assertEqual(actual, expected)
++
++    def test_all(self):
++        subj = ModuleSubject(MODULE_NSVAP)
++        result = list(subj.get_nsvap_possibilities())
++        self.assertEqual(len(result), 4)
++
++        actual = result[0]
++        expected = NSVAP(name="module-name", stream="stream", version="1", arch="x86_64", profile="profile")
++        self.assertEqual(actual, expected)
++
++        actual = result[1]
++        expected = NSVAP(name="module-name-stream", stream="1.x86_64", version=None, arch=None, profile="profile")
++        self.assertEqual(actual, expected)
++
++        actual = result[2]
++        expected = NSVAP(name="module-name-stream-1", stream=None, version=None, arch="x86_64", profile="profile")
++        self.assertEqual(actual, expected)
++
++        actual = result[3]
++        expected = NSVAP(name="module-name-stream-1.x86_64", stream=None, version=None, arch=None, profile="profile")
++        self.assertEqual(actual, expected)
++
++
++class RepoModuleDictTest(unittest.TestCase):
++
++    def _create_mmd(self, name, stream, version, rpms=None, profiles=None):
++        rpms = rpms or []
++        profiles = profiles or {}  # profile_name: {pkg_format: [pkg_names]}
++
++        mmd = modulemd.ModuleMetadata()
++        mmd.name = name
++        mmd.stream = stream
++        mmd.version = version
++        mmd.add_module_license("LGPLv2")
++        mmd.summary = "Fake module"
++        mmd.description = mmd.summary
++        for rpm in rpms:
++            mmd.components.add_rpm(rpm.rsplit("-", 2)[0], "")
++            mmd.artifacts.add_rpm(rpm[:-4])
++        for profile_name in profiles:
++            profile = modulemd.ModuleProfile()
++            profile.rpms.update(profiles[profile_name].get("rpms", []))
++            mmd.profiles["default"] = profile
++        return mmd
++
++    def test_find_module_version(self):
++        rmd = RepoModuleDict(None)
++
++        mmd = self._create_mmd(name="module-name", stream="stream", version=1, profiles={"default": {}})
++        rmv = RepoModuleVersion(mmd, None, None)
++        rmd.add(rmv)
++
++        mmd = self._create_mmd(name="module-name", stream="stream", version=2, profiles={"default": {}})
++        rmv = RepoModuleVersion(mmd, None, None)
++        rmd.add(rmv)
++
++        mmd = self._create_mmd(name="module-name", stream="enabled_stream", version=1, profiles={"default": {}})
++        rmv = RepoModuleVersion(mmd, None, None)
++        rmd.add(rmv)
++
++        mmd = self._create_mmd(name="module-name", stream="default_stream", version=1, profiles={"default": {}})
++        rmv = RepoModuleVersion(mmd, None, None)
++        rmd.add(rmv)
++
++        # no default, no active -> can't find stream automatically
++        rmv = rmd.find_module_version(name="module-name")
++        self.assertEqual(rmv, None)
++
++        # set enabled stream
++        conf = ModuleConf()
++        conf.enabled = 1
++        conf.stream = "enabled_stream"
++        rmd["module-name"].conf = conf
++
++        # stream provided by user
++        rmv = rmd.find_module_version(name="module-name", stream="stream")
++        self.assertEqual(rmv.full_version, "module-name-stream-2")
++
++        # stream and version provided by user
++        rmv = rmd.find_module_version(name="module-name", stream="stream", version=1)
++        self.assertEqual(rmv.full_version, "module-name-stream-1")
++
++        # stream == active stream
++        rmv = rmd.find_module_version(name="module-name")
++        self.assertEqual(rmv.full_version, "module-name-enabled_stream-1")
++
++        # stream == default stream
++        conf.enabled = 0
++        rmv = rmd.find_module_version(name="module-name")
++        # TODO: default from system profile
++        # self.assertEqual(rmv.full_version, "module-name-default_stream-1")
+-- 
+2.13.2
+

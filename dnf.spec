@@ -25,7 +25,7 @@
 
 Name:           dnf
 Version:        2.6.0
-Release:        1.git.40.c0f7fc6%{?dist}
+Release:        2.git.40.c0f7fc6%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -34,6 +34,10 @@ URL:            https://github.com/rpm-software-management/dnf
 # cd dnf
 # tito build --tgz --tag=dnf-2.5.1-1
 Source0: dnf-git-40.c0f7fc6.tar.gz
+Patch0001: 0001-fixup-Add-classes-for-processing-modules.patch
+Patch0002: 0002-Add-ModuleSubject-class-for-pkg_spec-matching.patch
+Patch0003: 0003-Use-ModuleSubject-in-all-module-actions.patch
+Patch0004: 0004-Add-initial-unit-tests-for-modularity.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
