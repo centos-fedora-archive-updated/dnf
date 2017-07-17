@@ -25,7 +25,7 @@
 
 Name:           dnf
 Version:        2.6.0
-Release:        2.git.40.c0f7fc6%{?dist}
+Release:        3.git.40.c0f7fc6%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -38,6 +38,7 @@ Patch0001: 0001-fixup-Add-classes-for-processing-modules.patch
 Patch0002: 0002-Add-ModuleSubject-class-for-pkg_spec-matching.patch
 Patch0003: 0003-Use-ModuleSubject-in-all-module-actions.patch
 Patch0004: 0004-Add-initial-unit-tests-for-modularity.patch
+Patch10: no-ugly-hacks.diff
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
