@@ -8,16 +8,31 @@
 %global confdir %{_sysconfdir}/%{name}
 
 %global pluginconfpath %{confdir}/plugins
-%global py2pluginpath %{python2_sitelib}/%{name}-plugins
 
+## What Python subpackages to build
+# Note that --without python2 will fail to build manpages
+# so it's currently unsupported
+# Also double check the results if you build with different combos
 %if 0%{?rhel} && 0%{?rhel} <= 7
+%bcond_without python2
 %bcond_with python3
+%bcond_with platform_python
 %else
+%bcond_without python2
 %bcond_without python3
+%bcond_without platform_python
+%endif
+
+%if %{with python2}
+%global py2pluginpath %{python2_sitelib}/%{name}-plugins
 %endif
 
 %if %{with python3}
 %global py3pluginpath %{python3_sitelib}/%{name}-plugins
+%endif
+
+%if %{with platform_python}
+%global platpypluginpath %{platform_python_sitelib}/%{name}-plugins
 %endif
 
 # Use the same directory of the main package for subpackage licence and docs
@@ -25,7 +40,7 @@
 
 Name:           dnf
 Version:        2.6.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -34,6 +49,7 @@ URL:            https://github.com/rpm-software-management/dnf
 # cd dnf
 # tito build --tgz --tag=dnf-2.5.1-1
 Source0:        %{name}-%{version}.tar.gz
+Patch0:         %{name}-nose-use-module.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -41,18 +57,32 @@ BuildRequires:  gettext
 BuildRequires:  %{_bindir}/sphinx-build
 BuildRequires:  systemd
 BuildRequires:  bash-completion
+%if %{with platform_python}
+Requires:       platform-python-%{name} = %{version}-%{release}
+%else
 %if %{with python3}
 Requires:       python3-%{name} = %{version}-%{release}
 %else
 Requires:       python2-%{name} = %{version}-%{release}
 %endif
+%endif
+
 %if 0%{?rhel} && 0%{?rhel} <= 7
 Requires:       python-dbus
 %else
+%if %{with platform_python}
 # TODO: use rich deps once it is allowed
-#Recommends:     (python%{?with_python3:3}-dbus if NetworkManager)
-Recommends:     python%{?with_python3:3}-dbus
+#Recommends:     (pythonX-dbus if NetworkManager)
+Recommends:     platform-python-dbus
+%else
+%if %{with python3}
+Recommends:     python3-dbus
+%else
+Recommends:     python2-dbus
 %endif
+%endif
+%endif
+
 Requires(post):     systemd
 Requires(preun):    systemd
 Requires(postun):   systemd
@@ -116,6 +146,7 @@ Summary:        As a Yum CLI compatibility layer, supplies /usr/bin/yum redirect
 As a Yum CLI compatibility layer, supplies /usr/bin/yum redirecting to DNF.
 %endif
 
+%if %{with python2}
 %package -n python2-%{name}
 Summary:        Python 2 interface to DNF
 %{?python_provide:%python_provide python2-%{name}}
@@ -148,11 +179,11 @@ Obsoletes:      python-dnf-langpacks < %{dnf_langpacks_ver}
 
 %description -n python2-%{name}
 Python 2 interface to DNF.
+%endif
 
 %if %{with python3}
 %package -n python3-%{name}
 Summary:        Python 3 interface to DNF.
-%{?system_python_abi}
 %{?python_provide:%python_provide python3-%{name}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-hawkey >= %{hawkey_version}
@@ -183,6 +214,35 @@ Obsoletes:      python3-dnf-langpacks < %{dnf_langpacks_ver}
 Python 3 interface to DNF.
 %endif
 
+%if %{with platform_python}
+%package -n platform-python-%{name}
+Summary:        Python 3 interface to DNF.
+BuildRequires:  platform-python-devel
+BuildRequires:  platform-python-hawkey >= %{hawkey_version}
+BuildRequires:  platform-python-iniparse
+BuildRequires:  platform-python-libcomps >= %{libcomps_version}
+BuildRequires:  platform-python-librepo >= %{librepo_version}
+BuildRequires:  platform-python-nose
+BuildRequires:  platform-python-gpg
+Requires:       platform-python-gpg
+BuildRequires:  platform-python-rpm >= %{rpm_version}
+Requires:       %{name}-conf = %{version}-%{release}
+Requires:       deltarpm
+Requires:       platform-python-hawkey >= %{hawkey_version}
+Requires:       platform-python-iniparse
+Requires:       platform-python-libcomps >= %{libcomps_version}
+Requires:       platform-python-librepo >= %{librepo_version}
+%if 0%{?rhel} && 0%{?rhel} <= 7
+Requires:       rpm-plugin-systemd-inhibit
+%else
+Recommends:     rpm-plugin-systemd-inhibit
+%endif
+Requires:       platform-python-rpm >= %{rpm_version}
+
+%description -n platform-python-%{name}
+Platform Python interface to DNF.
+%endif
+
 %package automatic
 Summary:        Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 BuildRequires:  systemd
@@ -196,17 +256,27 @@ Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
 %autosetup -p1
-mkdir build
+%if %{with python2}
+mkdir build-py2
+%endif
+
 %if %{with python3}
 mkdir build-py3
 %endif
 
+%if %{with platform_python}
+mkdir build-platform_py
+%endif
+
 %build
-pushd build
+%if %{with python2}
+pushd build-py2
   %cmake ..
   %make_build
   make doc-man
 popd
+%endif
+
 %if %{with python3}
 pushd build-py3
   %cmake .. -DPYTHON_DESIRED:str=3 -DWITH_MAN=0
@@ -214,31 +284,75 @@ pushd build-py3
 popd
 %endif
 
+%if %{with platform_python}
+pushd build-platform_py
+  %cmake ..  -DPYTHON_DESIRED:str=3 -DPYTHON_EXECUTABLE:FILEPATH=%{__platform_python} -DWITH_MAN=0
+  %make_build
+popd
+%endif
+
 %install
-pushd build
+%if %{with python2}
+pushd build-py2
   %make_install
 popd
+%endif
+
 %if %{with python3}
 pushd build-py3
   %make_install
 popd
 %endif
+
+%if %{with platform_python}
+pushd build-platform_py
+  %make_install
+popd
+%endif
+
 %find_lang %{name}
 
 mkdir -p %{buildroot}%{pluginconfpath}/
+
+%if %{with python2}
 mkdir -p %{buildroot}%{py2pluginpath}/
+%endif
+
 %if %{with python3}
 mkdir -p %{buildroot}%{py3pluginpath}/__pycache__/
 %endif
+
+%if %{with platform_python}
+mkdir -p %{buildroot}%{platpypluginpath}/__pycache__/
+%endif
+
 mkdir -p %{buildroot}%{_localstatedir}/log/
 mkdir -p %{buildroot}%{_var}/cache/dnf/
 touch %{buildroot}%{_localstatedir}/log/%{name}.log
+
+%if %{with platform_python}
 %if %{with python3}
-%{?system_python_abi:sed -i 's|#!%{__python3}|#!%{_libexecdir}/system-python|' %{buildroot}%{_bindir}/dnf-3}
-ln -sr %{buildroot}%{_bindir}/dnf-3 %{buildroot}%{_bindir}/dnf
-mv %{buildroot}%{_bindir}/dnf-automatic-3 %{buildroot}%{_bindir}/dnf-automatic
-ln -sr  %{buildroot}%{_bindir}/dnf-3 %{buildroot}%{_bindir}/yum
+cp %{buildroot}%{_bindir}/dnf-3 %{buildroot}%{_bindir}/dnf
+cp %{buildroot}%{_bindir}/dnf-automatic-3 %{buildroot}%{_bindir}/dnf-automatic
 %else
+mv %{buildroot}%{_bindir}/dnf-3 %{buildroot}%{_bindir}/dnf
+mv %{buildroot}%{_bindir}/dnf-automatic-3 %{buildroot}%{_bindir}/dnf-automatic
+%endif
+sed -i 's|#!%{__python3}|#!%{__platform_python}|' %{buildroot}%{_bindir}/dnf{,-automatic}
+ln -sr  %{buildroot}%{_bindir}/dnf %{buildroot}%{_bindir}/yum
+%endif
+
+%if %{with python3}
+%if %{without platform_python}
+ln -sr %{buildroot}%{_bindir}/dnf-3 %{buildroot}%{_bindir}/dnf
+ln -sr  %{buildroot}%{_bindir}/dnf-3 %{buildroot}%{_bindir}/yum
+mv %{buildroot}%{_bindir}/dnf-automatic-3 %{buildroot}%{_bindir}/dnf-automatic
+%else
+sed -i 's|#!%{__platform_python}|#!%{__python3}|' %{buildroot}%{_bindir}/dnf{,-automatic}-3
+%endif
+%endif
+
+%if %{with python2} && %{without platform_python} && %{without python3}
 ln -sr %{buildroot}%{_bindir}/dnf-2 %{buildroot}%{_bindir}/dnf
 mv %{buildroot}%{_bindir}/dnf-automatic-2 %{buildroot}%{_bindir}/dnf-automatic
 %if 0%{?rhel} && 0%{?rhel} <= 7
@@ -249,14 +363,28 @@ rm -f %{buildroot}%{_mandir}/man8/yum.8.gz
 ln -sr  %{buildroot}%{_bindir}/dnf-2 %{buildroot}%{_bindir}/yum
 %endif
 %endif
+
 rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 
+%if %{with python2}
+sed -i 's|#!/usr/bin/python|#!%{__python2}|' %{buildroot}%{_bindir}/dnf-2
+%endif
+
 %check
-pushd build
+%if %{with python2}
+pushd build-py2
   ctest -VV
 popd
+%endif
+
 %if %{with python3}
 pushd build-py3
+  ctest -VV
+popd
+%endif
+
+%if %{with platform_python}
+pushd build-platform_py
   ctest -VV
 popd
 %endif
@@ -334,11 +462,13 @@ popd
 %{_mandir}/man8/yum.8*
 %endif
 
+%if %{with python2}
 %files -n python2-%{name}
 %{_bindir}/%{name}-2
 %exclude %{python2_sitelib}/%{name}/automatic
 %{python2_sitelib}/%{name}/
 %dir %{py2pluginpath}
+%endif
 
 %if %{with python3}
 %files -n python3-%{name}
@@ -347,6 +477,14 @@ popd
 %{python3_sitelib}/%{name}/
 %dir %{py3pluginpath}
 %dir %{py3pluginpath}/__pycache__
+%endif
+
+%if %{with platform_python}
+%files -n platform-python-%{name}
+%exclude %{platform_python_sitelib}/%{name}/automatic
+%{platform_python_sitelib}/%{name}/
+%dir %{platpypluginpath}
+%dir %{platpypluginpath}/__pycache__
 %endif
 
 %files automatic
@@ -359,13 +497,22 @@ popd
 %{_unitdir}/%{name}-automatic-download.timer
 %{_unitdir}/%{name}-automatic-install.service
 %{_unitdir}/%{name}-automatic-install.timer
+%if %{with platform_python}
+%{platform_python_sitelib}/%{name}/automatic/
+%else
 %if %{with python3}
 %{python3_sitelib}/%{name}/automatic/
 %else
 %{python2_sitelib}/%{name}/automatic/
 %endif
+%endif
 
 %changelog
+* Fri Aug 11 2017 Miro Hrončok <mhroncok@redhat.com> - 2.6.3-2
+- Add platform-python subpackage
+- Remove system_python macros
+- Switch /usr/bin/dnf to use platform-python
+
 * Mon Aug 07 2017 Jaroslav Mracek <jmracek@redhat.com> 2.6.3-1
 - Fix problem with dnf.Package().remote_location() (RhBug:1476215) (Jaroslav
   Mracek)
