@@ -20,7 +20,7 @@
 %else
 %bcond_without python2
 %bcond_without python3
-%bcond_without platform_python
+%bcond_with platform_python
 %endif
 
 %if %{with python2}
@@ -40,7 +40,7 @@
 
 Name:           dnf
 Version:        2.6.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -508,6 +508,10 @@ popd
 %endif
 
 %changelog
+* Mon Aug 21 2017 Tomas Orsava <torsava@redhat.com> - 2.6.3-3
+- Rebuilt without platform-python to revert the switch of /usr/bin/dnf to
+  platform-python in standard Fedora
+
 * Fri Aug 11 2017 Miro Hrončok <mhroncok@redhat.com> - 2.6.3-2
 - Add platform-python subpackage
 - Remove system_python macros
