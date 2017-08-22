@@ -19,16 +19,19 @@
 # and set dnf_python to python3 at the same time
 # It should be one of: python2, python3, platform-python (with dash!)
 %if 0%{?rhel} && 0%{?rhel} <= 7
-%global dnf_python python2
 %bcond_without python2
 %bcond_with python3
 %bcond_with platform_python
+%global dnf_python python2
 %else
-%global dnf_python python3
-#global dnf_python platform-python
 %bcond_without python2
 %bcond_without python3
 %bcond_without platform_python
+%if 0%{?_module_build}
+%global dnf_python platform-python
+%else
+%global dnf_python python3
+%endif
 %endif
 
 %if %{with python2}
