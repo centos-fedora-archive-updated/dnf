@@ -13,14 +13,22 @@
 # Note that --without python2 will fail to build manpages
 # so it's currently unsupported
 # Also double check the results if you build with different combos
+#
+# %%dnf_python selects what dnf requires and what /usr/bin/dnf runs on
+# The build has to be enabled, i.e. you cannot build --without python3
+# and set dnf_python to python3 at the same time
+# It should be one of: python2, python3, platform-python (with dash!)
 %if 0%{?rhel} && 0%{?rhel} <= 7
+%global dnf_python python2
 %bcond_without python2
 %bcond_with python3
 %bcond_with platform_python
 %else
+%global dnf_python python3
+#global dnf_python platform-python
 %bcond_without python2
 %bcond_without python3
-%bcond_with platform_python
+%bcond_without platform_python
 %endif
 
 %if %{with python2}
@@ -40,7 +48,7 @@
 
 Name:           dnf
 Version:        2.6.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -57,15 +65,8 @@ BuildRequires:  gettext
 BuildRequires:  %{_bindir}/sphinx-build
 BuildRequires:  systemd
 BuildRequires:  bash-completion
-%if %{with platform_python}
-Requires:       platform-python-%{name} = %{version}-%{release}
-%else
-%if %{with python3}
-Requires:       python3-%{name} = %{version}-%{release}
-%else
-Requires:       python2-%{name} = %{version}-%{release}
-%endif
-%endif
+
+Requires:       %{dnf_python}-%{name} = %{version}-%{release}
 
 %if 0%{?rhel} && 0%{?rhel} <= 7
 Requires:       python-dbus
@@ -330,45 +331,46 @@ mkdir -p %{buildroot}%{_localstatedir}/log/
 mkdir -p %{buildroot}%{_var}/cache/dnf/
 touch %{buildroot}%{_localstatedir}/log/%{name}.log
 
+
+
 %if %{with platform_python}
-%if %{with python3}
-cp %{buildroot}%{_bindir}/dnf-3 %{buildroot}%{_bindir}/dnf
-cp %{buildroot}%{_bindir}/dnf-automatic-3 %{buildroot}%{_bindir}/dnf-automatic
-%else
-mv %{buildroot}%{_bindir}/dnf-3 %{buildroot}%{_bindir}/dnf
-mv %{buildroot}%{_bindir}/dnf-automatic-3 %{buildroot}%{_bindir}/dnf-automatic
+cp %{buildroot}%{_bindir}/dnf-3 %{buildroot}%{_bindir}/dnf-pp
+cp %{buildroot}%{_bindir}/dnf-automatic-3 %{buildroot}%{_bindir}/dnf-automatic-pp
+sed -i 's|#!%{__python3}|#!%{__platform_python}|' %{buildroot}%{_bindir}/dnf{,-automatic}-pp
+%if %{without python3}
+rm %{buildroot}%{_bindir}/*-3
 %endif
-sed -i 's|#!%{__python3}|#!%{__platform_python}|' %{buildroot}%{_bindir}/dnf{,-automatic}
-ln -sr  %{buildroot}%{_bindir}/dnf %{buildroot}%{_bindir}/yum
 %endif
 
 %if %{with python3}
-%if %{without platform_python}
-ln -sr %{buildroot}%{_bindir}/dnf-3 %{buildroot}%{_bindir}/dnf
-ln -sr  %{buildroot}%{_bindir}/dnf-3 %{buildroot}%{_bindir}/yum
-mv %{buildroot}%{_bindir}/dnf-automatic-3 %{buildroot}%{_bindir}/dnf-automatic
-%else
 sed -i 's|#!%{__platform_python}|#!%{__python3}|' %{buildroot}%{_bindir}/dnf{,-automatic}-3
 %endif
-%endif
 
-%if %{with python2} && %{without platform_python} && %{without python3}
-ln -sr %{buildroot}%{_bindir}/dnf-2 %{buildroot}%{_bindir}/dnf
-mv %{buildroot}%{_bindir}/dnf-automatic-2 %{buildroot}%{_bindir}/dnf-automatic
+%if %{with python2}
 %if 0%{?rhel} && 0%{?rhel} <= 7
 ln -sr  %{buildroot}%{_bindir}/dnf-2 %{buildroot}%{_bindir}/yum4
 ln -sr  %{buildroot}%{_mandir}/man8/dnf.8.gz %{buildroot}%{_mandir}/man8/yum4.8.gz
 rm -f %{buildroot}%{_mandir}/man8/yum.8.gz
+%endif
+sed -i 's|#!/usr/bin/python|#!%{__python2}|' %{buildroot}%{_bindir}/*-2
+%endif
+
+ln -sr  %{buildroot}%{_bindir}/dnf %{buildroot}%{_bindir}/yum
+
+%if "%{dnf_python}" == "python3"
+ln -sr  %{buildroot}%{_bindir}/dnf-3 %{buildroot}%{_bindir}/dnf
+mv -f  %{buildroot}%{_bindir}/dnf-automatic-3 %{buildroot}%{_bindir}/dnf-automatic
 %else
-ln -sr  %{buildroot}%{_bindir}/dnf-2 %{buildroot}%{_bindir}/yum
+%if "%{dnf_python}" == "python2"
+ln -sr  %{buildroot}%{_bindir}/dnf-2 %{buildroot}%{_bindir}/dnf
+mv -f %{buildroot}%{_bindir}/dnf-automatic-2 %{buildroot}%{_bindir}/dnf-automatic
+%else
+ln -sr  %{buildroot}%{_bindir}/dnf-pp %{buildroot}%{_bindir}/dnf
+mv -f  %{buildroot}%{_bindir}/dnf-automatic-pp %{buildroot}%{_bindir}/dnf-automatic
 %endif
 %endif
+rm %{buildroot}%{_bindir}/dnf-automatic-*
 
-rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
-
-%if %{with python2}
-sed -i 's|#!/usr/bin/python|#!%{__python2}|' %{buildroot}%{_bindir}/dnf-2
-%endif
 
 %check
 %if %{with python2}
@@ -481,6 +483,7 @@ popd
 
 %if %{with platform_python}
 %files -n platform-python-%{name}
+%{_bindir}/%{name}-pp
 %exclude %{platform_python_sitelib}/%{name}/automatic
 %{platform_python_sitelib}/%{name}/
 %dir %{platpypluginpath}
@@ -497,17 +500,23 @@ popd
 %{_unitdir}/%{name}-automatic-download.timer
 %{_unitdir}/%{name}-automatic-install.service
 %{_unitdir}/%{name}-automatic-install.timer
-%if %{with platform_python}
-%{platform_python_sitelib}/%{name}/automatic/
-%else
-%if %{with python3}
+
+
+%if "%{dnf_python}" == "python3"
 %{python3_sitelib}/%{name}/automatic/
 %else
+%if "%{dnf_python}" == "python2"
 %{python2_sitelib}/%{name}/automatic/
+%else
+%{platform_python_sitelib}/%{name}/automatic/
 %endif
 %endif
 
 %changelog
+* Tue Aug 22 2017 Miro Hrončok <mhroncok@redhat.com> - 2.6.3-4
+- Add %%dnf_python macro that selects what dnf runs on
+- Enable platform_python once again, but set %%dnf_python to python3
+
 * Mon Aug 21 2017 Tomas Orsava <torsava@redhat.com> - 2.6.3-3
 - Rebuilt without platform-python to revert the switch of /usr/bin/dnf to
   platform-python in standard Fedora
