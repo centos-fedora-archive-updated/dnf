@@ -51,7 +51,7 @@
 
 Name:           dnf
 Version:        2.6.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -76,12 +76,12 @@ Requires:       python-dbus
 %else
 %if %{with platform_python}
 # TODO: use rich deps once it is allowed
-Recommends:     (platform-python-dbus if NetworkManager)
+Requires:       (platform-python-dbus if NetworkManager)
 %else
 %if %{with python3}
-Recommends:     (python3-dbus if NetworkManager)
+Requires:       (python3-dbus if NetworkManager)
 %else
-Recommends:     (python2-dbus if NetworkManager)
+Requires:       (python2-dbus if NetworkManager)
 %endif
 %endif
 %endif
@@ -515,6 +515,9 @@ popd
 %endif
 
 %changelog
+* Sun Sep 03 2017 Igor Gnatenko <ignatenko@redhat.com> - 2.6.3-6
+- Use Requires for NM integration temporarily
+
 * Sun Sep 03 2017 Igor Gnatenko <ignatenko@rehdat.com> - 2.6.3-5
 - Use rich deps in Recommends for NM integration
 
