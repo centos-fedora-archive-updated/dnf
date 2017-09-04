@@ -51,7 +51,7 @@
 
 Name:           dnf
 Version:        2.6.3
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -74,16 +74,17 @@ Requires:       %{dnf_python}-%{name} = %{version}-%{release}
 %if 0%{?rhel} && 0%{?rhel} <= 7
 Requires:       python-dbus
 %else
-%if %{with platform_python}
+#if %{with platform_python}
 # TODO: use rich deps once it is allowed
-Requires:       (platform-python-dbus if NetworkManager)
-%else
+# platform-python-dbus doesn't exist
+#Requires:       (platform-python-dbus if NetworkManager)
+#else
 %if %{with python3}
 Requires:       (python3-dbus if NetworkManager)
 %else
 Requires:       (python2-dbus if NetworkManager)
 %endif
-%endif
+#endif
 %endif
 
 Requires(post):     systemd
@@ -515,6 +516,9 @@ popd
 %endif
 
 %changelog
+* Mon Sep 04 2017 Igor Gnatenko <ignatenko@redhat.com> - 2.6.3-7
+- Drop reference to platform-python-dbus
+
 * Sun Sep 03 2017 Igor Gnatenko <ignatenko@redhat.com> - 2.6.3-6
 - Use Requires for NM integration temporarily
 
