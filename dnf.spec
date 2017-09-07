@@ -51,7 +51,7 @@
 
 Name:           dnf
 Version:        2.6.3
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -86,7 +86,6 @@ Requires:       (python2-dbus if NetworkManager)
 %endif
 #endif
 %endif
-Requires:       (gcc with gcc(major) = 7)
 
 Requires(post):     systemd
 Requires(preun):    systemd
@@ -517,6 +516,9 @@ popd
 %endif
 
 %changelog
+* Thu Sep 07 2017 Igor Gnatenko <ignatenko@redhat.com> - 2.6.3-9
+- Don't use WITH richop
+
 * Thu Sep 07 2017 Igor Gnatenko <ignatenko@redhat.com> - 2.6.3-8
 - Use WITH richop
 
