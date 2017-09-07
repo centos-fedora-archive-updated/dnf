@@ -86,6 +86,7 @@ Requires:       (python2-dbus if NetworkManager)
 %endif
 #endif
 %endif
+Requires:       (gcc with gcc(major) = 7)
 
 Requires(post):     systemd
 Requires(preun):    systemd
