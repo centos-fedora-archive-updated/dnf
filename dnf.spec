@@ -24,8 +24,8 @@
 %global _docdir_fmt %{name}
 
 Name:           dnf
-Version:        2.6.0
-Release:        3.git.40.c0f7fc6%{?dist}
+Version:        2.6.5
+Release:        1%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -33,7 +33,7 @@ URL:            https://github.com/rpm-software-management/dnf
 # git clone https://github.com/rpm-software-management/dnf
 # cd dnf
 # tito build --tgz --tag=dnf-2.5.1-1
-Source0: dnf-git-40.c0f7fc6.tar.gz
+Source0: dnf-git-95.cc067f9.tar.gz
 Patch0001: 0001-fixup-Add-classes-for-processing-modules.patch
 Patch0002: 0002-Add-ModuleSubject-class-for-pkg_spec-matching.patch
 Patch0003: 0003-Use-ModuleSubject-in-all-module-actions.patch
@@ -186,7 +186,7 @@ Requires(postun): systemd
 Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
-%autosetup -n dnf-git-40.c0f7fc6 -p1
+%autosetup -n dnf-git-95.cc067f9 -p1
 mkdir build
 %if %{with python3}
 mkdir build-py3
@@ -344,6 +344,9 @@ popd
 %endif
 
 %changelog
+* Wed Sep 13 2017 Martin Hatina <mhatina@redhat.com> 2.6.5-1
+- bump version to 2.6.5 modular
+
 * Mon Jun 12 2017 Jaroslav Mracek <jmracek@redhat.com> 2.5.1-1
 - bump version to 2.5.1 + update release notes (Jaroslav Mracek)
 - Fix: dnf update --refresh fails for repo_gpgcheck=1 (RhBug:1456419) (Daniel
@@ -396,7 +399,7 @@ popd
   Mracek)
 - Show progress for DRPM (RhBug:1198975) (Jaroslav Mracek)
 - Fix disabledplugin option (Iavael)
-- [history]: fixed info command merged output (Eduard Čuba)
+- [history]: fixed info command merged output (Eduard ??uba)
 
 * Thu May 11 2017 Jaroslav Mracek <jmracek@redhat.com> 2.4.1-1
 - bump version to 2.4.1 + update release notes (Jaroslav Mracek)
@@ -471,7 +474,7 @@ popd
   Mracek)
 - Solve a problem with None names in callbacks (Jaroslav Mracek)
 - Solve a problem for callbacks (Jaroslav Mracek)
-- Revert "remove: CLI: --randomwait" (RhBug:1247122) (Ondřej Sojka)
+- Revert "remove: CLI: --randomwait" (RhBug:1247122) (Ond??ej Sojka)
 - po: update translations (Igor Gnatenko)
 - po: update translations (Igor Gnatenko)
 - Set strings for translations (RhBug:1298717) (Jaroslav Mracek)
@@ -505,7 +508,7 @@ popd
 - Inform about "Cache was expired" with "dnf clean" (RhBug:1401446) (Jaroslav
   Mracek)
 - crypto: port to the official gpgme bindings (Igor Gnatenko)
-- Fix doc example for `fill_sack` method (Lubomír Sedlář)
+- Fix doc example for `fill_sack` method (Lubom??r Sedl????)
 - po: update translations (Igor Gnatenko)
 - Not try to install src package (RhBug:1416699) (Jaroslav Mracek)
 - Add usage for add_new_repo() with repofrompath option (Jaroslav Mracek)
@@ -518,7 +521,7 @@ popd
 - Ensure that callback will not kill dnf transaction (Jaroslav Mracek)
 - Ensure that name will be not requested on None (RhBug:1397047) (Jaroslav
   Mracek)
-- Python 3.6 invalid escape sequence deprecation fix (Ville Skyttä)
+- Python 3.6 invalid escape sequence deprecation fix (Ville Skytt??)
 - display severity information in updateinfo (#741) (Michael Mraka)
 - po: update translations (Igor Gnatenko)
 - Add --nodocs option for dnf (RhBug:1379628) (Jaroslav Mracek)
@@ -540,7 +543,7 @@ popd
 - bump version to 2.1.0 + update release notes (Jaroslav Mracek)
 - Fix problem with --recent option in repoquery (Jaroslav Mracek)
 - Fix problem with duplicated --obsoletes (RhBug:1421835) (Jaroslav Mracek)
-- Python 3.6 invalid escape sequence deprecation fixes (Ville Skyttä)
+- Python 3.6 invalid escape sequence deprecation fixes (Ville Skytt??)
 - Add --repoid as alias for --repo (Jaroslav Mracek)
 - introduce dnf.base.Base.update_cache() (Martin Hatina)
 - Try to install uninstalled packages if group installed (Jaroslav Mracek)
@@ -562,8 +565,8 @@ popd
 - Honor additional arguments for DNF shell repo list command (Jaroslav Rohel)
 - don't traceback when bug title is not set (Michael Mraka)
 - introducing list-security, info-security etc. commands (Michael Mraka)
-- Add lsedlar to contributors list (Lubomír Sedlář)
-- Return just name from Package.source_name (Lubomír Sedlář)
+- Add lsedlar to contributors list (Lubom??r Sedl????)
+- Return just name from Package.source_name (Lubom??r Sedl????)
 - introduce dnf.conf.config.MainConf.exclude() (Martin Hatina)
 - systemd: Disable daemons on ostree-managed systems (Colin Walters)
 - introduced dnf.base.Base.autoremove() (RhBug:1414512) (Martin Hatina)
@@ -607,7 +610,7 @@ popd
 - let repo exclude work the same way as global exclude (Michael Mraka)
 - Fix wrong assumptions about metalinks (RhBug:1411349) (Jaroslav Mracek)
 - handle --disablerepo/--enablerepo properly with strict (RhBug:1345976)
-  (Štěpán Smetana)
+  (??t??p??n Smetana)
 - Add fix to notify user about no repos (RhBug:1369212) (Abhijeet Kasurde)
 - Add information about "hidden" option in dnf doc (RhBug:1349247) (Abhijeet
   Kasurde)
@@ -771,9 +774,9 @@ popd
 
 * Thu Feb 25 2016 Michal Luscon <mluscon@redhat.com> 1.1.7-1
 - Add `/etc/distro.repos.d` as a path owned by the dnf package (Neal Gompa
-  (ニール・ゴンパ))
+  (???????????????????????????))
 - Change order of search and add new default repodirs (RhBug:1286477) (Neal
-  Gompa (ニール・ゴンパ))
+  Gompa (???????????????????????????))
 - group: don't mark available packages as installed (RhBug:1305356) (Jan
   Silhan)
 - history: adjust demands for particular subcommands (RhBug:1258503) (Michal
@@ -795,10 +798,10 @@ popd
 - Fix handling of repo that never expire (RhBug:1289166) (Jaroslav Mracek)
 - Filter out .src packages when multilib_proto=all (Jeff Smith)
 - Enable string for translation (RhBug:1294355) (Parag Nemade)
-- Let logging format messages on demand (Ville Skyttä)
+- Let logging format messages on demand (Ville Skytt??)
 - clean: include metadata of local repos (RhBug:1226322) (Michal Domonkos)
-- completion: Install to where bash-completion.pc says (Ville Skyttä)
-- spec: bash completion is not a %%config file (Ville Skyttä)
+- completion: Install to where bash-completion.pc says (Ville Skytt??)
+- spec: bash completion is not a %%config file (Ville Skytt??)
 - Change assertion handling for rpmsack.py (RhBug:1275878) (Jaroslav Mracek)
 - cli: fix storing arguments in history (RhBug:1239274) (Ting-Wei Lan)
 
@@ -809,18 +812,18 @@ popd
   Luscon)
 - base: clean packages that do not belong to any trans (Michal Luscon)
 - upgrade: allow group upgrade via @ syntax (RhBug:1265391) (Michal Luscon)
-- spec: Mark license files as %%license where available (Ville Skyttä)
-- Remove unused imports (Ville Skyttä)
-- Spelling fixes (Ville Skyttä)
+- spec: Mark license files as %%license where available (Ville Skytt??)
+- Remove unused imports (Ville Skytt??)
+- Spelling fixes (Ville Skytt??)
 - Fix typos in documentation (Rob Cutmore)
 - parser: add support for braces in substitution (RhBug:1283017) (Dave
   Johansen)
 - completion_helper: Don't omit "packages" from clean completions (Ville
-  Skyttä)
+  Skytt??)
 - bash-completion: Avoid unnecessary python invocation per _dnf_helper (Ville
-  Skyttä)
-- repo: Download drpms early (RhBug:1260421) (Ville Skyttä)
-- clean: Don't hardcode list of args in two places (Ville Skyttä)
+  Skytt??)
+- repo: Download drpms early (RhBug:1260421) (Ville Skytt??)
+- clean: Don't hardcode list of args in two places (Ville Skytt??)
 - cli: don't crash if y/n and sys.stdin is None (RhBug:1278382) (Adam
   Williamson)
 - sp err "environement" -> "environment" (Michael Goodwin)
@@ -848,7 +851,7 @@ popd
 - Change in automatic.conf email settings to prevent email error with default
   sender name (Jaroslav Mracek)
 - Replace assert_called() with assert_called_with() for Py35 support (Neal
-  Gompa (ニール・ゴンパ))
+  Gompa (???????????????????????????))
 - doc: improve documentation (Jaroslav Mracek)
 - doc: update the instructions related to nightly builds (Radek Holy)
 - Revert "Add the continuous integration script" (Radek Holy)
@@ -890,7 +893,7 @@ popd
 - doc: improve configuration description (RhBug:1261766) (Michal Luscon)
 - remove: show from which repo a package is (Vladan Kudlac)
 - list: show from which repo a package is (RhBug:1234491) (Vladan Kudlac)
-- Spelling/grammar fixes (Ville Skyttä)
+- Spelling/grammar fixes (Ville Skytt??)
 - install: fix crash when terminal window is small (RhBug:1256531) (Vladan
   Kudlac)
 - install: mark unification of the progress bar (Vladan Kudlac)
@@ -934,7 +937,7 @@ popd
 * Mon Aug 10 2015 Michal Luscon <mluscon@redhat.com> 1.1.0-1
 - print skipped pkg with broken deps too (Related:RhBug:1210445) (Jan Silhan)
 - history: set commands output as default (RhBug:1218401) (Michal Luscon)
-- Update es.po. save:guardar -> save:ahorrar (Máximo Castañeda)
+- Update es.po. save:guardar -> save:ahorrar (M??ximo Casta??eda)
 - cosmetic: option arg in Base.*install is replaced with strict (Jan Silhan)
 - group: don't fail on first non-existing group (Jan Silhan)
 - install: skips local pkgs of lower version when strict=0
@@ -989,7 +992,7 @@ popd
 - show --best hint with skipped packages every time (RhBug:1176351) (Jan Silhan)
 - notify about skipped packages when upgrade (RhBug:1210445) (Jan Silhan)
 - dnf-automatic: Document apply_updates=no behavior wrt keepcache (Ville
-  Skyttä)
+  Skytt??)
 - persistor: share functionality of JSONDB (Jan Silhan)
 - keepcache=0 persists packages till next successful transaction
   (RhBug:1220074) (Jan Silhan)
@@ -1030,7 +1033,7 @@ popd
 - Add 'transaction_display' to DemandSheet (Will Woods)
 - translation: update (Jan Silhan)
 - translation: use zanata instead of transifex (Jan Silhan)
-- Updated Polish translation (Piotr Drąg)
+- Updated Polish translation (Piotr Dr??g)
 - updated georgian translation (George Machitidze)
 - group: fixed installing of already installed environment (Jan Silhan)
 - conf: change minrate threshold to librepo default (RhBug:1212320) (Michal
@@ -1046,13 +1049,13 @@ popd
 - group: print summary of marked groups / environments together at the end (Jan
   Silhan)
 - group: fixed marking as installed (RhBug:1222694) (Jan Silhan)
-- doc: Spelling fixes (Ville Skyttä)
-- dnf-automatic: Fix systemd service description (thanks Ville Skyttä) (Jan
+- doc: Spelling fixes (Ville Skytt??)
+- dnf-automatic: Fix systemd service description (thanks Ville Skytt??) (Jan
   Silhan)
 - doc: assumeyes added to Base.conf and config option (Jan Silhan)
 - optionparser: deleted --obsoletes option that conflicted with repoquery
   plugin (Jan Silhan)
-- dnf-automatic: Document emit_via default (Ville Skyttä)
+- dnf-automatic: Document emit_via default (Ville Skytt??)
 - man: yum2dnf don;t show content (RhBug:1225246) (Thanks Adam Salih) (Jan
   Silhan)
 - doc: allowed chars of repo ID (Jan Silhan)
@@ -1106,7 +1109,7 @@ popd
 - group: install_or_skip returns num of packages to install (Jan Silhan)
 - group: made global function install_or_skip (Jan Silhan)
 - AUTHORS: updated (Radek Holy)
-- describe --refresh option in --help output (Pádraig Brady)
+- describe --refresh option in --help output (P??draig Brady)
 - better no such command message (RhBug:1208773) (Jan Silhan)
 - doc: package-cleanup example doesn't print 'No match for argument:...'
   garbage (Jan Silhan)
@@ -1260,7 +1263,7 @@ popd
 - spec: own __pycache__ for python 3 (Igor Gnatenko)
 - changed hawkey.log dir to /var/log (RhBug:1175434) (Jan Silhan)
 - bash-completion: handle sqlite errors (Igor Gnatenko)
-- use LANG=C when invoking 'dnf help' and 'sed' with regular expressions (Jakub Dorňák)
+- use LANG=C when invoking 'dnf help' and 'sed' with regular expressions (Jakub Dor????k)
 - spec: own __pycache__ directory for py3 (Igor Gnatenko)
 - doc: mentioning Install command accepts path to local rpm package (Jan Silhan)
 - groups: in erase and install cmd non-existent group does not abort transaction (Jan Silhan)
@@ -1398,7 +1401,7 @@ popd
 - packaging: add automatic's systemd unit files. (RhBug:1109915) (Ales Kozumplik)
 - automatic: handle 'security' update_cmd. (Ales Kozumplik)
 
-* Tue Aug 12 2014 Aleš Kozumplík <ales@redhat.com> - 0.6.0-1
+* Tue Aug 12 2014 Ale?? Kozumpl??k <ales@redhat.com> - 0.6.0-1
 - lint: fix convention violations in the new source files (Radek Holy)
 - Add "updateinfo [<output>] [<availability>] security" command. (RhBug:850912) (Radek Holy)
 - Add "updateinfo [<output>] [<availability>] bugfix" command. (Radek Holy)
@@ -1458,7 +1461,7 @@ popd
 - search: do not double-report no matches. (Ales Kozumplik)
 - refactor: move UpgradeToCommand to its own module. (Ales Kozumplik)
 
-* Mon Jul 28 2014 Aleš Kozumplík <ales@redhat.com> - 0.5.5-1
+* Mon Jul 28 2014 Ale?? Kozumpl??k <ales@redhat.com> - 0.5.5-1
 - packaging: also add pyliblzma to BuildRequires. (Ales Kozumplik)
 - essential cleanup in dnf.yum.misc, removing a couple of functions too. (Ales Kozumplik)
 - remove: Base.findDeps and friends. (Ales Kozumplik)
@@ -1485,7 +1488,7 @@ popd
 - remove: protected_packages config option, it has been ignored. (Ales Kozumplik)
 - fix: misleading error message when no repo is enabled. (Ales Kozumplik)
 
-* Wed Jul 16 2014 Aleš Kozumplík <ales@redhat.com> - 0.5.4-1
+* Wed Jul 16 2014 Ale?? Kozumpl??k <ales@redhat.com> - 0.5.4-1
 - pkg name from rpm transaction callback is in Unicode (RhBug:1118796) (Jan Silhan)
 - packaging: python3-dnf depends on dnf. (RhBug:1119032) (Ales Kozumplik)
 - Ship /usr/bin/dnf-3 to run DNF under Py3. (RhBug:1117678) (Ales Kozumplik)
@@ -1498,8 +1501,8 @@ popd
 - Repo priorities. (RhBug:1048973) (Ales Kozumplik)
 - repo: simplify how things are propagated to repo.hawkey_repo. (Ales Kozumplik)
 - refactor: concentrate Repo.hawkey_repo construction in Repo.__init__(). (Ales Kozumplik)
-- bash-completion: Update command and option lists, sort in same order as --help (Ville Skyttä)
-- bash-completion: Use grep -E instead of deprecated egrep (Ville Skyttä)
+- bash-completion: Update command and option lists, sort in same order as --help (Ville Skytt??)
+- bash-completion: Use grep -E instead of deprecated egrep (Ville Skytt??)
 - output: fixed identation of info command output (Jan Silhan)
 - i18n: calculates right width of asian utf-8 strings (RhBug:1116544) (Jan Silhan)
 - transifex update + renamed po files to Fedora conventions (Jan Silhan)
@@ -1516,11 +1519,11 @@ popd
 - cli: break out the repolsit command into a separate module. (Ales Kozumplik)
 - does not crash with non-ascii user name (RhBug:1108908) (Jan Silhan)
 - doc: document 'pluginpath' configuration option. (RhBug:1117102) (Ales Kozumplik)
-- Spelling fixes (Ville Skyttä)
-- cli: Fix software name in --version help (Ville Skyttä)
+- Spelling fixes (Ville Skytt??)
+- cli: Fix software name in --version help (Ville Skytt??)
 - doc: ip_resolve documented at two places. remove one. (Ales Kozumplik)
 
-* Thu Jul 3 2014 Aleš Kozumplík <ales@redhat.com> - 0.5.3-1
+* Thu Jul 3 2014 Ale?? Kozumpl??k <ales@redhat.com> - 0.5.3-1
 - packaging: bump hawkey dep to 0.4.17. (Ales Kozumplik)
 - api: remove Base.select_group(). (Ales Kozumplik)
 - tests: cleanup our base test case classes a bit. (Ales Kozumplik)
@@ -1564,7 +1567,7 @@ popd
 - logging: improve how repolist logs the total number of packages. (Ales Kozumplik)
 - logging: Base.close() should not log to the terminal. (Ales Kozumplik)
 
-* Wed May 28 2014 Aleš Kozumplík <ales@redhat.com> - 0.5.2-1
+* Wed May 28 2014 Ale?? Kozumpl??k <ales@redhat.com> - 0.5.2-1
 - doc: packaging: add license block to each .rst. (Ales Kozumplik)
 - cosmetic: replaced yum with dnf in comment (Jan Silhan)
 - takes non-ascii cmd line input (RhBug:1092777) (Jan Silhan)
@@ -1606,7 +1609,7 @@ popd
 - packaging: cosmetic: copyright years in bin/dnf. (Ales Kozumplik)
 - bin/dnf: run the python interpreter with -OO. (Ales Kozumplik)
 
-* Fri May 2 2014 Aleš Kozumplík <ales@redhat.com> - 0.5.1-1
+* Fri May 2 2014 Ale?? Kozumpl??k <ales@redhat.com> - 0.5.1-1
 - drpm: output stats (RhBug:1065882) (Ales Kozumplik)
 - refactor: architectures. (Ales Kozumplik)
 - cli: be lot less verbose about dep processing. (Ales Kozumplik)
@@ -1617,14 +1620,14 @@ popd
 - groups: auto-saving the groups persistor. (RhBug:1089864) (Ales Kozumplik)
 - transifex update (Jan Silhan)
 - remove: profiling code from cli.main. (Ales Kozumplik)
-- remove: removal of dead code (Miroslav Suchý)
+- remove: removal of dead code (Miroslav Such??)
 - doc: changes to rhbug.py to work on readthedocs.org. (Ales Kozumplik)
 - doc: build the documentation without any dependencies (on DNF or anything else). (Ales Kozumplik)
-- doc: make clear where one should expect bin/dnf (Miroslav Suchý)
+- doc: make clear where one should expect bin/dnf (Miroslav Such??)
 - abrt: disable abrt for 'dnf makecache timer' run from systemd.service. (RhBug:1081753) (Ales Kozumplik)
 - remove: stray itertools import from group.py. (Ales Kozumplik)
 
-* Wed Apr 23 2014 Aleš Kozumplík <ales@redhat.com> - 0.5.0-1
+* Wed Apr 23 2014 Ale?? Kozumpl??k <ales@redhat.com> - 0.5.0-1
 - doc: fix formatting in api_cli.rst. (Ales Kozumplik)
 - doc: document operation of 'group upgrade'. (Ales Kozumplik)
 - comps: ensure only packages of 'group' reason get deleted on 'group erase'. (Ales Kozumplik)
@@ -1753,7 +1756,7 @@ popd
 - fixed not including .mo files (Jan Silhan)
 - comps: _by_pattern() no longer does the comma splitting. (Ales Kozumplik)
 
-* Mon Mar 24 2014 Aleš Kozumplík <ales@redhat.com> - 0.4.19-1
+* Mon Mar 24 2014 Ale?? Kozumpl??k <ales@redhat.com> - 0.4.19-1
 - downloads: bump number of downloaded files on a skip. (RhBug:1079621) (Ales Kozumplik)
 - packaging: add dnf.cli.commands to the installation. (Ales Kozumplik)
 - refactor: put GroupCommand into its separate module. (Ales Kozumplik)
@@ -1781,7 +1784,7 @@ popd
 - removed unused imports in base.py (Jan Silhan)
 - doc: typo in Base.group_install(). (Ales Kozumplik)
 
-* Mon Mar 17 2014 Aleš Kozumplík <ales@redhat.com> - 0.4.18-1
+* Mon Mar 17 2014 Ale?? Kozumpl??k <ales@redhat.com> - 0.4.18-1
 - api: drop items deprecated since 0.4.9 or earlier. (Ales Kozumplik)
 - api: deprecate Base.select_group() (Ales Kozumplik)
 - doc: document the group marking operations. (Ales Kozumplik)
@@ -1810,7 +1813,7 @@ popd
 - add support for ppc64le (Dennis Gilmore)
 - there is no arch called arm64 it is aarch64 (Dennis Gilmore)
 
-* Wed Mar 5 2014 Aleš Kozumplík <ales@redhat.com> - 0.4.17-1
+* Wed Mar 5 2014 Ale?? Kozumpl??k <ales@redhat.com> - 0.4.17-1
 - doc: in the faq, warn users who might install rawhide packages on stable. (RhBug:1071677) (Ales Kozumplik)
 - cli: better format the download errors report. (Ales Kozumplik)
 - drpm: properly report applydeltarpm errors. (RhBug:1071501) (Ales Kozumplik)
@@ -1846,7 +1849,7 @@ popd
 - build: rebuild with 9d95442 (updated summaries_cache). (Ales Kozumplik)
 - doc: update summaries_cache. (Ales Kozumplik)
 
-* Wed Feb 26 2014 Aleš Kozumplík <ales@redhat.com> - 0.4.16-1
+* Wed Feb 26 2014 Ale?? Kozumpl??k <ales@redhat.com> - 0.4.16-1
 - fix: ensure MDPayload always has a valid progress attribute. (RhBug:1069996) (Ales Kozumplik)
 - refactor: Move repo-pkgs upgrade-to to a standalone class instead of reusing the UpgradeToCommand. (Radek Holy)
 - remove: BaseCli.updatePkgs (Radek Holy)
