@@ -1,0 +1,279 @@
+From 808afe9e41d3d79ec875cd0cc83c84846776a4f9 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Thu, 7 Sep 2017 23:16:57 -0700
+Subject: [PATCH] Re-introduce dnf-automatic.{service,timer}
+
+Per RHBZ #1489595, the way the function-specific timers were
+introduced has some issues. It is unnecessarily incompatible
+with the previous behaviour, so systems updated from DNF 1.x
+suddenly lose dnf-automatic functionality. Also, the behaviour
+of the new 'function-specific' services can still in fact be
+modified by the configuration file: the 'notifyonly' service
+will actually download and install updates if the configuration
+file says so.
+
+This fixes both problems. It re-introduces the dnf-automatic
+service and timer units with the same behaviour as before. It
+also tweaks the CLI arguments and definitions of the function-
+specific timers such that they will always do what they claim
+to do, regardless of what the configuration file says. Finally,
+it updates the dnf-automatic documentation to correctly describe
+all behaviours.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ dnf.spec                                     |  5 +++++
+ dnf/automatic/main.py                        | 16 ++++++++++++----
+ doc/automatic.rst                            | 10 ++++++----
+ etc/dnf/automatic.conf                       | 20 +++++++++-----------
+ etc/systemd/CMakeLists.txt                   |  2 ++
+ etc/systemd/dnf-automatic-download.service   |  2 +-
+ etc/systemd/dnf-automatic-notifyonly.service |  2 +-
+ etc/systemd/dnf-automatic.service            | 12 ++++++++++++
+ etc/systemd/dnf-automatic.timer              | 11 +++++++++++
+ tests/automatic/test_main.py                 | 14 ++++++++++++++
+ 10 files changed, 73 insertions(+), 21 deletions(-)
+ create mode 100644 etc/systemd/dnf-automatic.service
+ create mode 100644 etc/systemd/dnf-automatic.timer
+
+diff --git a/dnf.spec b/dnf.spec
+index 53d3c898..8a94e037 100644
+--- a/dnf.spec
++++ b/dnf.spec
+@@ -271,16 +271,19 @@ popd
+ %systemd_postun_with_restart dnf-makecache.timer
+ 
+ %post automatic
++%systemd_post dnf-automatic.timer
+ %systemd_post dnf-automatic-notifyonly.timer
+ %systemd_post dnf-automatic-download.timer
+ %systemd_post dnf-automatic-install.timer
+ 
+ %preun automatic
++%systemd_preun dnf-automatic.timer
+ %systemd_preun dnf-automatic-notifyonly.timer
+ %systemd_preun dnf-automatic-download.timer
+ %systemd_preun dnf-automatic-install.timer
+ 
+ %postun automatic
++%systemd_postun_with_restart dnf-automatic.timer
+ %systemd_postun_with_restart dnf-automatic-notifyonly.timer
+ %systemd_postun_with_restart dnf-automatic-download.timer
+ %systemd_postun_with_restart dnf-automatic-install.timer
+@@ -353,6 +356,8 @@ popd
+ %{_bindir}/%{name}-automatic
+ %config(noreplace) %{confdir}/automatic.conf
+ %{_mandir}/man8/%{name}.automatic.8*
++%{_unitdir}/%{name}-automatic.service
++%{_unitdir}/%{name}-automatic.timer
+ %{_unitdir}/%{name}-automatic-notifyonly.service
+ %{_unitdir}/%{name}-automatic-notifyonly.timer
+ %{_unitdir}/%{name}-automatic-download.service
+diff --git a/dnf/automatic/main.py b/dnf/automatic/main.py
+index 73dcdf21..9745cf00 100644
+--- a/dnf/automatic/main.py
++++ b/dnf/automatic/main.py
+@@ -71,15 +71,19 @@ def parse_arguments(args):
+     parser = argparse.ArgumentParser()
+     parser.add_argument('conf_path', nargs='?', default=dnf.const.CONF_AUTOMATIC_FILENAME)
+     parser.add_argument('--timer', action='store_true')
+-    parser.add_argument('--installupdates', action='store_true')
+-    parser.add_argument('--downloadupdates', action='store_true')
++    parser.add_argument('--installupdates', dest='installupdates', action='store_true')
++    parser.add_argument('--downloadupdates', dest='downloadupdates', action='store_true')
++    parser.add_argument('--no-installupdates', dest='installupdates', action='store_false')
++    parser.add_argument('--no-downloadupdates', dest='downloadupdates', action='store_false')
++    parser.set_defaults(installupdates=None)
++    parser.set_defaults(downloadupdates=None)
+ 
+     return parser.parse_args(args), parser
+ 
+ 
+ class AutomaticConfig(object):
+-    def __init__(self, filename=None, downloadupdates=False,
+-                 installupdates=False):
++    def __init__(self, filename=None, downloadupdates=None,
++                 installupdates=None):
+         if not filename:
+             filename = dnf.const.CONF_AUTOMATIC_FILENAME
+         self.commands = CommandsConfig()
+@@ -91,8 +95,12 @@ class AutomaticConfig(object):
+ 
+         if downloadupdates:
+             self.commands.download_updates = True
++        elif downloadupdates is False:
++            self.commands.download_updates = False
+         if installupdates:
+             self.commands.apply_updates = True
++        elif installupdates is False:
++            self.commands.apply_updates = False
+ 
+         self.commands.imply()
+         self.filename = filename
+diff --git a/doc/automatic.rst b/doc/automatic.rst
+index b21789fb..99d84d7a 100644
+--- a/doc/automatic.rst
++++ b/doc/automatic.rst
+@@ -31,16 +31,18 @@
+ 
+ Alternative CLI to ``dnf upgrade`` with specific facilities to make it suitable to be executed automatically and regularly from systemd timers, cron jobs and similar.
+ 
+-The operation of the tool is completely controlled by the configuration file and the command only accepts single optional argument pointing to it. If no configuration file is passed from the command line, ``/etc/dnf/automatic.conf`` is used.
++The operation of the tool is usually controlled by the configuration file or the function-specific timer units (see below). The command only accepts a single optional argument pointing to the config file, and some control arguments intended for use by the services that back the timer units. If no configuration file is passed from the command line, ``/etc/dnf/automatic.conf`` is used.
+ 
+ The tool synchronizes package metadata as needed and then checks for updates available for the given system and then either exits, downloads the packages or downloads and applies the packages. The outcome of the operation is then reported by a selected mechanism, for instance via the standard output, email or MOTD messages.
+ 
+-A few default systemd units are provided to enable some standard configurations:
++The systemd timer unit ``dnf-automatic.timer`` will behave as the configuration file specifies (see below) with regard to whether to download and apply updates. Some other timer units are provided which override the configuration file with some standard behaviours:
+ 
+ - dnf-automatic-notifyonly
+ - dnf-automatic-download
+ - dnf-automatic-install
+ 
++Regardless of the configuration file settings, the first will only notify of available updates. The second will download, but not install them. The third will download and install them.
++
+ ===================
+  Run dnf-automatic
+ ===================
+@@ -64,12 +66,12 @@ Setting the mode of operation of the program.
+ ``apply_updates``
+     boolean, default: False
+ 
+-    Whether packages comprising the available updates should be applied, i.e. installed via RPM. Implies ``download_updates``. Note that if this is set to ``False``, downloaded packages will be left in the cache till the next successful DNF transaction.
++    Whether packages comprising the available updates should be applied by ``dnf-automatic.timer``, i.e. installed via RPM. Implies ``download_updates``. Note that if this is set to ``False``, downloaded packages will be left in the cache till the next successful DNF transaction. Note that the other timer units override this setting.
+ 
+ ``download_updates``
+     boolean, default: False
+ 
+-    Whether packages comprising the available updates should be downloaded.
++    Whether packages comprising the available updates should be downloaded by ``dnf-automatic.timer``. Note that the other timer units override this setting.
+ 
+ .. _upgrade_type_automatic-label:
+ 
+diff --git a/etc/dnf/automatic.conf b/etc/dnf/automatic.conf
+index 62dadc4f..ef8f1697 100644
+--- a/etc/dnf/automatic.conf
++++ b/etc/dnf/automatic.conf
+@@ -7,17 +7,15 @@ random_sleep = 300
+ 
+ # To just receive updates use dnf-automatic-notifyonly.timer
+ 
+-# Whether updates should be downloaded when they are available.
+-#
+-# To download updates automatically use dnf-automatic-download.timer
+-# download_updates = yes
+-
+-# Whether updates should be applied when they are available.
+-# Note that if this is set to no, downloaded packages will be left in the
+-# cache regardless of the keepcache setting.
+-#
+-# To install updates automatically use dnf-automatic-install.timer
+-# apply_updates = no
++# Whether updates should be downloaded when they are available, by
++# dnf-automatic.timer. notifyonly.timer, download.timer and
++# install.timer override this setting.
++download_updates = yes
++
++# Whether updates should be applied when they are available, by
++# dnf-automatic.timer. notifyonly.timer, download.timer and
++# install.timer override this setting.
++apply_updates = no
+ 
+ 
+ [emitters]
+diff --git a/etc/systemd/CMakeLists.txt b/etc/systemd/CMakeLists.txt
+index edbf994b..944670f6 100644
+--- a/etc/systemd/CMakeLists.txt
++++ b/etc/systemd/CMakeLists.txt
+@@ -1,4 +1,6 @@
+ SET (systemd_FILES
++     dnf-automatic.service
++     dnf-automatic.timer
+      dnf-automatic-notifyonly.service
+      dnf-automatic-notifyonly.timer
+      dnf-automatic-install.service
+diff --git a/etc/systemd/dnf-automatic-download.service b/etc/systemd/dnf-automatic-download.service
+index f779890b..962a0a25 100644
+--- a/etc/systemd/dnf-automatic-download.service
++++ b/etc/systemd/dnf-automatic-download.service
+@@ -9,4 +9,4 @@ Nice=19
+ IOSchedulingClass=2
+ IOSchedulingPriority=7
+ Environment="ABRT_IGNORE_PYTHON=1"
+-ExecStart=/usr/bin/dnf-automatic /etc/dnf/automatic.conf --timer --downloadupdates
++ExecStart=/usr/bin/dnf-automatic /etc/dnf/automatic.conf --timer --downloadupdates --no-installupdates
+diff --git a/etc/systemd/dnf-automatic-notifyonly.service b/etc/systemd/dnf-automatic-notifyonly.service
+index 3f7cc364..c8a21bca 100644
+--- a/etc/systemd/dnf-automatic-notifyonly.service
++++ b/etc/systemd/dnf-automatic-notifyonly.service
+@@ -9,4 +9,4 @@ Nice=19
+ IOSchedulingClass=2
+ IOSchedulingPriority=7
+ Environment="ABRT_IGNORE_PYTHON=1"
+-ExecStart=/usr/bin/dnf-automatic /etc/dnf/automatic.conf --timer
++ExecStart=/usr/bin/dnf-automatic /etc/dnf/automatic.conf --timer --no-installupdates --no-downloadupdates
+diff --git a/etc/systemd/dnf-automatic.service b/etc/systemd/dnf-automatic.service
+new file mode 100644
+index 00000000..0b390c8a
+--- /dev/null
++++ b/etc/systemd/dnf-automatic.service
+@@ -0,0 +1,12 @@
++[Unit]
++Description=dnf automatic
++# See comment in dnf-makecache.service
++ConditionPathExists=!/run/ostree-booted
++
++[Service]
++Type=oneshot
++Nice=19
++IOSchedulingClass=2
++IOSchedulingPriority=7
++Environment="ABRT_IGNORE_PYTHON=1"
++ExecStart=/usr/bin/dnf-automatic /etc/dnf/automatic.conf --timer
+diff --git a/etc/systemd/dnf-automatic.timer b/etc/systemd/dnf-automatic.timer
+new file mode 100644
+index 00000000..62f1b70d
+--- /dev/null
++++ b/etc/systemd/dnf-automatic.timer
+@@ -0,0 +1,11 @@
++[Unit]
++Description=dnf-automatic timer
++# See comment in dnf-makecache.service
++ConditionPathExists=!/run/ostree-booted
++
++[Timer]
++OnBootSec=1h
++OnUnitInactiveSec=1d
++
++[Install]
++WantedBy=basic.target
+diff --git a/tests/automatic/test_main.py b/tests/automatic/test_main.py
+index d8789fec..c99fa38c 100644
+--- a/tests/automatic/test_main.py
++++ b/tests/automatic/test_main.py
+@@ -23,8 +23,22 @@ FILE = tests.support.resource_path('etc/automatic.conf')
+ 
+ class TestConfig(tests.support.TestCase):
+     def test_load(self):
++        # test values from config file take effect if no overrides
++        # note: config file specifies download = no apply = yes,
++        # test expects implication to turn download into True
+         conf = dnf.automatic.main.AutomaticConfig(FILE)
+         self.assertTrue(conf.commands.apply_updates)
+         self.assertTrue(conf.commands.download_updates)
+         self.assertEqual(conf.commands.random_sleep, 300)
+         self.assertEqual(conf.email.email_from, 'staring@crowd.net')
++
++        # test overriding installupdates
++        conf = dnf.automatic.main.AutomaticConfig(FILE, installupdates=False)
++        # as per above, download is set false in config
++        self.assertFalse(conf.commands.download_updates)
++        self.assertFalse(conf.commands.apply_updates)
++
++        # test overriding installupdates and downloadupdates
++        conf = dnf.automatic.main.AutomaticConfig(FILE, downloadupdates=True, installupdates=False)
++        self.assertTrue(conf.commands.download_updates)
++        self.assertFalse(conf.commands.apply_updates)
+-- 
+2.13.5
+
