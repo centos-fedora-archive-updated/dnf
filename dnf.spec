@@ -34,11 +34,6 @@ URL:            https://github.com/rpm-software-management/dnf
 # cd dnf
 # tito build --tgz --tag=dnf-2.5.1-1
 Source0: dnf-git-95.cc067f9.tar.gz
-Patch0001: 0001-fixup-Add-classes-for-processing-modules.patch
-Patch0002: 0002-Add-ModuleSubject-class-for-pkg_spec-matching.patch
-Patch0003: 0003-Use-ModuleSubject-in-all-module-actions.patch
-Patch0004: 0004-Add-initial-unit-tests-for-modularity.patch
-Patch10: no-ugly-hacks.diff
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
