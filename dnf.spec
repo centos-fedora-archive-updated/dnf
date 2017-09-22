@@ -51,7 +51,7 @@
 
 Name:           dnf
 Version:        2.6.3
-Release:        11%{?dist}
+Release:        12%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -62,6 +62,7 @@ URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{name}-%{version}.tar.gz
 Patch0:         %{name}-nose-use-module.patch
 Patch1:         0001-Re-introduce-dnf-automatic.-service-timer.patch
+Patch2:         0002-Add-pre_configuration-def-for-commands.patch
 Patch35:        0035-base-set-priority-to-hawkey-repo-as-well-RhBug-14700.patch
 
 BuildArch:      noarch
@@ -524,6 +525,9 @@ popd
 %endif
 
 %changelog
+* Fri Sep 22 2017 Jaroslav Mracek <jmracek@redhat.com> - 2.6.3-12
+- Added support for command pre_configuration
+
 * Wed Sep 13 2017 Jeroen van Meeuwen <kanarip@fedoraproject.org> - 2.6.3-11
 - Added patch to obey repository priority configuration
 
