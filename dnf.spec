@@ -1,4 +1,4 @@
-%global commit cc067f9de32445e216a6830f69ae967593934ca1
+%global commit 22c5c220bdbe1811b2ae5a3837fdcbb8e30df391
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %global hawkey_version 0.9.3
