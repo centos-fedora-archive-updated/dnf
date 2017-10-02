@@ -28,7 +28,7 @@
 
 Name:           dnf
 Version:        2.6.3
-Release:        13%{?dist}.modularity.1.%{shortcommit}
+Release:        13%{?dist}.modularity.2.%{shortcommit}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -37,6 +37,7 @@ URL:            https://github.com/rpm-software-management/dnf
 # cd dnf
 # tito build --tgz --tag=dnf-2.5.1-1
 Source0:        %{url}/archive/%{commit}/%{name}-%{shortcommit}.tar.gz
+Patch0:         0001-Fix-recursion-problem.patch
 Patch1:         0001-Re-introduce-dnf-automatic.-service-timer.patch
 Patch35:        0035-base-set-priority-to-hawkey-repo-as-well-RhBug-14700.patch
 

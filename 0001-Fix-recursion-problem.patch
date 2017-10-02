@@ -1,0 +1,60 @@
+From 2226f0d9167355dac2edc0d48765e55314c74bb5 Mon Sep 17 00:00:00 2001
+From: Daniel Mach <dmach@redhat.com>
+Date: Mon, 2 Oct 2017 12:44:49 -0400
+Subject: [PATCH] Fix recursion problem.
+
+---
+ dnf/module/repo_module_dict.py | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/dnf/module/repo_module_dict.py b/dnf/module/repo_module_dict.py
+index 2d6c9c2e..e1baa00a 100644
+--- a/dnf/module/repo_module_dict.py
++++ b/dnf/module/repo_module_dict.py
+@@ -89,7 +89,8 @@ class RepoModuleDict(OrderedDict):
+             return None
+         return repo_module_version
+ 
+-    def get_includes_latest(self, name, stream, visited=set()):
++    def get_includes_latest(self, name, stream, visited=None):
++        visited = visited or set()
+         includes = set()
+         repos = set()
+         try:
+@@ -103,7 +104,10 @@ class RepoModuleDict(OrderedDict):
+ 
+             for requires_name, requires_stream in \
+                     repo_module_version.module_metadata.requires.items():
+-                visited.add("{}:{}".format(requires_name, requires_stream))
++                requires_ns = "{}:{}".format(requires_name, requires_stream)
++                if requires_ns in visited:
++                    continue
++                visited.add(requires_ns)
+                 requires_includes, requires_repos = self.get_includes_latest(requires_name,
+                                                                              requires_stream,
+                                                                              visited)
+@@ -114,7 +118,8 @@ class RepoModuleDict(OrderedDict):
+ 
+         return includes, repos
+ 
+-    def get_includes(self, name, stream, visited=set()):
++    def get_includes(self, name, stream, visited=None):
++        visited = visited or set()
+         includes = set()
+         repos = set()
+         try:
+@@ -127,7 +132,10 @@ class RepoModuleDict(OrderedDict):
+ 
+                 for requires_name, requires_stream in \
+                         repo_module_version.module_metadata.requires.items():
+-                    visited.add("{}:{}".format(requires_name, requires_stream))
++                    requires_ns = "{}:{}".format(requires_name, requires_stream)
++                    if requires_ns in visited:
++                        continue
++                    visited.add(requires_ns)
+                     requires_includes, requires_repos = self.get_includes(requires_name,
+                                                                           requires_stream,
+                                                                           visited)
+-- 
+2.13.5
+
