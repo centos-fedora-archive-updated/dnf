@@ -1,4 +1,4 @@
-%global hawkey_version 0.9.3
+%global hawkey_version 0.10.1
 %global librepo_version 1.7.19
 %global libcomps_version 0.1.8
 %global rpm_version 4.13.0-0.rc1.29
@@ -50,8 +50,8 @@
 %global _docdir_fmt %{name}
 
 Name:           dnf
-Version:        2.6.3
-Release:        13%{?dist}
+Version:        2.7.2
+Release:        1%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -60,11 +60,6 @@ URL:            https://github.com/rpm-software-management/dnf
 # cd dnf
 # tito build --tgz --tag=dnf-2.5.1-1
 Source0:        %{name}-%{version}.tar.gz
-Patch0:         %{name}-nose-use-module.patch
-Patch1:         0001-Re-introduce-dnf-automatic.-service-timer.patch
-Patch2:         0002-Add-pre_configuration-def-for-commands.patch
-Patch35:        0035-base-set-priority-to-hawkey-repo-as-well-RhBug-14700.patch
-
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
