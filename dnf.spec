@@ -50,16 +50,13 @@
 %global _docdir_fmt %{name}
 
 Name:           dnf
-Version:        2.7.2
+Version:        2.7.3
 Release:        1%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
-# git clone https://github.com/rpm-software-management/dnf
-# cd dnf
-# tito build --tgz --tag=dnf-2.5.1-1
-Source0:        %{name}-%{version}.tar.gz
+Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -164,7 +161,6 @@ BuildRequires:  python-nose
 BuildRequires:  python2-gpg
 Requires:       python2-gpg
 BuildRequires:  pyliblzma
-BuildRequires:  rpm-python >= %{rpm_version}
 Requires:       pyliblzma
 Requires:       %{name}-conf = %{version}-%{release}
 Requires:       deltarpm
@@ -173,11 +169,14 @@ Requires:       python-iniparse
 Requires:       python-libcomps >= %{libcomps_version}
 Requires:       python-librepo >= %{librepo_version}
 %if 0%{?rhel} && 0%{?rhel} <= 7
+BuildRequires:  rpm-python >= %{rpm_version}
+Requires:       rpm-python >= %{rpm_version}
 Requires:       rpm-plugin-systemd-inhibit
 %else
+BuildRequires:  python2-rpm >= %{rpm_version}
+Requires:       python2-rpm >= %{rpm_version}
 Recommends:     rpm-plugin-systemd-inhibit
 %endif
-Requires:       rpm-python >= %{rpm_version}
 # dnf-langpacks package is retired in F25
 # to have clean upgrade path for dnf-langpacks
 Obsoletes:      python-dnf-langpacks < %{dnf_langpacks_ver}
@@ -198,7 +197,6 @@ BuildRequires:  python3-librepo >= %{librepo_version}
 BuildRequires:  python3-nose
 BuildRequires:  python3-gpg
 Requires:       python3-gpg
-BuildRequires:  rpm-python3 >= %{rpm_version}
 Requires:       %{name}-conf = %{version}-%{release}
 Requires:       deltarpm
 Requires:       python3-hawkey >= %{hawkey_version}
@@ -206,11 +204,14 @@ Requires:       python3-iniparse
 Requires:       python3-libcomps >= %{libcomps_version}
 Requires:       python3-librepo >= %{librepo_version}
 %if 0%{?rhel} && 0%{?rhel} <= 7
+BuildRequires:  rpm-python3 >= %{rpm_version}
+Requires:       rpm-python3 >= %{rpm_version}
 Requires:       rpm-plugin-systemd-inhibit
 %else
+BuildRequires:  python3-rpm >= %{rpm_version}
+Requires:       python3-rpm >= %{rpm_version}
 Recommends:     rpm-plugin-systemd-inhibit
 %endif
-Requires:       rpm-python3 >= %{rpm_version}
 # dnf-langpacks package is retired in F25
 # to have clean upgrade path for dnf-langpacks
 Obsoletes:      python3-dnf-langpacks < %{dnf_langpacks_ver}
@@ -522,6 +523,11 @@ popd
 %endif
 
 %changelog
+* Fri Oct 06 2017 Igor Gnatenko <ignatenko@redhat.com> - 2.7.3-1
+- Fix URL detection (RHBZ #1472847)
+- Do not remove downloaded files with --destdir option (RHBZ #1498426)
+- Fix handling of conditional packages in comps (RHBZ #1427144)
+
 * Mon Oct 02 2017 Jaroslav Mracek <jmracek@redhat.com> - 2.7.2-1
 - Update to 2.7.2-1
 - Added new option ``--comment=<comment>`` that adds a comment to transaction in history
