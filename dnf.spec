@@ -1,4 +1,4 @@
-%global commit 854e61a4492cb733fe832658ee30d214bc39572f 
+%global commit 35f1b77187dd7fb321baf8ccb3ff45d0124e0420
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %global hawkey_version 0.9.3
@@ -37,7 +37,6 @@ URL:            https://github.com/rpm-software-management/dnf
 # cd dnf
 # tito build --tgz --tag=dnf-2.5.1-1
 Source0:        %{url}/archive/%{commit}/%{name}-%{shortcommit}.tar.gz
-Patch1:         0001-Re-introduce-dnf-automatic.-service-timer.patch
 Patch35:        0035-base-set-priority-to-hawkey-repo-as-well-RhBug-14700.patch
 
 BuildArch:      noarch
