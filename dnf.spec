@@ -37,6 +37,7 @@ URL:            https://github.com/rpm-software-management/dnf
 # cd dnf
 # tito build --tgz --tag=dnf-2.5.1-1
 Source0:        %{url}/archive/%{commit}/%{name}-%{shortcommit}.tar.gz
+Patch01:        0001-Re-introduce-dnf-automatic.-service-timer.patch
 Patch35:        0035-base-set-priority-to-hawkey-repo-as-well-RhBug-14700.patch
 
 BuildArch:      noarch
@@ -55,7 +56,6 @@ Requires:       python2-%{name} = %{version}-%{release}
 Requires:       python-dbus
 %else
 # TODO: use rich deps once it is allowed
-#Recommends:     (python%{?with_python3:3}-dbus if NetworkManager)
 Recommends:     python%{?with_python3:3}-dbus
 %endif
 Requires(post):     systemd
