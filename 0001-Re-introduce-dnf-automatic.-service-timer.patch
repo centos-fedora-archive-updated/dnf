@@ -22,7 +22,6 @@ all behaviours.
 
 Signed-off-by: Adam Williamson <awilliam@redhat.com>
 ---
- dnf.spec                                     |  5 +++++
  dnf/automatic/main.py                        | 16 ++++++++++++----
  doc/automatic.rst                            | 10 ++++++----
  etc/dnf/automatic.conf                       | 20 +++++++++-----------
@@ -36,39 +35,6 @@ Signed-off-by: Adam Williamson <awilliam@redhat.com>
  create mode 100644 etc/systemd/dnf-automatic.service
  create mode 100644 etc/systemd/dnf-automatic.timer
 
-diff --git a/dnf.spec b/dnf.spec
-index 53d3c898..8a94e037 100644
---- a/dnf.spec
-+++ b/dnf.spec
-@@ -271,16 +271,19 @@ popd
- %systemd_postun_with_restart dnf-makecache.timer
- 
- %post automatic
-+%systemd_post dnf-automatic.timer
- %systemd_post dnf-automatic-notifyonly.timer
- %systemd_post dnf-automatic-download.timer
- %systemd_post dnf-automatic-install.timer
- 
- %preun automatic
-+%systemd_preun dnf-automatic.timer
- %systemd_preun dnf-automatic-notifyonly.timer
- %systemd_preun dnf-automatic-download.timer
- %systemd_preun dnf-automatic-install.timer
- 
- %postun automatic
-+%systemd_postun_with_restart dnf-automatic.timer
- %systemd_postun_with_restart dnf-automatic-notifyonly.timer
- %systemd_postun_with_restart dnf-automatic-download.timer
- %systemd_postun_with_restart dnf-automatic-install.timer
-@@ -353,6 +356,8 @@ popd
- %{_bindir}/%{name}-automatic
- %config(noreplace) %{confdir}/automatic.conf
- %{_mandir}/man8/%{name}.automatic.8*
-+%{_unitdir}/%{name}-automatic.service
-+%{_unitdir}/%{name}-automatic.timer
- %{_unitdir}/%{name}-automatic-notifyonly.service
- %{_unitdir}/%{name}-automatic-notifyonly.timer
- %{_unitdir}/%{name}-automatic-download.service
 diff --git a/dnf/automatic/main.py b/dnf/automatic/main.py
 index 73dcdf21..9745cf00 100644
 --- a/dnf/automatic/main.py
