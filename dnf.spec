@@ -1,7 +1,7 @@
-%global commit 35f1b77187dd7fb321baf8ccb3ff45d0124e0420
+%global commit 3fb9e5cfe3f1f441192006c6ddc8cf186894dc0c
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
-%global hawkey_version 0.9.3
+%global hawkey_version 0.10.1
 %global librepo_version 1.7.19
 %global libcomps_version 0.1.8
 %global rpm_version 4.13.0-0.rc1.29
@@ -27,19 +27,13 @@
 %global _docdir_fmt %{name}
 
 Name:           dnf
-Version:        2.6.3
-Release:        13%{?dist}.modularity.3.%{shortcommit}
+Version:        2.7.3
+Release:        1%{?dist}.modularity.1.%{shortcommit}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
-# git clone https://github.com/rpm-software-management/dnf
-# cd dnf
-# tito build --tgz --tag=dnf-2.5.1-1
 Source0:        %{url}/archive/%{commit}/%{name}-%{shortcommit}.tar.gz
-Patch01:        0001-Re-introduce-dnf-automatic.-service-timer.patch
-Patch35:        0035-base-set-priority-to-hawkey-repo-as-well-RhBug-14700.patch
-
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -56,6 +50,7 @@ Requires:       python2-%{name} = %{version}-%{release}
 Requires:       python-dbus
 %else
 # TODO: use rich deps once it is allowed
+#Recommends:     (python%{?with_python3:3}-dbus if NetworkManager)
 Recommends:     python%{?with_python3:3}-dbus
 %endif
 Requires(post):     systemd
@@ -133,7 +128,6 @@ BuildRequires:  python-nose
 BuildRequires:  python2-gpg
 Requires:       python2-gpg
 BuildRequires:  pyliblzma
-BuildRequires:  rpm-python >= %{rpm_version}
 Requires:       pyliblzma
 Requires:       %{name}-conf = %{version}-%{release}
 Requires:       deltarpm
@@ -142,11 +136,14 @@ Requires:       python-iniparse
 Requires:       python-libcomps >= %{libcomps_version}
 Requires:       python-librepo >= %{librepo_version}
 %if 0%{?rhel} && 0%{?rhel} <= 7
+BuildRequires:  rpm-python >= %{rpm_version}
+Requires:       rpm-python >= %{rpm_version}
 Requires:       rpm-plugin-systemd-inhibit
 %else
+BuildRequires:  python2-rpm >= %{rpm_version}
+Requires:       python2-rpm >= %{rpm_version}
 Recommends:     rpm-plugin-systemd-inhibit
 %endif
-Requires:       rpm-python >= %{rpm_version}
 BuildRequires:  python2-modulemd
 Requires:       python2-modulemd
 BuildRequires:  python2-smartcols
@@ -171,7 +168,6 @@ BuildRequires:  python3-librepo >= %{librepo_version}
 BuildRequires:  python3-nose
 BuildRequires:  python3-gpg
 Requires:       python3-gpg
-BuildRequires:  rpm-python3 >= %{rpm_version}
 Requires:       %{name}-conf = %{version}-%{release}
 Requires:       deltarpm
 Requires:       python3-hawkey >= %{hawkey_version}
@@ -179,11 +175,14 @@ Requires:       python3-iniparse
 Requires:       python3-libcomps >= %{libcomps_version}
 Requires:       python3-librepo >= %{librepo_version}
 %if 0%{?rhel} && 0%{?rhel} <= 7
+BuildRequires:  rpm-python3 >= %{rpm_version}
+Requires:       rpm-python3 >= %{rpm_version}
 Requires:       rpm-plugin-systemd-inhibit
 %else
+BuildRequires:  python3-rpm >= %{rpm_version}
+Requires:       python3-rpm >= %{rpm_version}
 Recommends:     rpm-plugin-systemd-inhibit
 %endif
-Requires:       rpm-python3 >= %{rpm_version}
 BuildRequires:  python3-modulemd
 Requires:       python3-modulemd
 BuildRequires:  python3-smartcols
@@ -208,7 +207,7 @@ Requires(postun): systemd
 Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
-%autosetup -n %{name}-%{commit} -p1
+%autosetup -n %{name}-%{commit}
 mkdir build
 %if %{with python3}
 mkdir build-py3
@@ -369,6 +368,8 @@ popd
 %{_bindir}/%{name}-automatic
 %config(noreplace) %{confdir}/automatic.conf
 %{_mandir}/man8/%{name}.automatic.8*
+%{_unitdir}/%{name}-automatic.service
+%{_unitdir}/%{name}-automatic.timer
 %{_unitdir}/%{name}-automatic-notifyonly.service
 %{_unitdir}/%{name}-automatic-notifyonly.timer
 %{_unitdir}/%{name}-automatic-download.service
