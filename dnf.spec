@@ -1,4 +1,4 @@
-%global commit 3fb9e5cfe3f1f441192006c6ddc8cf186894dc0c
+%global commit 7493ec80bd1e2d1201fdc80e88c13d91bb446d4e
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %global hawkey_version 0.10.1
@@ -27,7 +27,7 @@
 %global _docdir_fmt %{name}
 
 Name:           dnf
-Version:        2.7.3
+Version:        2.8.0
 Release:        1%{?dist}.modularity.1.%{shortcommit}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
@@ -146,8 +146,8 @@ Recommends:     rpm-plugin-systemd-inhibit
 %endif
 BuildRequires:  python2-modulemd
 Requires:       python2-modulemd
-BuildRequires:  python2-smartcols
-Requires:       python2-smartcols
+BuildRequires:  python2-smartcols >= 0.3.0
+Requires:       python2-smartcols >= 0.3.0
 # dnf-langpacks package is retired in F25
 # to have clean upgrade path for dnf-langpacks
 Obsoletes:      python-dnf-langpacks < %{dnf_langpacks_ver}
@@ -185,8 +185,8 @@ Recommends:     rpm-plugin-systemd-inhibit
 %endif
 BuildRequires:  python3-modulemd
 Requires:       python3-modulemd
-BuildRequires:  python3-smartcols
-Requires:       python3-smartcols
+BuildRequires:  python3-smartcols >= 0.3.0
+Requires:       python3-smartcols >= 0.3.0
 # dnf-langpacks package is retired in F25
 # to have clean upgrade path for dnf-langpacks
 Obsoletes:      python3-dnf-langpacks < %{dnf_langpacks_ver}
