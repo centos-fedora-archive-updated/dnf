@@ -27,7 +27,7 @@
 %global _docdir_fmt %{name}
 
 Name:           dnf
-Version:        2.8.0
+Version:        2.7.3
 Release:        1%{?dist}.modularity.1.%{shortcommit}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
