@@ -51,7 +51,7 @@
 
 Name:           dnf
 Version:        2.7.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -76,11 +76,9 @@ Requires:       python-dbus
 #Requires:       (platform-python-dbus if NetworkManager)
 #else
 %if %{with python3}
-#Recommends:     (python3-dbus if NetworkManager)
-Recommends:     python3-dbus
+Recommends:     (python3-dbus if NetworkManager)
 %else
-#Recommends:     (python2-dbus if NetworkManager)
-Recommends:     python2-dbus
+Recommends:     (python2-dbus if NetworkManager)
 %endif
 #endif
 %endif
@@ -523,6 +521,9 @@ popd
 %endif
 
 %changelog
+* Fri Oct 27 2017 Igor Gnatenko <ignatenko@redhat.com> - 2.7.5-2
+- Enable usage of rich deps for NM integration
+
 * Wed Oct 18 2017 Igor Gnatenko <ignatenko@redhat.com> - 2.7.5-1
 - Improve performance for excludes and includes handling (RHBZ #1500361)
 - Fixed problem of handling checksums for local repositories (RHBZ #1502106)
