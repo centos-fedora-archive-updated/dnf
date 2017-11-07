@@ -46,8 +46,10 @@ Requires:       %{dnf_python}-%{name} = %{version}-%{release}
 
 %if 0%{?rhel} && 0%{?rhel} <= 7
 Requires:       python-dbus
+Requires:       %{_bindir}/sqlite3
 %else
 Recommends:     (%{dnf_python}-dbus if NetworkManager)
+Recommends:     (%{_bindir}/sqlite3 if bash-completion)
 %endif
 Requires(post):     systemd
 Requires(preun):    systemd
