@@ -28,12 +28,15 @@
 
 Name:           dnf
 Version:        2.7.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0:         0001-Allow-to-set-cacheonly-from-commands-and-conf-RhBug-.patch
+Patch1:         0002-Remove-redundant-conf-option-cacheonly.patch
+Patch2:         0003-Remove-unnecessary-code-for-set-cacheonly.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -372,6 +375,9 @@ popd
 %endif
 
 %changelog
+* Wed Nov 29 2017 Jaroslav Mracek <jmracek@redhat.com> - 2.7.5-4
+- Fix problem with demands.cacheonly that caused problems for system-upgrade
+
 * Tue Nov 07 2017 Igor Gnatenko <ignatenko@redhat.com> - 2.7.5-3
 - Remove platform-python subpackage
 
