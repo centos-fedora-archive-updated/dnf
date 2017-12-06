@@ -1,0 +1,15 @@
+---
+# This first play always runs on the local staging system
+- hosts: localhost
+  roles:
+  - role: standard-test-beakerlib
+    tags:
+    - classic
+    tests:
+    - basic-sanity
+    required_packages:
+    - dnf          # required for basic-sanity
+    - createrepo_c # required for basic-sanity
+    - httpd        # required for basic-sanity
+    - rpm-build    # required for basic-sanity
+
