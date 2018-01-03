@@ -28,7 +28,7 @@
 
 Name:           dnf
 Version:        2.7.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -54,9 +54,7 @@ Requires:       %{_bindir}/sqlite3
 Recommends:     (%{dnf_python}-dbus if NetworkManager)
 Recommends:     (%{_bindir}/sqlite3 if bash-completion)
 %endif
-Requires(post):     systemd
-Requires(preun):    systemd
-Requires(postun):   systemd
+%{?systemd_requires}
 Provides:       dnf-command(autoremove)
 Provides:       dnf-command(check-update)
 Provides:       dnf-command(clean)
@@ -122,10 +120,9 @@ Summary:        Python 2 interface to DNF
 %{?python_provide:%python_provide python2-%{name}}
 BuildRequires:  python2-devel
 BuildRequires:  python2-hawkey >= %{hawkey_version}
-BuildRequires:  python-iniparse
-BuildRequires:  python-libcomps >= %{libcomps_version}
-BuildRequires:  python-librepo >= %{librepo_version}
-BuildRequires:  python-nose
+BuildRequires:  python2-libcomps >= %{libcomps_version}
+BuildRequires:  python2-librepo >= %{librepo_version}
+BuildRequires:  python2-nose
 BuildRequires:  python2-gpg
 Requires:       python2-gpg
 BuildRequires:  pyliblzma
@@ -133,14 +130,17 @@ Requires:       pyliblzma
 Requires:       %{name}-conf = %{version}-%{release}
 Requires:       deltarpm
 Requires:       python2-hawkey >= %{hawkey_version}
-Requires:       python-iniparse
-Requires:       python-libcomps >= %{libcomps_version}
-Requires:       python-librepo >= %{librepo_version}
+Requires:       python2-libcomps >= %{libcomps_version}
+Requires:       python2-librepo >= %{librepo_version}
 %if 0%{?rhel} && 0%{?rhel} <= 7
+BuildRequires:  python-iniparse
+Requires:       python-iniparse
 BuildRequires:  rpm-python >= %{rpm_version}
 Requires:       rpm-python >= %{rpm_version}
 Requires:       rpm-plugin-systemd-inhibit
 %else
+BuildRequires:  python2-iniparse
+Requires:       python2-iniparse
 BuildRequires:  python2-rpm >= %{rpm_version}
 Requires:       python2-rpm >= %{rpm_version}
 Recommends:     rpm-plugin-systemd-inhibit
@@ -190,9 +190,7 @@ Python 3 interface to DNF.
 Summary:        Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 BuildRequires:  systemd
 Requires:       %{name} = %{version}-%{release}
-Requires(post):   systemd
-Requires(preun):  systemd
-Requires(postun): systemd
+%{?systemd_requires}
 
 %description automatic
 Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
@@ -375,6 +373,11 @@ popd
 %endif
 
 %changelog
+* Wed Jan 03 2018 Igor Gnatenko <ignatenko@redhat.com> - 2.7.5-5
+- Use %%systemd_requires
+- Update Python 2 dependency declarations to new packaging standards
+  (See https://fedoraproject.org/wiki/FinalizingFedoraSwitchtoPython3)
+
 * Wed Nov 29 2017 Jaroslav Mracek <jmracek@redhat.com> - 2.7.5-4
 - Fix problem with demands.cacheonly that caused problems for system-upgrade
 
