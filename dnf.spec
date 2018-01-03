@@ -28,7 +28,7 @@
 
 Name:           dnf
 Version:        2.7.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -122,10 +122,10 @@ Summary:        Python 2 interface to DNF
 %{?python_provide:%python_provide python2-%{name}}
 BuildRequires:  python2-devel
 BuildRequires:  python2-hawkey >= %{hawkey_version}
-BuildRequires:  python-iniparse
-BuildRequires:  python-libcomps >= %{libcomps_version}
-BuildRequires:  python-librepo >= %{librepo_version}
-BuildRequires:  python-nose
+BuildRequires:  python2-iniparse
+BuildRequires:  python2-libcomps >= %{libcomps_version}
+BuildRequires:  python2-librepo >= %{librepo_version}
+BuildRequires:  python2-nose
 BuildRequires:  python2-gpg
 Requires:       python2-gpg
 BuildRequires:  pyliblzma
@@ -133,9 +133,9 @@ Requires:       pyliblzma
 Requires:       %{name}-conf = %{version}-%{release}
 Requires:       deltarpm
 Requires:       python2-hawkey >= %{hawkey_version}
-Requires:       python-iniparse
-Requires:       python-libcomps >= %{libcomps_version}
-Requires:       python-librepo >= %{librepo_version}
+Requires:       python2-iniparse
+Requires:       python2-libcomps >= %{libcomps_version}
+Requires:       python2-librepo >= %{librepo_version}
 %if 0%{?rhel} && 0%{?rhel} <= 7
 BuildRequires:  rpm-python >= %{rpm_version}
 Requires:       rpm-python >= %{rpm_version}
@@ -375,6 +375,10 @@ popd
 %endif
 
 %changelog
+* Wed Jan 03 2018 Iryna Shcherbina <ishcherb@redhat.com> - 2.7.5-5
+- Update Python 2 dependency declarations to new packaging standards
+  (See https://fedoraproject.org/wiki/FinalizingFedoraSwitchtoPython3)
+
 * Wed Nov 29 2017 Jaroslav Mracek <jmracek@redhat.com> - 2.7.5-4
 - Fix problem with demands.cacheonly that caused problems for system-upgrade
 
