@@ -1,0 +1,41 @@
+---
+# This first play always runs on the local staging system
+- hosts: localhost
+  tags:
+    - classic
+
+  tasks:
+
+  - name: change tests set for basic tests
+    set_fact:
+      tests:
+        - 'basic-sanity'
+      required_packages:
+      - dnf          # required for basic-sanity
+      - createrepo_c # required for basic-sanity
+      - httpd        # required for basic-sanity
+      - rpm-build    # required for basic-sanity
+
+  - include_role:
+      name: standard-test-beakerlib
+
+  - set_fact:
+      working_dir: behave_tests
+
+  - name: set tests var for running behave tests
+    set_fact:
+      tests: "{{ tests|default([]) }} + {{ [{item + '.test': {'dir': working_dir , 'run': './dnf-testing.sh run ' + item}}] }}"
+    with_lines: ls -1 {{ working_dir }}/dnf-docker-test/features/*.feature | xargs -n 1 basename | sed -e 's/\.feature$//'
+
+  - name: Starting docker service
+    shell: "/usr/sbin/service docker start"
+
+  - name: Building image for running dnf tests
+    shell: "./{{ working_dir }}/dnf-testing.sh build"
+
+  - include_role:
+     name: standard-test-basic
+
+
+
+
