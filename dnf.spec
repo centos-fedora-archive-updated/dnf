@@ -28,7 +28,7 @@
 
 Name:           dnf
 Version:        2.7.5
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -373,6 +373,9 @@ popd
 %endif
 
 %changelog
+* Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.5-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
 * Wed Jan 03 2018 Igor Gnatenko <ignatenko@redhat.com> - 2.7.5-5
 - Use %%systemd_requires
 - Update Python 2 dependency declarations to new packaging standards
