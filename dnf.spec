@@ -1,4 +1,4 @@
-%global commit e403d1e89597f135e69ae575ae700c618e4f9750
+%global commit f0d441d3eabe3d10a3ebb8427d14256394cdd5de
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %global hawkey_version 0.10.1
@@ -28,7 +28,7 @@
 
 Name:           dnf
 Version:        2.7.5
-Release:        1%{?dist}.modularity.2.%{shortcommit}
+Release:        1%{?dist}.modularity.3.%{shortcommit}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
