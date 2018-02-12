@@ -28,12 +28,12 @@
 
 Name:           dnf
 Version:        2.7.5
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
-Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/%{version}/%{name}-%{version}-modularity.tar.gz
 Patch0:         0001-Allow-to-set-cacheonly-from-commands-and-conf-RhBug-.patch
 Patch1:         0002-Remove-redundant-conf-option-cacheonly.patch
 Patch2:         0003-Remove-unnecessary-code-for-set-cacheonly.patch
@@ -147,6 +147,10 @@ BuildRequires:  python2-rpm >= %{rpm_version}
 Requires:       python2-rpm >= %{rpm_version}
 Recommends:     rpm-plugin-systemd-inhibit
 %endif
+BuildRequires:  python2-modulemd
+Requires:       python2-modulemd
+BuildRequires:  python2-smartcols >= 0.3.0
+Requires:       python2-smartcols >= 0.3.0
 # dnf-langpacks package is retired in F25
 # to have clean upgrade path for dnf-langpacks
 Obsoletes:      python-dnf-langpacks < %{dnf_langpacks_ver}
@@ -181,6 +185,10 @@ Requires:       rpm-plugin-systemd-inhibit
 %else
 Recommends:     rpm-plugin-systemd-inhibit
 %endif
+BuildRequires:  python3-modulemd
+Requires:       python3-modulemd
+BuildRequires:  python3-smartcols >= 0.3.0
+Requires:       python3-smartcols >= 0.3.0
 # dnf-langpacks package is retired in F25
 # to have clean upgrade path for dnf-langpacks
 Obsoletes:      python3-dnf-langpacks < %{dnf_langpacks_ver}
@@ -200,7 +208,7 @@ Requires:       %{name} = %{version}-%{release}
 Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}-%{version}-modularity
 mkdir build
 %if %{with python3}
 mkdir build-py3
@@ -377,6 +385,9 @@ popd
 %endif
 
 %changelog
+* Mon Feb 12 2018 Daniel Mach <dmach@redhat.com> - 2.7.5-8
+- Rebase to dnf from dnf-2-modularity branch.
+
 * Thu Feb 08 2018 Igor Gnatenko <ignatenko@redhat.com> - 2.7.5-7
 - Demote deltarpm to weak dependencies
 
