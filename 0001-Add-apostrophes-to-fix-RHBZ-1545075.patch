@@ -1,0 +1,25 @@
+From b59a4b78435f34f609ac4a697c40deff843981ff Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ren=C3=A9=20Genz?= <liebundartig@freenet.de>
+Date: Sat, 24 Mar 2018 15:35:12 +0100
+Subject: [PATCH] Add apostrophes to fix RHBZ#1545075
+
+---
+ dnf/cli/commands/updateinfo.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dnf/cli/commands/updateinfo.py b/dnf/cli/commands/updateinfo.py
+index b74428e..db1c8e7 100644
+--- a/dnf/cli/commands/updateinfo.py
++++ b/dnf/cli/commands/updateinfo.py
+@@ -53,7 +53,7 @@ class UpdateInfoCommand(commands.Command):
+                       'Important': _('Important/Sec.'),
+                       'Moderate': _('Moderate/Sec.'),
+                       'Low': _('Low/Sec.'),
+-                      None: _('Unknown/Sec.')}
++                      'None': _('Unknown/Sec.')}
+ 
+     direct_commands = {'list-updateinfo'    : 'list',
+                        'list-security'      : 'list',
+-- 
+2.16.2
+

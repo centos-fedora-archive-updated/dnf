@@ -28,7 +28,7 @@
 
 Name:           dnf
 Version:        2.7.5
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -37,6 +37,7 @@ Source0:        %{url}/archive/%{version}/%{name}-%{version}-modularity.tar.gz
 Patch0:         0001-Allow-to-set-cacheonly-from-commands-and-conf-RhBug-.patch
 Patch1:         0002-Remove-redundant-conf-option-cacheonly.patch
 Patch2:         0003-Remove-unnecessary-code-for-set-cacheonly.patch
+Patch3:         0001-Add-apostrophes-to-fix-RHBZ-1545075.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -385,6 +386,9 @@ popd
 %endif
 
 %changelog
+* Sat Mar 24 2018 René Genz <liebundartig@freenet.de> - 2.7.5-9
+- Add apostrophes to fix RHBZ#1545075
+
 * Mon Feb 12 2018 Daniel Mach <dmach@redhat.com> - 2.7.5-8
 - Rebase to dnf from dnf-2-modularity branch.
 
