@@ -28,12 +28,12 @@
 
 Name:           dnf
 Version:        2.7.5
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
-Source0:        %{url}/archive/%{version}/%{name}-%{version}-modularity.tar.gz
+Source0:        %{url}/archive/%{version}/%{name}-%{version}-modularity-3.tar.gz
 Patch0:         0001-Allow-to-set-cacheonly-from-commands-and-conf-RhBug-.patch
 Patch1:         0002-Remove-redundant-conf-option-cacheonly.patch
 Patch2:         0003-Remove-unnecessary-code-for-set-cacheonly.patch
@@ -208,7 +208,7 @@ Requires:       %{name} = %{version}-%{release}
 Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
-%autosetup -p1 -n %{name}-%{version}-modularity
+%autosetup -p1 -n %{name}-%{version}-modularity-3
 mkdir build
 %if %{with python3}
 mkdir build-py3
@@ -240,6 +240,7 @@ popd
 
 mkdir -p %{buildroot}%{pluginconfpath}/
 mkdir -p %{buildroot}%{py2pluginpath}/
+mkdir -p %{buildroot}%{_sysconfdir}/%{name}/modules.d
 %if %{with python3}
 mkdir -p %{buildroot}%{py3pluginpath}/__pycache__/
 %endif
@@ -354,6 +355,7 @@ popd
 %exclude %{python2_sitelib}/%{name}/automatic
 %{python2_sitelib}/%{name}/
 %dir %{py2pluginpath}
+%dir %{_sysconfdir}/%{name}/modules.d
 
 %if %{with python3}
 %files -n python3-%{name}
@@ -362,6 +364,7 @@ popd
 %{python3_sitelib}/%{name}/
 %dir %{py3pluginpath}
 %dir %{py3pluginpath}/__pycache__
+%dir %{_sysconfdir}/%{name}/modules.d
 %endif
 
 %files automatic
@@ -385,6 +388,9 @@ popd
 %endif
 
 %changelog
+* Mon Mar 26 2018 Martin Hatina <mhatina@redhat.com> - 2.7.5-9
+- Rebase to dnf from dnf-2-modularity-3 release.
+
 * Mon Feb 12 2018 Daniel Mach <dmach@redhat.com> - 2.7.5-8
 - Rebase to dnf from dnf-2-modularity branch.
 
