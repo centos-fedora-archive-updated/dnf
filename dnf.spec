@@ -28,7 +28,7 @@
 
 Name:           dnf
 Version:        2.7.5
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -147,8 +147,10 @@ BuildRequires:  python2-rpm >= %{rpm_version}
 Requires:       python2-rpm >= %{rpm_version}
 Recommends:     rpm-plugin-systemd-inhibit
 %endif
-BuildRequires:  python2-modulemd
-Requires:       python2-modulemd
+BuildRequires:  libmodulemd
+Requires:       libmodulemd
+BuildRequires:  python2-gobject-base
+Requires:       python2-gobject-base
 BuildRequires:  python2-smartcols >= 0.3.0
 Requires:       python2-smartcols >= 0.3.0
 # dnf-langpacks package is retired in F25
@@ -185,8 +187,10 @@ Requires:       rpm-plugin-systemd-inhibit
 %else
 Recommends:     rpm-plugin-systemd-inhibit
 %endif
-BuildRequires:  python3-modulemd
-Requires:       python3-modulemd
+BuildRequires:  libmodulemd
+Requires:       libmodulemd
+BuildRequires:  python3-gobject-base
+Requires:       python3-gobject-base
 BuildRequires:  python3-smartcols >= 0.3.0
 Requires:       python3-smartcols >= 0.3.0
 # dnf-langpacks package is retired in F25
@@ -388,6 +392,9 @@ popd
 %endif
 
 %changelog
+* Mon Mar 26 2018 Martin Hatina <mhatina@redhat.com> - 2.7.5-10
+- Require libmodulemd.
+
 * Mon Mar 26 2018 Martin Hatina <mhatina@redhat.com> - 2.7.5-9
 - Rebase to dnf from dnf-2-modularity-3 release.
 
