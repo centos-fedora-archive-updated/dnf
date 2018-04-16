@@ -245,6 +245,7 @@ popd
 mkdir -p %{buildroot}%{pluginconfpath}/
 mkdir -p %{buildroot}%{py2pluginpath}/
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}/modules.d
+mkdir -p %{buildroot}%{_sysconfdir}/%{name}/module-defaults.d
 %if %{with python3}
 mkdir -p %{buildroot}%{py3pluginpath}/__pycache__/
 %endif
@@ -360,6 +361,8 @@ popd
 %{python2_sitelib}/%{name}/
 %dir %{py2pluginpath}
 %dir %{_sysconfdir}/%{name}/modules.d
+%dir %{_sysconfdir}/%{name}/module-defaults.d
+
 
 %if %{with python3}
 %files -n python3-%{name}
@@ -369,6 +372,7 @@ popd
 %dir %{py3pluginpath}
 %dir %{py3pluginpath}/__pycache__
 %dir %{_sysconfdir}/%{name}/modules.d
+%dir %{_sysconfdir}/%{name}/module-defaults.d
 %endif
 
 %files automatic
