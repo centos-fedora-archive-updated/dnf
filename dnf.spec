@@ -28,12 +28,12 @@
 
 Name:           dnf
 Version:        2.7.5
-Release:        9%{?dist}
+Release:        11%{?dist}
 Summary:        Package manager forked from Yum, using libsolv as a dependency resolver
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
-Source0:        %{url}/archive/%{version}/%{name}-%{version}-modularity-3.tar.gz
+Source0:        %{url}/archive/%{version}/%{name}-%{version}-modularity-4.tar.gz
 Patch0:         0001-Allow-to-set-cacheonly-from-commands-and-conf-RhBug-.patch
 Patch1:         0002-Remove-redundant-conf-option-cacheonly.patch
 Patch2:         0003-Remove-unnecessary-code-for-set-cacheonly.patch
@@ -147,8 +147,8 @@ BuildRequires:  python2-rpm >= %{rpm_version}
 Requires:       python2-rpm >= %{rpm_version}
 Recommends:     rpm-plugin-systemd-inhibit
 %endif
-BuildRequires:  libmodulemd
-Requires:       libmodulemd
+BuildRequires:  libmodulemd >= 1.3.0
+Requires:       libmodulemd >= 1.3.0
 BuildRequires:  python2-gobject-base
 Requires:       python2-gobject-base
 BuildRequires:  python2-smartcols >= 0.3.0
@@ -187,8 +187,8 @@ Requires:       rpm-plugin-systemd-inhibit
 %else
 Recommends:     rpm-plugin-systemd-inhibit
 %endif
-BuildRequires:  libmodulemd
-Requires:       libmodulemd
+BuildRequires:  libmodulemd >= 1.3.0
+Requires:       libmodulemd >= 1.3.0
 BuildRequires:  python3-gobject-base
 Requires:       python3-gobject-base
 BuildRequires:  python3-smartcols >= 0.3.0
@@ -212,7 +212,7 @@ Requires:       %{name} = %{version}-%{release}
 Alternative CLI to "dnf upgrade" suitable for automatic, regular execution.
 
 %prep
-%autosetup -p1 -n %{name}-%{version}-modularity-3
+%autosetup -p1 -n %{name}-%{version}-modularity-4
 mkdir build
 %if %{with python3}
 mkdir build-py3
@@ -245,6 +245,7 @@ popd
 mkdir -p %{buildroot}%{pluginconfpath}/
 mkdir -p %{buildroot}%{py2pluginpath}/
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}/modules.d
+mkdir -p %{buildroot}%{_sysconfdir}/%{name}/modules.defaults.d
 %if %{with python3}
 mkdir -p %{buildroot}%{py3pluginpath}/__pycache__/
 %endif
@@ -360,6 +361,7 @@ popd
 %{python2_sitelib}/%{name}/
 %dir %{py2pluginpath}
 %dir %{_sysconfdir}/%{name}/modules.d
+%dir %{_sysconfdir}/%{name}/modules.defaults.d
 
 %if %{with python3}
 %files -n python3-%{name}
@@ -369,6 +371,7 @@ popd
 %dir %{py3pluginpath}
 %dir %{py3pluginpath}/__pycache__
 %dir %{_sysconfdir}/%{name}/modules.d
+%dir %{_sysconfdir}/%{name}/modules.defaults.d
 %endif
 
 %files automatic
@@ -392,6 +395,9 @@ popd
 %endif
 
 %changelog
+* Tue Apr 17 2018 Martin Hatina <mhatina@redhat.com> - 2.7.5-11
+- Rebase to dnf from dnf-2-modularity-4 release.
+
 * Tue Mar 27 2018 Martin Hatina <mhatina@redhat.com> - 2.7.5-9
 - Rebase to dnf from dnf-2-modularity-3 release.
 
