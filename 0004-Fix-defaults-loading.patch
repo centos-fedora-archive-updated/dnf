@@ -1,0 +1,22 @@
+From 5842971b6df574b214806fcc286114813d370e1d Mon Sep 17 00:00:00 2001
+From: Daniel Mach <dmach@redhat.com>
+Date: Wed, 18 Apr 2018 16:13:59 +0200
+Subject: [PATCH] Fix defaults loading.
+
+---
+ dnf/module/metadata_loader.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dnf/module/metadata_loader.py b/dnf/module/metadata_loader.py
+index 78e7f051..150b66f0 100644
+--- a/dnf/module/metadata_loader.py
++++ b/dnf/module/metadata_loader.py
+@@ -61,4 +61,4 @@ class ModuleMetadataLoader(object):
+         if PY3:
+             modules_yaml = modules_yaml.decode("utf-8")
+ 
+-        return Modulemd.Module.new_all_from_string(modules_yaml)
++        return Modulemd.Module.new_all_from_string_ext(modules_yaml)
+-- 
+2.17.0
+
