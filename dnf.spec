@@ -78,6 +78,9 @@ Summary:        %{pkg_summary}
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}-modularity-6.tar.gz
+Patch0:         0001-Allow-to-set-cacheonly-from-commands-and-conf-RhBug-.patch
+Patch1:         0002-Remove-redundant-conf-option-cacheonly.patch
+Patch2:         0003-Remove-unnecessary-code-for-set-cacheonly.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
