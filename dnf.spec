@@ -72,7 +72,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        2.7.5
-Release:        13%{?dist}
+Release:        14%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -252,7 +252,7 @@ Systemd units that can periodically download package upgrades and apply them.
 
 
 %prep
-%autosetup -n %{name}-%{version}-modularity-6
+%autosetup -p1 -n %{name}-%{version}-modularity-6
 mkdir build-py2
 mkdir build-py3
 
@@ -464,6 +464,9 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %endif
 
 %changelog
+* Fri May 25 2018 Martin Hatina <mhatina@redhat.com> - 2.7.5-14
+- Fix patch applying.
+
 * Fri May 25 2018 Martin Hatina <mhatina@redhat.com> - 2.7.5-13
 - Rebase to dnf from dnf-2-modularity-6 release.
 
