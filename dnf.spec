@@ -72,7 +72,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        2.7.5
-Release:        13%{?dist}
+Release:        14%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -175,7 +175,6 @@ Requires:       %{name}-data = %{version}-%{release}
 Requires:       deltarpm
 %endif
 Requires:       python2-hawkey >= %{hawkey_version}
-Requires:       python2-libdnf >= %{hawkey_version}
 Requires:       python2-libcomps >= %{libcomps_version}
 Requires:       python2-librepo >= %{librepo_version}
 %if 0%{?rhel} && 0%{?rhel} <= 7
@@ -219,7 +218,6 @@ Requires:       %{name}-data = %{version}-%{release}
 Requires:       deltarpm
 %endif
 Requires:       python3-hawkey >= %{hawkey_version}
-Requires:       python3-libdnf >= %{hawkey_version}
 Requires:       python3-iniparse
 Requires:       python3-libcomps >= %{libcomps_version}
 Requires:       python3-librepo >= %{librepo_version}
@@ -464,6 +462,9 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %endif
 
 %changelog
+* Mon May 28 2018 Martin Hatina <mhatina@redhat.com> - 2.7.5-14
+- Do not require libdnf
+
 * Fri May 25 2018 Martin Hatina <mhatina@redhat.com> - 2.7.5-13
 - Rebase to dnf from dnf-2-modularity-6 release.
 
