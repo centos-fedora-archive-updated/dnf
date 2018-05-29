@@ -72,7 +72,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        2.7.5
-Release:        15%{?dist}
+Release:        16%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -81,6 +81,7 @@ Source0:        %{url}/archive/%{version}/%{name}-%{version}-modularity-6.tar.gz
 Patch0:         0001-Allow-to-set-cacheonly-from-commands-and-conf-RhBug-.patch
 Patch1:         0002-Remove-redundant-conf-option-cacheonly.patch
 Patch2:         0003-Remove-unnecessary-code-for-set-cacheonly.patch
+Patch3:         0004-util-Correctly-source-errno.EEXIST.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -462,7 +463,10 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %endif
 
 %changelog
-* Mon May 28 2018 Martin Hatina <mhatina@redhat.com> - 2.7.5.15
+* Tue May 29 2018 Martin Hatina <mhatina@redhat.com> - 2.7.5-16
+- Apply util-Correctly-source-errno.EEXIST patch
+
+* Mon May 28 2018 Martin Hatina <mhatina@redhat.com> - 2.7.5-15
 - Do not require libdnf
 
 * Fri May 25 2018 Martin Hatina <mhatina@redhat.com> - 2.7.5-14
