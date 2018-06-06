@@ -72,7 +72,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        2.7.5
-Release:        16%{?dist}
+Release:        17%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -172,7 +172,10 @@ Requires:       python2-gpg
 BuildRequires:  pyliblzma
 Requires:       pyliblzma
 Requires:       %{name}-data = %{version}-%{release}
-%if 0%{?fedora} || 0%{?centos}
+%if 0%{?fedora}
+Recommends:     deltarpm
+%endif
+%if 0%{?centos}
 Requires:       deltarpm
 %endif
 Requires:       python2-hawkey >= %{hawkey_version}
@@ -215,7 +218,10 @@ BuildRequires:  python3-nose
 BuildRequires:  python3-gpg
 Requires:       python3-gpg
 Requires:       %{name}-data = %{version}-%{release}
-%if 0%{?fedora} || 0%{?centos}
+%if 0%{?fedora}
+Recommends:     deltarpm
+%endif
+%if 0%{?centos}
 Requires:       deltarpm
 %endif
 Requires:       python3-hawkey >= %{hawkey_version}
@@ -463,6 +469,9 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %endif
 
 %changelog
+* Wed Jun 06 2018 Marek Blaha <mblaha@redhat.com> - 2.7.5-17
+- Demote deltarpm to weak dependencies again
+
 * Tue May 29 2018 Martin Hatina <mhatina@redhat.com> - 2.7.5-16
 - Apply util-Correctly-source-errno.EEXIST patch
 
