@@ -72,7 +72,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        2.7.5
-Release:        17%{?dist}
+Release:        18%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -469,6 +469,9 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %endif
 
 %changelog
+* Sat Jun 16 2018 Miro Hrončok <mhroncok@redhat.com> - 2.7.5-18
+- Rebuilt for Python 3.7
+
 * Wed Jun 06 2018 Marek Blaha <mblaha@redhat.com> - 2.7.5-17
 - Demote deltarpm to weak dependencies again
 
