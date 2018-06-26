@@ -1,13 +1,15 @@
 # default dependencies
-%global hawkey_version 0.11.1
-%global librepo_version 1.8.1
+%global hawkey_version 0.14.0
+%global librepo_version 1.9.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global python_smartcols_version 0.3.0
 %global rpm_version 4.14.0
 
 # conflicts
-%global conflicts_dnf_plugins_core_version 2.1.3
+%global conflicts_dnf_plugins_core_version 3.0.1
+%global conflicts_dnf_plugins_extras_version 3.0.0
+%global conflicts_dnfdaemon_version 0.3.19
 
 # override dependencies for rhel 7
 %if 0%{?rhel} == 7
@@ -71,17 +73,13 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        2.7.5
-Release:        18%{?dist}
+Version:        3.0.1
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
-Source0:        %{url}/archive/%{version}/%{name}-%{version}-modularity-6.tar.gz
-Patch0:         0001-Allow-to-set-cacheonly-from-commands-and-conf-RhBug-.patch
-Patch1:         0002-Remove-redundant-conf-option-cacheonly.patch
-Patch2:         0003-Remove-unnecessary-code-for-set-cacheonly.patch
-Patch3:         0004-util-Correctly-source-errno.EEXIST.patch
+Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -130,6 +128,8 @@ Provides:       dnf-command(upgrade)
 Provides:       dnf-command(upgrade-to)
 Conflicts:      python2-dnf-plugins-core < %{conflicts_dnf_plugins_core_version}
 Conflicts:      python3-dnf-plugins-core < %{conflicts_dnf_plugins_core_version}
+Conflicts:      python2-dnf-plugins-extras < %{conflicts_dnf_plugins_extras_version}
+Conflicts:      python3-dnf-plugins-extras < %{conflicts_dnf_plugins_extras_version}
 
 %description
 %{pkg_description}
@@ -159,13 +159,23 @@ Summary:        Python 2 interface to DNF
 %{?python_provide:%python_provide python2-%{name}}
 BuildRequires:  python2-devel
 BuildRequires:  python2-hawkey >= %{hawkey_version}
+BuildRequires:  python2-libdnf >= %{hawkey_version}
 BuildRequires:  python2-libcomps >= %{libcomps_version}
+BuildRequires:  python2-libdnf
 BuildRequires:  python2-librepo >= %{librepo_version}
 BuildRequires:  python2-nose
+BuildRequires:  libmodulemd >= %{libmodulemd_version}
+Requires:       libmodulemd >= %{libmodulemd_version}
+BuildRequires:  python2-smartcols >= %{python_smartcols_version}
+Requires:       python2-smartcols >= %{python_smartcols_version}
 %if (0%{?rhel} && 0%{?rhel} <= 7)
 BuildRequires:  pygpgme
 Requires:       pygpgme
+BuildRequires:  python-gobject-base
+Requires:       python-gobject-base
 %else
+BuildRequires:  python2-gobject-base
+Requires:       python2-gobject-base
 BuildRequires:  python2-gpg
 Requires:       python2-gpg
 %endif
@@ -179,7 +189,9 @@ Recommends:     deltarpm
 Requires:       deltarpm
 %endif
 Requires:       python2-hawkey >= %{hawkey_version}
+Requires:       python2-libdnf >= %{hawkey_version}
 Requires:       python2-libcomps >= %{libcomps_version}
+Requires:       python2-libdnf
 Requires:       python2-librepo >= %{librepo_version}
 %if 0%{?rhel} && 0%{?rhel} <= 7
 BuildRequires:  python-iniparse
@@ -192,14 +204,8 @@ Requires:       python2-iniparse
 BuildRequires:  python2-rpm >= %{rpm_version}
 Requires:       python2-rpm >= %{rpm_version}
 Recommends:     rpm-plugin-systemd-inhibit
-
-BuildRequires:  libmodulemd >= %{libmodulemd_version}
-Requires:       libmodulemd >= %{libmodulemd_version}
-BuildRequires:  python2-gobject-base
-Requires:       python2-gobject-base
-BuildRequires:  python2-smartcols >= %{python_smartcols_version}
-Requires:       python2-smartcols >= %{python_smartcols_version}
 %endif
+Conflicts:      dnfdaemon < %{conflicts_dnfdaemon_version}
 
 %description -n python2-%{name}
 Python 2 interface to DNF.
@@ -211,9 +217,17 @@ Summary:        Python 3 interface to DNF
 %{?python_provide:%python_provide python3-%{name}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-hawkey >= %{hawkey_version}
+BuildRequires:  python3-libdnf >= %{hawkey_version}
 BuildRequires:  python3-iniparse
 BuildRequires:  python3-libcomps >= %{libcomps_version}
+BuildRequires:  python3-libdnf
 BuildRequires:  python3-librepo >= %{librepo_version}
+BuildRequires:  libmodulemd >= %{libmodulemd_version}
+Requires:       libmodulemd >= %{libmodulemd_version}
+BuildRequires:  python3-gobject-base
+Requires:       python3-gobject-base
+BuildRequires:  python3-smartcols >= %{python_smartcols_version}
+Requires:       python3-smartcols >= %{python_smartcols_version}
 BuildRequires:  python3-nose
 BuildRequires:  python3-gpg
 Requires:       python3-gpg
@@ -225,8 +239,10 @@ Recommends:     deltarpm
 Requires:       deltarpm
 %endif
 Requires:       python3-hawkey >= %{hawkey_version}
+Requires:       python3-libdnf >= %{hawkey_version}
 Requires:       python3-iniparse
 Requires:       python3-libcomps >= %{libcomps_version}
+Requires:       python3-libdnf
 Requires:       python3-librepo >= %{librepo_version}
 BuildRequires:  python3-rpm >= %{rpm_version}
 Requires:       python3-rpm >= %{rpm_version}
@@ -234,12 +250,6 @@ Requires:       python3-rpm >= %{rpm_version}
 Requires:       rpm-plugin-systemd-inhibit
 %else
 Recommends:     rpm-plugin-systemd-inhibit
-BuildRequires:  libmodulemd >= %{libmodulemd_version}
-Requires:       libmodulemd >= %{libmodulemd_version}
-BuildRequires:  python3-gobject-base
-Requires:       python3-gobject-base
-BuildRequires:  python3-smartcols >= %{python_smartcols_version}
-Requires:       python3-smartcols >= %{python_smartcols_version}
 %endif
 
 %description -n python3-%{name}
@@ -257,7 +267,7 @@ Systemd units that can periodically download package upgrades and apply them.
 
 
 %prep
-%autosetup -p1 -n %{name}-%{version}-modularity-6
+%autosetup -p1
 mkdir build-py2
 mkdir build-py3
 
@@ -296,14 +306,14 @@ mkdir build-py3
 %find_lang %{name}
 mkdir -p %{buildroot}%{confdir}/vars
 mkdir -p %{buildroot}%{pluginconfpath}/
+mkdir -p %{buildroot}%{_sysconfdir}/%{name}/modules.d
+mkdir -p %{buildroot}%{_sysconfdir}/%{name}/modules.defaults.d
 %if %{with python2}
 mkdir -p %{buildroot}%{py2pluginpath}/
 %endif
 %if %{with python3}
 mkdir -p %{buildroot}%{py3pluginpath}/__pycache__/
 %endif
-mkdir -p %{buildroot}%{confdir}/modules.d
-mkdir -p %{buildroot}%{confdir}/modules.defaults.d
 ln -sr  %{buildroot}%{confdir}/%{name}.conf %{buildroot}%{_sysconfdir}/yum.conf
 mkdir -p %{buildroot}%{_localstatedir}/log/
 mkdir -p %{buildroot}%{_var}/cache/dnf/
@@ -391,6 +401,8 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %dir %{confdir}/modules.d
 %dir %{confdir}/modules.defaults.d
 %dir %{pluginconfpath}
+%dir %{_sysconfdir}/%{name}/modules.d
+%dir %{_sysconfdir}/%{name}/modules.defaults.d
 %dir %{confdir}/protected.d
 %dir %{confdir}/vars
 %config(noreplace) %{confdir}/%{name}.conf
@@ -469,6 +481,70 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %endif
 
 %changelog
+* Tue Jun 26 2018 Jaroslav Mracek <jmracek@redhat.com> - 3.0.1-1
+- Update to 3.0.1-1
+- Support of MODULES - new DNF command `module`
+- Add attribute dnf.conf.Conf.proxy_auth_method
+- New repoquery option `--depends` and `--whatdepends`
+- Enhanced support of variables
+- Enhanced documentation
+- Resolves: rhbz#1565599
+- Resolves: rhbz#1508839
+- Resolves: rhbz#1506486
+- Resolves: rhbz#1506475
+- Resolves: rhbz#1505577
+- Resolves: rhbz#1505574
+- Resolves: rhbz#1505573
+- Resolves: rhbz#1480481
+- Resolves: rhbz#1496732
+- Resolves: rhbz#1497272
+- Resolves: rhbz#1488100
+- Resolves: rhbz#1488086
+- Resolves: rhbz#1488112
+- Resolves: rhbz#1488105
+- Resolves: rhbz#1488089
+- Resolves: rhbz#1488092
+- Resolves: rhbz#1486839
+- Resolves: rhbz#1486839
+- Resolves: rhbz#1486827
+- Resolves: rhbz#1486816
+- Resolves: rhbz#1565647
+- Resolves: rhbz#1583834
+- Resolves: rhbz#1576921
+- Resolves: rhbz#1270295
+- Resolves: rhbz#1361698
+- Resolves: rhbz#1369847
+- Resolves: rhbz#1368651
+- Resolves: rhbz#1563841
+- Resolves: rhbz#1387622
+- Resolves: rhbz#1575998
+- Resolves: rhbz#1577854
+- Resolves: rhbz#1387622
+- Resolves: rhbz#1542416
+- Resolves: rhbz#1542416
+- Resolves: rhbz#1496153
+- Resolves: rhbz#1568366
+- Resolves: rhbz#1539803
+- Resolves: rhbz#1552576
+- Resolves: rhbz#1545075
+- Resolves: rhbz#1544359
+- Resolves: rhbz#1547672
+- Resolves: rhbz#1537957
+- Resolves: rhbz#1542920
+- Resolves: rhbz#1507129
+- Resolves: rhbz#1512956
+- Resolves: rhbz#1512663
+- Resolves: rhbz#1247083
+- Resolves: rhbz#1247083
+- Resolves: rhbz#1247083
+- Resolves: rhbz#1519325
+- Resolves: rhbz#1492036
+- Resolves: rhbz#1391911
+- Resolves: rhbz#1391911
+- Resolves: rhbz#1479330
+- Resolves: rhbz#1505185
+- Resolves: rhbz#1305232
+
 * Sat Jun 16 2018 Miro Hrončok <mhroncok@redhat.com> - 2.7.5-18
 - Rebuilt for Python 3.7
 
