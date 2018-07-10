@@ -74,7 +74,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        3.0.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -275,7 +275,7 @@ mkdir build-py3
 %build
 %if %{with python2}
     pushd build-py2
-    %cmake .. -DPYTHON_DESIRED:str=2
+    %cmake .. -DPYTHON_DESIRED:str=2 -DPYTHON_EXECUTABLE:FILEPATH=%{__python2}
     %make_build
     make doc-man
     popd
@@ -283,7 +283,7 @@ mkdir build-py3
 
 %if %{with python3}
     pushd build-py3
-    %cmake .. -DPYTHON_DESIRED:str=3
+    %cmake .. -DPYTHON_DESIRED:str=3 -DPYTHON_EXECUTABLE:FILEPATH=%{__python3}
     %make_build
     make doc-man
     popd
@@ -481,6 +481,9 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %endif
 
 %changelog
+* Tue Jul 10 2018 Marek Blaha <mblaha@redhat.com> - 3.0.2-2
+- Explicitly set python executable for py2/py3 builds
+
 * Fri Jun 29 2018 Jaroslav Mracek <jmracek@redhat.com> - 3.0.2-1
 - Update to 3.0.2-1
 
