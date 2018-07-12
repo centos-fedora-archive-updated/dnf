@@ -74,7 +74,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        3.0.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -275,7 +275,7 @@ mkdir build-py3
 %build
 %if %{with python2}
     pushd build-py2
-    %cmake .. -DPYTHON_DESIRED:str=2
+    %cmake .. -DPYTHON_DESIRED:FILEPATH=%{__python2}
     %make_build
     make doc-man
     popd
@@ -283,7 +283,7 @@ mkdir build-py3
 
 %if %{with python3}
     pushd build-py3
-    %cmake .. -DPYTHON_DESIRED:str=3
+    %cmake .. -DPYTHON_DESIRED:FILEPATH=%{__python3}
     %make_build
     make doc-man
     popd
@@ -401,8 +401,6 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %dir %{confdir}/modules.d
 %dir %{confdir}/modules.defaults.d
 %dir %{pluginconfpath}
-%dir %{_sysconfdir}/%{name}/modules.d
-%dir %{_sysconfdir}/%{name}/modules.defaults.d
 %dir %{confdir}/protected.d
 %dir %{confdir}/vars
 %config(noreplace) %{confdir}/%{name}.conf
@@ -481,6 +479,9 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %endif
 
 %changelog
+* Thu Jul 12 2018 Martin Hatina <mhatina@redhat.com> - 3.0.3-2
+- Ensure that correct python version is used for build
+
 * Thu Jul 12 2018 Martin Hatina <mhatina@redhat.com> - 3.0.3-1
 - Bug fix release
 
