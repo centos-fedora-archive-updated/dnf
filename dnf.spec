@@ -74,7 +74,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        3.0.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -479,6 +479,9 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %endif
 
 %changelog
+* Thu Jul 12 2018 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
 * Thu Jul 12 2018 Martin Hatina <mhatina@redhat.com> - 3.0.3-2
 - Ensure that correct python version is used for build
 
