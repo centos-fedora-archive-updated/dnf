@@ -74,12 +74,16 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        3.0.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+# Avoid systemd dependency loop in dnf-makecache.timer
+# https://bugzilla.redhat.com/show_bug.cgi?id=1600823
+# https://github.com/rpm-software-management/dnf/commit/4ca1555ab6ffb1b916094802440b84e74aca2eb5
+Patch0:         0001-dnf-makecache.timer-move-to-multi-user-to-fix-loop.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -479,6 +483,10 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %endif
 
 %changelog
+* Mon Jul 16 2018 Adam Williamson <awilliam@redhat.com> - 3.0.3-4
+- Backport fix for dnf-makecache.timer loop from git
+- Resolves: rhbz#1600823
+
 * Thu Jul 12 2018 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.3-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 

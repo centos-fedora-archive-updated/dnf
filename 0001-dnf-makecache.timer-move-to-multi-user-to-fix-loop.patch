@@ -1,0 +1,50 @@
+From 4ca1555ab6ffb1b916094802440b84e74aca2eb5 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Fri, 13 Jul 2018 00:07:13 -0700
+Subject: [PATCH] dnf-makecache.timer: move to multi-user to fix loop
+
+In ee96304, `After=network-online.target` was added to the
+dnf-makecache.timer service definition. However, it was already
+`WantedBy=basic.target`. These two requests are contradictory
+in Fedora and probably most distributions, as it seems that
+network-online.target requires NetworkManager.service, and
+NetworkManger.service requires basic.target. systemd is forced
+to break this loop somehow: my testing suggests that it usually
+does so by throwing dnf-makecache.timer out of the process, but
+sometimes does it by throwing NetworkManager out of the process,
+resulting in the network unexpectedly not coming up. See
+https://bugzilla.redhat.com/show_bug.cgi?id=1600823 for more.
+
+This commit resolves this simply having dnf-makecache.timer
+WantedBy multi-user.target, not basic.target. I don't think we
+*really* want DNF refreshing its caches in what is basically a
+recovery environment, after all, and NetworkManager itself is
+WantedBy multi-user.target, so if you actually only boot to
+basic.target, there is no network up at all after boot (I've
+tested this).
+
+There are other options (e.g. dropping the After network-online
+ordering and just trusting the Wants and the ten-minute startup
+delay to be sufficient), but we certainly should resolve this
+one way or another.
+
+Resolves: rhbz#1600823
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ etc/systemd/dnf-makecache.timer | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/etc/systemd/dnf-makecache.timer b/etc/systemd/dnf-makecache.timer
+index 72b6b78c..e3e612c8 100644
+--- a/etc/systemd/dnf-makecache.timer
++++ b/etc/systemd/dnf-makecache.timer
+@@ -12,4 +12,4 @@ OnUnitInactiveSec=1h
+ Unit=dnf-makecache.service
+ 
+ [Install]
+-WantedBy=basic.target
++WantedBy=multi-user.target
+-- 
+2.18.0.rc2
+
