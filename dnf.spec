@@ -1,5 +1,5 @@
 # default dependencies
-%global hawkey_version 0.14.0
+%global hawkey_version 0.16.0
 %global librepo_version 1.9.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
@@ -73,8 +73,8 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        3.0.3
-Release:        4%{?dist}
+Version:        3.0.4
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -83,7 +83,6 @@ Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 # Avoid systemd dependency loop in dnf-makecache.timer
 # https://bugzilla.redhat.com/show_bug.cgi?id=1600823
 # https://github.com/rpm-software-management/dnf/commit/4ca1555ab6ffb1b916094802440b84e74aca2eb5
-Patch0:         0001-dnf-makecache.timer-move-to-multi-user-to-fix-loop.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -148,6 +147,11 @@ Provides:       %{name}-conf = %{version}-%{release}
 Common data and configuration files for DNF
 
 %package -n %{yum_subpackage_name}
+# DNF == YUM4; prefix version with 4.0 to make it higher than any version of YUM3
+# save and restore version, otherwise setting Version affects other sub-packages
+%global pkg_version %{version}
+Version:        4.0.%{version}
+%global version %{pkg_version}
 Requires:       %{name} = %{version}-%{release}
 Summary:        %{pkg_summary}
 %if 0%{?fedora}
@@ -405,6 +409,8 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %dir %{confdir}/modules.d
 %dir %{confdir}/modules.defaults.d
 %dir %{pluginconfpath}
+%dir %{_sysconfdir}/%{name}/modules.d
+%dir %{_sysconfdir}/%{name}/modules.defaults.d
 %dir %{confdir}/protected.d
 %dir %{confdir}/vars
 %config(noreplace) %{confdir}/%{name}.conf
@@ -483,6 +489,18 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %endif
 
 %changelog
+* Sun Jul 22 2018 Daniel Mach <dmach@redhat.com> - 3.0.4-1
+- [transaction] Fix 'TransactionItem not found for key' error.
+- [module] Allow removing module profile without specifying a stream.
+- [module] Fix 'BaseCli' object has no attribute '_yumdb' error.
+- [callback] Fix TransactionDisplay.PKG_ERASE redirect to a non-existing constant.
+- [spec] Change yum compat package version to 4.0.version.
+- [cache] Clean transaction temp files after successfull transaction
+- [log] Log messages from libdnf logger
+- [transaction] Add states to report rpm transaction progress
+- [transaction] Cache TransactionItem during handling of RPM callback (RhBug:1599597)
+- [systemd] dnf-makecache.timer: move to multi-user to fix loop
+
 * Mon Jul 16 2018 Adam Williamson <awilliam@redhat.com> - 3.0.3-4
 - Backport fix for dnf-makecache.timer loop from git
 - Resolves: rhbz#1600823
