@@ -74,12 +74,16 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        3.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+# Fix for https://bugzilla.redhat.com/show_bug.cgi?id=1613577
+# crash that breaks distro composes
+# https://github.com/rpm-software-management/dnf/pull/1168
+Patch0:         1168.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -486,6 +490,9 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %endif
 
 %changelog
+* Wed Aug 08 2018 Adam Williamson <awilliam@redhat.com> - 3.2.0-2
+- Fix a crash that breaks Rawhide composes (RhBug:1613577)
+
 * Tue Aug 07 2018 Daniel Mach <dmach@redhat.com> - 3.2.0-1
 - [sack] Use module_platform_id option.
 - [module] Switch module persistor to libdnf implementation.
