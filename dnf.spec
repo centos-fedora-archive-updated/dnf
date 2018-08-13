@@ -1,9 +1,8 @@
 # default dependencies
-%global hawkey_version 0.17.0
+%global hawkey_version 0.17.2
 %global librepo_version 1.9.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
-%global python_smartcols_version 0.3.0
 %global rpm_version 4.14.0
 
 # conflicts
@@ -73,8 +72,8 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        3.2.0
-Release:        2%{?dist}
+Version:        3.3.0
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -175,8 +174,6 @@ BuildRequires:  python2-librepo >= %{librepo_version}
 BuildRequires:  python2-nose
 BuildRequires:  libmodulemd >= %{libmodulemd_version}
 Requires:       libmodulemd >= %{libmodulemd_version}
-BuildRequires:  python2-smartcols >= %{python_smartcols_version}
-Requires:       python2-smartcols >= %{python_smartcols_version}
 %if (0%{?rhel} && 0%{?rhel} <= 7)
 BuildRequires:  pygpgme
 Requires:       pygpgme
@@ -235,8 +232,6 @@ BuildRequires:  libmodulemd >= %{libmodulemd_version}
 Requires:       libmodulemd >= %{libmodulemd_version}
 BuildRequires:  python3-gobject-base
 Requires:       python3-gobject-base
-BuildRequires:  python3-smartcols >= %{python_smartcols_version}
-Requires:       python3-smartcols >= %{python_smartcols_version}
 BuildRequires:  python3-nose
 BuildRequires:  python3-gpg
 Requires:       python3-gpg
@@ -490,6 +485,21 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %endif
 
 %changelog
+* Mon Aug 13 2018 Daniel Mach <dmach@redhat.com> - 3.3.0-1
+- [misc] Fallback to os.getuid() if /proc/self/loginuid can't be read (RhBug:1597005)
+- [translations] Update translations from zanata.
+- [doc] Update module documentation.
+- [module] Fix `module provides` output.
+- [module] Add `module reset` command.
+- [module] Fix module disable command
+- [repo] Improve error message on broken repo (RhBug:1595796)
+- [doc] Enhance a command documentation (RhBug:1361617)
+- [module] Automatically save module persistor in do_transaction().
+- [drpm] Fixed setting deltarpm_percentage=0 to switch drpm off
+- [repo] Split base.download_packages into two functions
+- [output] Use libdnf wrapper for smartcols
+- [conf] Do not traceback on empty option (RhBug:1613577)
+
 * Wed Aug 08 2018 Adam Williamson <awilliam@redhat.com> - 3.2.0-2
 - Fix a crash that breaks Rawhide composes (RhBug:1613577)
 
