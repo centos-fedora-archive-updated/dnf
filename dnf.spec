@@ -79,10 +79,6 @@ Summary:        %{pkg_summary}
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
-# Fix for https://bugzilla.redhat.com/show_bug.cgi?id=1613577
-# crash that breaks distro composes
-# https://github.com/rpm-software-management/dnf/pull/1168
-Patch0:         1168.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
