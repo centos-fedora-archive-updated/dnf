@@ -73,12 +73,13 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        3.3.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0:         1181.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -481,6 +482,9 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %endif
 
 %changelog
+* Tue Aug 28 2018 Daniel Mach <dmach@redhat.com> - 3.3.0-2
+- [history] Fix 'attempt to write a readonly database' error in addConsoleOutputLine().
+
 * Mon Aug 13 2018 Daniel Mach <dmach@redhat.com> - 3.3.0-1
 - [misc] Fallback to os.getuid() if /proc/self/loginuid can't be read (RhBug:1597005)
 - [translations] Update translations from zanata.

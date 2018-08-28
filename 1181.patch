@@ -1,0 +1,56 @@
+From 76d33665cbf1d8576cf6ee939bb1acd794efa892 Mon Sep 17 00:00:00 2001
+From: Daniel Mach <dmach@redhat.com>
+Date: Tue, 28 Aug 2018 20:25:55 +0200
+Subject: [PATCH] [history] Fix 'attempt to write a readonly database' error in
+ addConsoleOutputLine().
+
+If transaction runs in a forked process, it fails with
+'attempt to write a readonly database' error in addConsoleOutputLine().
+To avoid database writes in the forked process, console output has to
+be stored in a variable and written right before finishing the transaction.
+---
+ dnf/db/history.py | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/dnf/db/history.py b/dnf/db/history.py
+index f4158eccb..5616c0bc0 100644
+--- a/dnf/db/history.py
++++ b/dnf/db/history.py
+@@ -256,6 +256,7 @@ def __init__(self, db_dir, releasever=""):
+         self._addon_data = None
+         self._swdb = None
+         self._db_dir = db_dir
++        self._output = []
+ 
+     def __del__(self):
+         self.close()
+@@ -302,6 +303,7 @@ def close(self):
+         if self._swdb:
+             self._swdb.closeDatabase()
+         self._swdb = None
++        self._output = []
+ 
+     @property
+     def path(self):
+@@ -468,7 +470,8 @@ def log_scriptlet_output(self, msg):
+             return
+         for line in msg.splitlines():
+             line = ucd(line)
+-            self.swdb.addConsoleOutputLine(1, line)
++            # logging directly to database fails if transaction runs in a background process
++            self._output.append((1, line))
+ 
+     '''
+     def _log_errors(self, errors):
+@@ -484,6 +487,11 @@ def end(self, end_rpmdb_version="", return_code=0, errors=None):
+         return_code = not bool(return_code)
+         if not hasattr(self, '_tid'):
+             return  # Failed at beg() time
++
++        for file_descriptor, line in self._output:
++            self.swdb.addConsoleOutputLine(file_descriptor, line)
++        self._output = []
++
+         self.swdb.endTransaction(
+             int(time.time()),
+             str(end_rpmdb_version),
