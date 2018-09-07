@@ -1,6 +1,5 @@
 # default dependencies
-%global hawkey_version 0.17.2
-%global librepo_version 1.9.0
+%global hawkey_version 0.19.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
@@ -72,7 +71,7 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        3.3.0
+Version:        3.5.0
 Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
@@ -166,18 +165,13 @@ BuildRequires:  python2-hawkey >= %{hawkey_version}
 BuildRequires:  python2-libdnf >= %{hawkey_version}
 BuildRequires:  python2-libcomps >= %{libcomps_version}
 BuildRequires:  python2-libdnf
-BuildRequires:  python2-librepo >= %{librepo_version}
 BuildRequires:  python2-nose
 BuildRequires:  libmodulemd >= %{libmodulemd_version}
 Requires:       libmodulemd >= %{libmodulemd_version}
 %if (0%{?rhel} && 0%{?rhel} <= 7)
 BuildRequires:  pygpgme
 Requires:       pygpgme
-BuildRequires:  python-gobject-base
-Requires:       python-gobject-base
 %else
-BuildRequires:  python2-gobject-base
-Requires:       python2-gobject-base
 BuildRequires:  python2-gpg
 Requires:       python2-gpg
 %endif
@@ -194,7 +188,6 @@ Requires:       python2-hawkey >= %{hawkey_version}
 Requires:       python2-libdnf >= %{hawkey_version}
 Requires:       python2-libcomps >= %{libcomps_version}
 Requires:       python2-libdnf
-Requires:       python2-librepo >= %{librepo_version}
 %if 0%{?rhel} && 0%{?rhel} <= 7
 BuildRequires:  python-iniparse
 Requires:       python-iniparse
@@ -223,11 +216,8 @@ BuildRequires:  python3-libdnf >= %{hawkey_version}
 BuildRequires:  python3-iniparse
 BuildRequires:  python3-libcomps >= %{libcomps_version}
 BuildRequires:  python3-libdnf
-BuildRequires:  python3-librepo >= %{librepo_version}
 BuildRequires:  libmodulemd >= %{libmodulemd_version}
 Requires:       libmodulemd >= %{libmodulemd_version}
-BuildRequires:  python3-gobject-base
-Requires:       python3-gobject-base
 BuildRequires:  python3-nose
 BuildRequires:  python3-gpg
 Requires:       python3-gpg
@@ -243,7 +233,6 @@ Requires:       python3-libdnf >= %{hawkey_version}
 Requires:       python3-iniparse
 Requires:       python3-libcomps >= %{libcomps_version}
 Requires:       python3-libdnf
-Requires:       python3-librepo >= %{librepo_version}
 BuildRequires:  python3-rpm >= %{rpm_version}
 Requires:       python3-rpm >= %{rpm_version}
 %if 0%{?rhel} && 0%{?rhel} <= 7
@@ -334,6 +323,12 @@ ln -sr  %{buildroot}%{_bindir}/dnf-2 %{buildroot}%{_bindir}/yum
 %endif
 %endif
 rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
+%if "%{yum_subpackage_name}" == "yum"
+mkdir -p %{buildroot}%{_sysconfdir}/yum
+ln -sr  %{buildroot}%{pluginconfpath} %{buildroot}%{_sysconfdir}/yum/pluginconf.d
+ln -sr  %{buildroot}%{confdir}/protected.d %{buildroot}%{_sysconfdir}/yum/protected.d
+ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
+%endif
 
 
 %check
@@ -426,8 +421,19 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %{_bindir}/yum
 %{_mandir}/man8/yum.8*
 %{_sysconfdir}/yum.conf
+%{_sysconfdir}/yum/pluginconf.d
+%{_sysconfdir}/yum/protected.d
+%{_sysconfdir}/yum/vars
+%{_mandir}/man1/repoquery.1.*
 %{_mandir}/man5/yum.conf.5.*
 %{_mandir}/man8/yum.8*
+%{_mandir}/man8/yum-shell.8*
+%else
+%exclude %{_mandir}/man1/repoquery.1.*
+%exclude %{_mandir}/man8/yum-shell.8*
+%exclude %{_sysconfdir}/yum/pluginconf.d
+%exclude %{_sysconfdir}/yum/protected.d
+%exclude %{_sysconfdir}/yum/vars
 %endif
 
 %if "%{yum_subpackage_name}" == "yum4"
@@ -439,8 +445,8 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %endif
 
 %if "%{yum_subpackage_name}" == "%{name}-yum"
-%{_sysconfdir}/yum.conf
 %{_bindir}/yum
+%{_sysconfdir}/yum.conf
 %{_mandir}/man5/yum.conf.5*
 %{_mandir}/man8/yum.8*
 %endif
@@ -481,6 +487,9 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %endif
 
 %changelog
+* Fri Sep 07 2018 Jaroslav Mracek <jmracek@redhat.com> - 3.5.0-1
+- New implementation of modularity
+
 * Mon Aug 13 2018 Daniel Mach <dmach@redhat.com> - 3.3.0-1
 - [misc] Fallback to os.getuid() if /proc/self/loginuid can't be read (RhBug:1597005)
 - [translations] Update translations from zanata.
