@@ -1,4 +1,4 @@
-From edbd86922b2733fd36622abadca15e744d12bfde Mon Sep 17 00:00:00 2001
+From c9c10a0f479954c9e829ce8b604ceb1d29746317 Mon Sep 17 00:00:00 2001
 From: Adam Williamson <awilliam@redhat.com>
 Date: Tue, 13 Mar 2018 15:33:24 -0700
 Subject: [PATCH] Restore 'strict' choice for group installs (#1461539)
@@ -114,10 +114,10 @@ Signed-off-by: Adam Williamson <awilliam@redhat.com>
  create mode 100644 tests/repos/broken_group.repo
 
 diff --git a/dnf/base.py b/dnf/base.py
-index 88e9467a..dacc42d9 100644
+index 96c1aab7..60c60779 100644
 --- a/dnf/base.py
 +++ b/dnf/base.py
-@@ -1450,17 +1450,17 @@ class Base(object):
+@@ -1438,10 +1438,10 @@ class Base(object):
              self._goal.upgrade(select=sltr)
              return remove_query
  
@@ -130,7 +130,8 @@ index 88e9467a..dacc42d9 100644
                  else:
                      # it installs only one arch for conditional packages
                      installed_query = query.installed().apply()
-                     self._report_already_installed(installed_query)
+@@ -1450,7 +1450,7 @@ class Base(object):
+                             _msg_installed(pkg)
                      sltr = dnf.selector.Selector(self.sack)
                      sltr.set(provides="({} if {})".format(comps_pkg.name, comps_pkg.requires))
 -                    self._goal.install(select=sltr, optional=True)
@@ -138,7 +139,7 @@ index 88e9467a..dacc42d9 100644
  
              else:
                  sltr = dnf.selector.Selector(self.sack)
-@@ -1468,7 +1468,7 @@ class Base(object):
+@@ -1458,7 +1458,7 @@ class Base(object):
                      sltr.set(provides="({} if {})".format(comps_pkg.name, comps_pkg.requires))
                  else:
                      sltr.set(pkg=query)
@@ -147,7 +148,7 @@ index 88e9467a..dacc42d9 100644
              return remove_query
  
          def trans_remove(query, remove_query, comps_pkg):
-@@ -1476,7 +1476,8 @@ class Base(object):
+@@ -1466,7 +1466,8 @@ class Base(object):
              return remove_query
  
          remove_query = self.sack.query().filterm(empty=True)
@@ -157,7 +158,7 @@ index 88e9467a..dacc42d9 100644
                     (trans.upgrade, trans_upgrade),
                     (trans.remove, trans_remove))
  
-@@ -1547,6 +1548,10 @@ class Base(object):
+@@ -1537,6 +1538,10 @@ class Base(object):
          """Installs packages of selected group
          :param exclude: list of package name glob patterns
              that will be excluded from install set
@@ -168,7 +169,7 @@ index 88e9467a..dacc42d9 100644
          """
          def _pattern_to_pkgname(pattern):
              if dnf.util.is_glob_pattern(pattern):
-@@ -1568,8 +1573,12 @@ class Base(object):
+@@ -1558,8 +1563,12 @@ class Base(object):
                                            strict)
          if not trans:
              return 0
