@@ -72,12 +72,15 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        3.5.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+# Backport of https://github.com/rpm-software-management/dnf/pull/1038
+# Should make compose fail on missing group packages again
+Patch0:         0001-Restore-strict-choice-for-group-installs-1461539.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -487,6 +490,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Thu Sep 20 2018 Adam Williamson <awilliam@redhat.com> - 3.5.1-2
+- Backport PR #1038 to make compose fail on missing group packages again
+
 * Mon Sep 10 2018 Jaroslav Mracek <jmracek@redhat.com> - 3.5.1-1
 - [module] Fixed list and info subcommands
 
