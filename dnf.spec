@@ -1,12 +1,12 @@
 # default dependencies
-%global hawkey_version 0.19.0
+%global hawkey_version 0.20.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
 
 # conflicts
-%global conflicts_dnf_plugins_core_version 3.0.1
-%global conflicts_dnf_plugins_extras_version 3.0.0
+%global conflicts_dnf_plugins_core_version 3.0.4
+%global conflicts_dnf_plugins_extras_version 3.0.2
 %global conflicts_dnfdaemon_version 0.3.19
 
 # override dependencies for rhel 7
@@ -30,7 +30,8 @@
 %bcond_without python3
 %endif
 
-%if 0%{?rhel} >= 8
+%if 0%{?rhel} >= 8 || 0%{?fedora} > 29
+# Disable python2 build
 %bcond_with python2
 %else
 %bcond_without python2
@@ -39,9 +40,9 @@
 # configurable name for the compat yum package
 %global yum_subpackage_name %{name}-yum
 
-# provide yum4 on rhel <= 7 to avoid conflict with existing yum
+# provide nextgen-yum4 on rhel <= 7 to avoid conflict with existing yum
 %if 0%{?rhel} && 0%{?rhel} <= 7
-    %global yum_subpackage_name yum4
+    %global yum_subpackage_name nextgen-yum4
 %endif
 
 # provide yum on rhel >= 8, it replaces old yum
@@ -71,7 +72,7 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        3.5.1
+Version:        3.6.1
 Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
@@ -150,7 +151,11 @@ Version:        4.0.%{version}
 Requires:       %{name} = %{version}-%{release}
 Summary:        %{pkg_summary}
 %if 0%{?fedora}
+%if 0%{?fedora} >= 30
 Conflicts:      yum
+%else
+Conflicts:      yum < 3.4.3-505
+%endif
 %endif
 
 %description -n %{yum_subpackage_name}
@@ -396,8 +401,6 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %dir %{confdir}/modules.d
 %dir %{confdir}/modules.defaults.d
 %dir %{pluginconfpath}
-%dir %{_sysconfdir}/%{name}/modules.d
-%dir %{_sysconfdir}/%{name}/modules.defaults.d
 %dir %{confdir}/protected.d
 %dir %{confdir}/vars
 %config(noreplace) %{confdir}/%{name}.conf
@@ -436,7 +439,7 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %exclude %{_sysconfdir}/yum/vars
 %endif
 
-%if "%{yum_subpackage_name}" == "yum4"
+%if "%{yum_subpackage_name}" == "nextgen-yum4"
 %{_bindir}/yum4
 %{_mandir}/man8/yum4.8*
 %exclude %{_sysconfdir}/yum.conf
@@ -446,9 +449,14 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 
 %if "%{yum_subpackage_name}" == "%{name}-yum"
 %{_bindir}/yum
+%{_mandir}/man8/yum.8*
+%if 0%{?fedora} >= 30
 %{_sysconfdir}/yum.conf
 %{_mandir}/man5/yum.conf.5*
-%{_mandir}/man8/yum.8*
+%else
+%exclude %{_sysconfdir}/yum.conf
+%exclude %{_mandir}/man5/yum.conf.5*
+%endif
 %endif
 
 %if %{with python2}
@@ -487,6 +495,26 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Tue Sep 25 2018 Jaroslav Mracek <jmracek@redhat.com> - 3.6.1-1
+- [module] Improved module commands list, info
+- [module] Reports error from module solver
+- Fix: Error detected when calling 'RepoCB.fastestMirror' (RhBug:1628056)
+- Preserve packages from other installed mod profiles (RhBug:1629841)
+- [spec] Postpone conflict with yum to Fedora 30+ (RhBug:1600444)
+- [cli] Install command recommends alternative packages (RhBug:1625586)
+- [cli] Fix case insensitive hint (1628514)
+- Fix installed profiles for module info (RhBug:1629689)
+- Fix module provides not having consistent output (RhBug:1623866)
+- Enhance label for transaction table (RhBug:1609919)
+- Implement C_, the gettext function with a context (RhBug:1305340)
+- Actually disambiguate some messages using C_ (RhBug:1305340)
+- Restore 'strict' choice for group installs (#1461539)
+- [repoquery] More strict queryformat parsing (RhBug:1631458)
+- Redirect repo progress to std error (RhBug:1626011)
+- Unify behavior of remove and module remove (RhBug:1629848)
+- Change behavior of disabled module for module install (RhBug:1629711)
+- Allow enablement on disabled plugin (RhBug:1614539)
+
 * Mon Sep 10 2018 Jaroslav Mracek <jmracek@redhat.com> - 3.5.1-1
 - [module] Fixed list and info subcommands
 
