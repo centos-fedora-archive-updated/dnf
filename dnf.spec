@@ -30,7 +30,7 @@
 %bcond_without python3
 %endif
 
-%if 0%{?rhel} >= 8 || 0%{?fedora} > 29
+%if 0%{?rhel} >= 8
 # Disable python2 build
 %bcond_with python2
 %else
@@ -73,7 +73,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        3.6.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -495,6 +495,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Sat Sep 29 2018 Kevin Fenzi <kevin@scrye.com> - 3.6.1-2
+- Temp re-add python2 package to get rawhide composes working again.
+
 * Tue Sep 25 2018 Jaroslav Mracek <jmracek@redhat.com> - 3.6.1-1
 - [module] Improved module commands list, info
 - [module] Reports error from module solver
