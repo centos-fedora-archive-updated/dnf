@@ -73,12 +73,16 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        3.6.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+# Backported fixes for https://bugzilla.redhat.com/show_bug.cgi?id=1616118
+# from upstream master
+Patch0:         0001-Solves-problem-with-dnf-upgrade-if-base.conf.obsolet.patch
+Patch1:         0002-Fix-problem-with-upgrade-in-dnf.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -495,6 +499,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Tue Oct 09 2018 Adam Williamson <awilliam@redhat.com> - 3.6.1-3
+- Backport fixes for RHBZ#1616118 from upstream master
+
 * Sat Sep 29 2018 Kevin Fenzi <kevin@scrye.com> - 3.6.1-2
 - Temp re-add python2 package to get rawhide composes working again.
 
