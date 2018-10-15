@@ -1,11 +1,11 @@
 # default dependencies
-%global hawkey_version 0.20.0
+%global hawkey_version 0.22.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
 
 # conflicts
-%global conflicts_dnf_plugins_core_version 3.0.4
+%global conflicts_dnf_plugins_core_version 3.1
 %global conflicts_dnf_plugins_extras_version 3.0.2
 %global conflicts_dnfdaemon_version 0.3.19
 
@@ -72,17 +72,13 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        3.6.1
-Release:        3%{?dist}
+Version:        4.0.4
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
-# Backported fixes for https://bugzilla.redhat.com/show_bug.cgi?id=1616118
-# from upstream master
-Patch0:         0001-Solves-problem-with-dnf-upgrade-if-base.conf.obsolet.patch
-Patch1:         0002-Fix-problem-with-upgrade-in-dnf.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -147,11 +143,6 @@ Provides:       %{name}-conf = %{version}-%{release}
 Common data and configuration files for DNF
 
 %package -n %{yum_subpackage_name}
-# DNF == YUM4; prefix version with 4.0 to make it higher than any version of YUM3
-# save and restore version, otherwise setting Version affects other sub-packages
-%global pkg_version %{version}
-Version:        4.0.%{version}
-%global version %{pkg_version}
 Requires:       %{name} = %{version}-%{release}
 Summary:        %{pkg_summary}
 %if 0%{?fedora}
@@ -180,15 +171,20 @@ Requires:       libmodulemd >= %{libmodulemd_version}
 %if (0%{?rhel} && 0%{?rhel} <= 7)
 BuildRequires:  pygpgme
 Requires:       pygpgme
+BuildRequires:  python-enum34
+Requires:       python-enum34
 %else
 BuildRequires:  python2-gpg
 Requires:       python2-gpg
+BuildRequires:  python2-enum34
+Requires:       python2-enum34
 %endif
 BuildRequires:  pyliblzma
 Requires:       pyliblzma
 Requires:       %{name}-data = %{version}-%{release}
 %if 0%{?fedora}
 Recommends:     deltarpm
+Recommends:     python2-unbound
 %endif
 %if 0%{?centos}
 Requires:       deltarpm
@@ -244,6 +240,7 @@ Requires:       python3-libcomps >= %{libcomps_version}
 Requires:       python3-libdnf
 BuildRequires:  python3-rpm >= %{rpm_version}
 Requires:       python3-rpm >= %{rpm_version}
+Recommends:     python3-unbound
 %if 0%{?rhel} && 0%{?rhel} <= 7
 Requires:       rpm-plugin-systemd-inhibit
 %else
@@ -431,12 +428,10 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %{_sysconfdir}/yum/pluginconf.d
 %{_sysconfdir}/yum/protected.d
 %{_sysconfdir}/yum/vars
-%{_mandir}/man1/repoquery.1.*
 %{_mandir}/man5/yum.conf.5.*
 %{_mandir}/man8/yum.8*
 %{_mandir}/man8/yum-shell.8*
 %else
-%exclude %{_mandir}/man1/repoquery.1.*
 %exclude %{_mandir}/man8/yum-shell.8*
 %exclude %{_sysconfdir}/yum/pluginconf.d
 %exclude %{_sysconfdir}/yum/protected.d
@@ -499,6 +494,14 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Mon Oct 15 2018 Jaroslav Mracek <jmracek@redhat.com> - 4.0.4-1
+- Update to 4.0.4
+- Add dnssec extension
+- Set termforce to AUTO to automatically detect if stdout is terminal
+- Repoquery command accepts --changelogs option (RhBug:1483458)
+- Calculate sack version from all installed packages (RhBug:1624291)
+- [module] Allow to enable module dependencies (RhBug:1622566)
+
 * Tue Oct 09 2018 Adam Williamson <awilliam@redhat.com> - 3.6.1-3
 - Backport fixes for RHBZ#1616118 from upstream master
 
