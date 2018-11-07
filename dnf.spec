@@ -73,12 +73,13 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.0.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0001:      0001-Set-tsi-state-if-multiple-pkgs-have-same-nevra-RhBug1642796.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -494,6 +495,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Wed Nov 07 2018 Jaroslav Mracek <jmracek@redhat.com> - 4.0.4-2
+- Backport fixes for RHBZ#1642796 from upstream master
+
 * Mon Oct 15 2018 Jaroslav Mracek <jmracek@redhat.com> - 4.0.4-1
 - Update to 4.0.4
 - Add dnssec extension
