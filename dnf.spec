@@ -1,11 +1,11 @@
 # default dependencies
-%global hawkey_version 0.22.0
+%global hawkey_version 0.22.3
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
 
 # conflicts
-%global conflicts_dnf_plugins_core_version 3.1
+%global conflicts_dnf_plugins_core_version 4.0.2
 %global conflicts_dnf_plugins_extras_version 3.0.2
 %global conflicts_dnfdaemon_version 0.3.19
 
@@ -72,14 +72,13 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.0.4
-Release:        2%{?dist}
+Version:        4.0.9
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
-Patch0001:      0001-Set-tsi-state-if-multiple-pkgs-have-same-nevra-RhBug1642796.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -495,6 +494,19 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Thu Nov 22 2018 Jaroslav Mracek <jmracek@redhat.com> - 4.0.9-1
+- Added dnf.repo.Repo.get_http_headers
+- Added dnf.repo.Repo.set_http_headers
+- Added dnf.repo.Repo.add_metadata_type_to_download
+- Added dnf.repo.Repo.get_metadata_path
+- Added dnf.repo.Repo.get_metadata_content
+- Added --changelogs option for check-update command
+- [module] Add information about active modules
+- Hide messages created only for logging
+- Enhanced --setopt option
+- [module] Fix dnf remove @<module>
+- [transaction] Make transaction content available for plugins
+
 * Wed Nov 07 2018 Jaroslav Mracek <jmracek@redhat.com> - 4.0.4-2
 - Backport fixes for RHBZ#1642796 from upstream master
 
