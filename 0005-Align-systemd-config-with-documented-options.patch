@@ -1,0 +1,34 @@
+From 27a4c9de230258dbc6ee9d9d06f63403d1672011 Mon Sep 17 00:00:00 2001
+From: Peter Oliver <git@mavit.org.uk>
+Date: Thu, 21 Jun 2018 12:31:23 +0100
+Subject: [PATCH] Align systemd config with documented options
+
+---
+ etc/systemd/dnf-makecache.service | 2 +-
+ etc/systemd/dnf-makecache.timer   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/etc/systemd/dnf-makecache.service b/etc/systemd/dnf-makecache.service
+index 4a280c8f..a18fe798 100644
+--- a/etc/systemd/dnf-makecache.service
++++ b/etc/systemd/dnf-makecache.service
+@@ -11,4 +11,4 @@ Nice=19
+ IOSchedulingClass=2
+ IOSchedulingPriority=7
+ Environment="ABRT_IGNORE_PYTHON=1"
+-ExecStart=/usr/bin/dnf makecache timer
++ExecStart=/usr/bin/dnf makecache --timer
+diff --git a/etc/systemd/dnf-makecache.timer b/etc/systemd/dnf-makecache.timer
+index 5005ca8a..72b6b78c 100644
+--- a/etc/systemd/dnf-makecache.timer
++++ b/etc/systemd/dnf-makecache.timer
+@@ -1,5 +1,5 @@
+ [Unit]
+-Description=dnf makecache timer
++Description=dnf makecache --timer
+ ConditionKernelCommandLine=!rd.live.image
+ # See comment in dnf-makecache.service
+ ConditionPathExists=!/run/ostree-booted
+-- 
+2.17.2
+

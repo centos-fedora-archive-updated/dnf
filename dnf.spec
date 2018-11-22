@@ -72,7 +72,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        2.7.5
-Release:        15%{?dist}
+Release:        16%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -82,6 +82,7 @@ Patch0:         0001-Allow-to-set-cacheonly-from-commands-and-conf-RhBug-.patch
 Patch1:         0002-Remove-redundant-conf-option-cacheonly.patch
 Patch2:         0003-Remove-unnecessary-code-for-set-cacheonly.patch
 Patch3:         0004-util-Correctly-source-errno.EEXIST.patch
+Patch4:         0005-Align-systemd-config-with-documented-options.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -463,6 +464,9 @@ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 %endif
 
 %changelog
+* Thu Nov 22 2018 Tim Landscheidt <tim@tim-landscheidt.de> - 2.7.5-16
+- Apply Align-systemd-config-with-documented-options patch (RHBZ #1652655).
+
 * Tue May 29 2018 Martin Hatina <mhatina@redhat.com> - 2.7.5-15
 - Apply util-Correctly-source-errno.EEXIST patch
 
