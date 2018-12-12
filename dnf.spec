@@ -1,5 +1,5 @@
 # default dependencies
-%global hawkey_version 0.22.3
+%global hawkey_version 0.24.1
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
@@ -72,7 +72,7 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.0.9
+Version:        4.0.10
 Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
@@ -103,6 +103,7 @@ Recommends:     (python2-dbus if NetworkManager)
 Recommends:     (%{_bindir}/sqlite3 if bash-completion)
 %endif
 %{?systemd_requires}
+Provides:       dnf-command(alias)
 Provides:       dnf-command(autoremove)
 Provides:       dnf-command(check-update)
 Provides:       dnf-command(clean)
@@ -300,6 +301,7 @@ mkdir build-py3
 
 %find_lang %{name}
 mkdir -p %{buildroot}%{confdir}/vars
+mkdir -p %{buildroot}%{confdir}/aliases.d
 mkdir -p %{buildroot}%{pluginconfpath}/
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}/modules.d
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}/modules.defaults.d
@@ -404,18 +406,19 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %dir %{pluginconfpath}
 %dir %{confdir}/protected.d
 %dir %{confdir}/vars
+%dir %{confdir}/aliases.d
 %config(noreplace) %{confdir}/%{name}.conf
 %config(noreplace) %{confdir}/protected.d/%{name}.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
-%ghost %{_localstatedir}/log/hawkey.log
-%ghost %{_localstatedir}/log/%{name}.log
-%ghost %{_localstatedir}/log/%{name}.librepo.log
-%ghost %{_localstatedir}/log/%{name}.rpm.log
-%ghost %{_localstatedir}/log/%{name}.plugin.log
-%ghost %{_sharedstatedir}/%{name}
-%ghost %{_sharedstatedir}/%{name}/groups.json
-%ghost %{_sharedstatedir}/%{name}/yumdb
-%ghost %{_sharedstatedir}/%{name}/history
+%ghost %attr(644,-,-) %{_localstatedir}/log/hawkey.log
+%ghost %attr(644,-,-) %{_localstatedir}/log/%{name}.log
+%ghost %attr(644,-,-) %{_localstatedir}/log/%{name}.librepo.log
+%ghost %attr(644,-,-) %{_localstatedir}/log/%{name}.rpm.log
+%ghost %attr(644,-,-) %{_localstatedir}/log/%{name}.plugin.log
+%ghost %attr(755,-,-) %dir %{_sharedstatedir}/%{name}
+%ghost %attr(644,-,-) %{_sharedstatedir}/%{name}/groups.json
+%ghost %attr(755,-,-) %dir %{_sharedstatedir}/%{name}/yumdb
+%ghost %attr(755,-,-) %dir %{_sharedstatedir}/%{name}/history
 %{_mandir}/man5/%{name}.conf.5*
 %{_tmpfilesdir}/%{name}.conf
 %{_sysconfdir}/libreport/events.d/collect_dnf.conf
@@ -431,8 +434,10 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %{_mandir}/man5/yum.conf.5.*
 %{_mandir}/man8/yum.8*
 %{_mandir}/man8/yum-shell.8*
+%{_mandir}/man1/yum-aliases.1*
 %else
 %exclude %{_mandir}/man8/yum-shell.8*
+%exclude %{_mandir}/man1/yum-aliases.1*
 %exclude %{_sysconfdir}/yum/pluginconf.d
 %exclude %{_sysconfdir}/yum/protected.d
 %exclude %{_sysconfdir}/yum/vars
@@ -494,6 +499,19 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Wed Dec 12 2018 Jaroslav Mracek <jmracek@redhat.com> - 4.0.10-1
+- Update to 4.0.10
+- Updated difference YUM vs. DNF for yum-updateonboot
+- Added new command ``dnf alias [options] [list|add|delete] [<name>...]`` to allow the user to
+  define and manage a list of aliases
+- Enhanced documentation
+- Unifying return codes for remove operations
+- [transaction] Make transaction content available for commands
+- Triggering transaction hooks if no transaction (RhBug:1650157)
+- Add hotfix packages to install pool (RhBug:1654738)
+- Report group operation in transaction table
+- [sack] Change algorithm to calculate rpmdb_version
+
 * Thu Nov 22 2018 Jaroslav Mracek <jmracek@redhat.com> - 4.0.9-1
 - Added dnf.repo.Repo.get_http_headers
 - Added dnf.repo.Repo.set_http_headers
