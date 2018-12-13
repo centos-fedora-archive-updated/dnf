@@ -73,12 +73,14 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.0.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0001:      0001-transaction-Make-transaction-content-available-for-commands.patch
+
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -494,6 +496,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Thu Dec 13 2018 Jaroslav Mracek <jmracek@redhat.com> - 4.0.9-2
+- Backport Make transaction content available for commands
+
 * Thu Nov 22 2018 Jaroslav Mracek <jmracek@redhat.com> - 4.0.9-1
 - Added dnf.repo.Repo.get_http_headers
 - Added dnf.repo.Repo.set_http_headers
