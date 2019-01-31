@@ -73,7 +73,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.0.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -104,7 +104,7 @@ Recommends:     (python2-dbus if NetworkManager)
 %endif
 Recommends:     (%{_bindir}/sqlite3 if bash-completion)
 %endif
-%{?systemd_requires}
+%{?systemd_ordering}
 Provides:       dnf-command(autoremove)
 Provides:       dnf-command(check-update)
 Provides:       dnf-command(clean)
@@ -257,7 +257,7 @@ Python 3 interface to DNF.
 Summary:        %{pkg_summary} - automated upgrades
 BuildRequires:  systemd
 Requires:       %{name} = %{version}-%{release}
-%{?systemd_requires}
+%{?systemd_ordering}
 
 %description automatic
 Systemd units that can periodically download package upgrades and apply them.
@@ -496,6 +496,10 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Thu Jan 31 2019 Bogdan Dobrelia <bdobreli@redhat.com> - 4.0.9-3
+- Use %%systemd_ordering
+- Related: rhbz#1671362
+
 * Thu Dec 13 2018 Jaroslav Mracek <jmracek@redhat.com> - 4.0.9-2
 - Backport Make transaction content available for commands
 
