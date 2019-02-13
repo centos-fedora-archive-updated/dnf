@@ -1,5 +1,5 @@
 # default dependencies
-%global hawkey_version 0.24.1
+%global hawkey_version 0.25.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
@@ -72,23 +72,25 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.0.10
-Release:        2%{?dist}
+Version:        4.1.0
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0001:      0001-Revert-Add-best-as-default-behavior-RhBug16707761671683.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
 # Documentation
-BuildRequires:  %{_bindir}/sphinx-build
 BuildRequires:  systemd
 BuildRequires:  bash-completion
 %if %{with python3}
+BuildRequires:  %{_bindir}/sphinx-build-3
 Requires:       python3-%{name} = %{version}-%{release}
 %else
+BuildRequires:  %{_bindir}/sphinx-build
 Requires:       python2-%{name} = %{version}-%{release}
 %endif
 %if 0%{?rhel} && 0%{?rhel} <= 7
@@ -499,6 +501,13 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Wed Feb 13 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.1.0-1
+- Update to 4.1.0
+- Allow to enable modules that break default modules (RhBug:1648839)
+- Enhance documentation - API examples
+- Add --nobest option
+- Revert commit that adds best as default behavior
+
 * Thu Jan 31 2019 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.10-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
