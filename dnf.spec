@@ -1,12 +1,12 @@
 # default dependencies
-%global hawkey_version 0.25.0
+%global hawkey_version 0.28.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
 
 # conflicts
-%global conflicts_dnf_plugins_core_version 4.0.2
-%global conflicts_dnf_plugins_extras_version 3.0.2
+%global conflicts_dnf_plugins_core_version 4.0.6
+%global conflicts_dnf_plugins_extras_version 4.0.4
 %global conflicts_dnfdaemon_version 0.3.19
 
 # override dependencies for rhel 7
@@ -72,7 +72,7 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.1.0
+Version:        4.2.1
 Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
@@ -149,7 +149,7 @@ Common data and configuration files for DNF
 Requires:       %{name} = %{version}-%{release}
 Summary:        %{pkg_summary}
 %if 0%{?fedora}
-%if 0%{?fedora} >= 30
+%if 0%{?fedora} >= 31
 Conflicts:      yum
 %else
 Conflicts:      yum < 3.4.3-505
@@ -182,8 +182,6 @@ Requires:       python2-gpg
 BuildRequires:  python2-enum34
 Requires:       python2-enum34
 %endif
-BuildRequires:  pyliblzma
-Requires:       pyliblzma
 Requires:       %{name}-data = %{version}-%{release}
 %if 0%{?fedora}
 Recommends:     deltarpm
@@ -197,13 +195,9 @@ Requires:       python2-libdnf >= %{hawkey_version}
 Requires:       python2-libcomps >= %{libcomps_version}
 Requires:       python2-libdnf
 %if 0%{?rhel} && 0%{?rhel} <= 7
-BuildRequires:  python-iniparse
-Requires:       python-iniparse
 BuildRequires:  rpm-python >= %{rpm_version}
 Requires:       rpm-python >= %{rpm_version}
 %else
-BuildRequires:  python2-iniparse
-Requires:       python2-iniparse
 BuildRequires:  python2-rpm >= %{rpm_version}
 Requires:       python2-rpm >= %{rpm_version}
 Recommends:     rpm-plugin-systemd-inhibit
@@ -221,7 +215,6 @@ Summary:        Python 3 interface to DNF
 BuildRequires:  python3-devel
 BuildRequires:  python3-hawkey >= %{hawkey_version}
 BuildRequires:  python3-libdnf >= %{hawkey_version}
-BuildRequires:  python3-iniparse
 BuildRequires:  python3-libcomps >= %{libcomps_version}
 BuildRequires:  python3-libdnf
 BuildRequires:  libmodulemd >= %{libmodulemd_version}
@@ -238,7 +231,6 @@ Requires:       deltarpm
 %endif
 Requires:       python3-hawkey >= %{hawkey_version}
 Requires:       python3-libdnf >= %{hawkey_version}
-Requires:       python3-iniparse
 Requires:       python3-libcomps >= %{libcomps_version}
 Requires:       python3-libdnf
 BuildRequires:  python3-rpm >= %{rpm_version}
@@ -437,12 +429,14 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %{_mandir}/man8/yum.8*
 %{_mandir}/man8/yum-shell.8*
 %{_mandir}/man1/yum-aliases.1*
+%config(noreplace) %{confdir}/protected.d/yum.conf
 %else
 %exclude %{_mandir}/man8/yum-shell.8*
 %exclude %{_mandir}/man1/yum-aliases.1*
 %exclude %{_sysconfdir}/yum/pluginconf.d
 %exclude %{_sysconfdir}/yum/protected.d
 %exclude %{_sysconfdir}/yum/vars
+%exclude %{confdir}/protected.d/yum.conf
 %endif
 
 %if "%{yum_subpackage_name}" == "nextgen-yum4"
@@ -456,7 +450,7 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %if "%{yum_subpackage_name}" == "%{name}-yum"
 %{_bindir}/yum
 %{_mandir}/man8/yum.8*
-%if 0%{?fedora} >= 30
+%if 0%{?fedora} >= 31
 %{_sysconfdir}/yum.conf
 %{_mandir}/man5/yum.conf.5*
 %else
@@ -501,6 +495,19 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Mon Mar 11 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.1-1
+- Do not allow direct module switch (RhBug:1669491)
+- Use improved config parser that preserves order of data
+- Fix alias list command (RhBug:1666325)
+- Postpone yum conflict to F31
+- Update documentation: implemented plugins; options; deprecated commands (RhBug:1670835,1673278)
+- Support zchunk (".zck") compression
+- Fix behavior  of ``--bz`` option when specifying more values
+- Follow RPM security policy for package verification
+- Update modules regardless of installed profiles
+- Add protection of yum package (RhBug:1639363)
+- Fix ``list --showduplicates`` (RhBug:1655605)
+
 * Wed Feb 13 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.1.0-1
 - Update to 4.1.0
 - Allow to enable modules that break default modules (RhBug:1648839)
