@@ -37,19 +37,26 @@
 %bcond_without python2
 %endif
 
-# configurable name for the compat yum package
-%global yum_subpackage_name %{name}-yum
-
-# provide nextgen-yum4 on rhel <= 7 to avoid conflict with existing yum
+# YUM compat subpackage configuration
+#
+# level=full    -> deploy all compat symlinks (conflicts with yum < 4)
+# level=minimal -> deploy a subset of compat symlinks only
+#                  (no conflict with yum >= 3.4.3-505)*
+# level=preview -> minimal level with altered paths (no conflict with yum < 4)
+# *release 505 renamed /usr/bin/yum to /usr/bin/yum-deprecated
+%global yum_compat_level full
+%global yum_subpackage_name yum
+%if 0%{?fedora}
+    %global yum_compat_level minimal
+    %if 0%{?fedora} < 31
+        # Avoid name conflict with yum < 4
+        %global yum_subpackage_name %{name}-yum
+    %endif
+%endif
 %if 0%{?rhel} && 0%{?rhel} <= 7
+    %global yum_compat_level preview
     %global yum_subpackage_name nextgen-yum4
 %endif
-
-# provide yum on rhel >= 8, it replaces old yum
-%if 0%{?rhel} && 0%{?rhel} >= 8
-    %global yum_subpackage_name yum
-%endif
-
 
 # paths
 %global confdir %{_sysconfdir}/%{name}
@@ -72,7 +79,7 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.2.1
+Version:        4.2.2
 Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
@@ -148,12 +155,11 @@ Common data and configuration files for DNF
 %package -n %{yum_subpackage_name}
 Requires:       %{name} = %{version}-%{release}
 Summary:        %{pkg_summary}
-%if 0%{?fedora}
 %if 0%{?fedora} >= 31
-Conflicts:      yum
+Provides:       %{name}-yum = %{version}-%{release}
+Obsoletes:      %{name}-yum < %{version}-%{release}
 %else
 Conflicts:      yum < 3.4.3-505
-%endif
 %endif
 
 %description -n %{yum_subpackage_name}
@@ -206,7 +212,8 @@ Conflicts:      dnfdaemon < %{conflicts_dnfdaemon_version}
 
 %description -n python2-%{name}
 Python 2 interface to DNF.
-%endif  # %%{with python2}
+%endif
+# ^ %{with python2}
 
 %if %{with python3}
 %package -n python3-%{name}
@@ -305,18 +312,24 @@ mkdir -p %{buildroot}%{py2pluginpath}/
 %if %{with python3}
 mkdir -p %{buildroot}%{py3pluginpath}/__pycache__/
 %endif
-ln -sr  %{buildroot}%{confdir}/%{name}.conf %{buildroot}%{_sysconfdir}/yum.conf
 mkdir -p %{buildroot}%{_localstatedir}/log/
 mkdir -p %{buildroot}%{_var}/cache/dnf/
 touch %{buildroot}%{_localstatedir}/log/%{name}.log
 %if %{with python3}
 ln -sr %{buildroot}%{_bindir}/dnf-3 %{buildroot}%{_bindir}/dnf
 mv %{buildroot}%{_bindir}/dnf-automatic-3 %{buildroot}%{_bindir}/dnf-automatic
-ln -sr  %{buildroot}%{_bindir}/dnf-3 %{buildroot}%{_bindir}/yum
 %else
 ln -sr %{buildroot}%{_bindir}/dnf-2 %{buildroot}%{_bindir}/dnf
 mv %{buildroot}%{_bindir}/dnf-automatic-2 %{buildroot}%{_bindir}/dnf-automatic
-%if 0%{?rhel} && 0%{?rhel} <= 7
+%endif
+rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
+
+# YUM compat layer
+ln -sr  %{buildroot}%{confdir}/%{name}.conf %{buildroot}%{_sysconfdir}/yum.conf
+%if %{with python3}
+ln -sr  %{buildroot}%{_bindir}/dnf-3 %{buildroot}%{_bindir}/yum
+%else
+%if "%{yum_compat_level}" == "preview"
 ln -sr  %{buildroot}%{_bindir}/dnf-2 %{buildroot}%{_bindir}/yum4
 ln -sr  %{buildroot}%{_mandir}/man8/dnf.8.gz %{buildroot}%{_mandir}/man8/yum4.8.gz
 rm -f %{buildroot}%{_mandir}/man8/yum.8.gz
@@ -324,8 +337,7 @@ rm -f %{buildroot}%{_mandir}/man8/yum.8.gz
 ln -sr  %{buildroot}%{_bindir}/dnf-2 %{buildroot}%{_bindir}/yum
 %endif
 %endif
-rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
-%if "%{yum_subpackage_name}" == "yum"
+%if "%{yum_compat_level}" == "full"
 mkdir -p %{buildroot}%{_sysconfdir}/yum
 ln -sr  %{buildroot}%{pluginconfpath} %{buildroot}%{_sysconfdir}/yum/pluginconf.d
 ln -sr  %{buildroot}%{confdir}/protected.d %{buildroot}%{_sysconfdir}/yum/protected.d
@@ -418,45 +430,37 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %{_sysconfdir}/libreport/events.d/collect_dnf.conf
 
 %files -n %{yum_subpackage_name}
-%if "%{yum_subpackage_name}" == "yum"
+%if "%{yum_compat_level}" == "full"
 %{_bindir}/yum
-%{_mandir}/man8/yum.8*
 %{_sysconfdir}/yum.conf
 %{_sysconfdir}/yum/pluginconf.d
 %{_sysconfdir}/yum/protected.d
 %{_sysconfdir}/yum/vars
-%{_mandir}/man5/yum.conf.5.*
 %{_mandir}/man8/yum.8*
+%{_mandir}/man5/yum.conf.5.*
 %{_mandir}/man8/yum-shell.8*
 %{_mandir}/man1/yum-aliases.1*
 %config(noreplace) %{confdir}/protected.d/yum.conf
 %else
-%exclude %{_mandir}/man8/yum-shell.8*
-%exclude %{_mandir}/man1/yum-aliases.1*
+%exclude %{_sysconfdir}/yum.conf
 %exclude %{_sysconfdir}/yum/pluginconf.d
 %exclude %{_sysconfdir}/yum/protected.d
 %exclude %{_sysconfdir}/yum/vars
 %exclude %{confdir}/protected.d/yum.conf
-%endif
-
-%if "%{yum_subpackage_name}" == "nextgen-yum4"
-%{_bindir}/yum4
-%{_mandir}/man8/yum4.8*
-%exclude %{_sysconfdir}/yum.conf
 %exclude %{_mandir}/man5/yum.conf.5.*
-%exclude %{_mandir}/man8/yum.8*
+%exclude %{_mandir}/man8/yum-shell.8*
+%exclude %{_mandir}/man1/yum-aliases.1*
 %endif
 
-%if "%{yum_subpackage_name}" == "%{name}-yum"
+%if "%{yum_compat_level}" == "minimal"
 %{_bindir}/yum
 %{_mandir}/man8/yum.8*
-%if 0%{?fedora} >= 31
-%{_sysconfdir}/yum.conf
-%{_mandir}/man5/yum.conf.5*
-%else
-%exclude %{_sysconfdir}/yum.conf
-%exclude %{_mandir}/man5/yum.conf.5*
 %endif
+
+%if "%{yum_compat_level}" == "preview"
+%{_bindir}/yum4
+%{_mandir}/man8/yum4.8*
+%exclude %{_mandir}/man8/yum.8*
 %endif
 
 %if %{with python2}
@@ -495,6 +499,15 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Wed Mar 27 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.2-1
+- [conf] Use environment variables prefixed with DNF_VAR_
+- Enhance documentation of --whatdepends option (RhBug:1687070)
+- Allow adjustment of repo from --repofrompath (RhBug:1689591)
+- Document cachedir option (RhBug:1691365)
+- Retain order of headers in search results (RhBug:1613860)
+- Solve traceback with the "dnf install @module" (RhBug:1688823)
+- Build "yum" instead of "dnf-yum" on Fedora 31
+
 * Mon Mar 11 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.1-1
 - Do not allow direct module switch (RhBug:1669491)
 - Use improved config parser that preserves order of data
