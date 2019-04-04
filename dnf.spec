@@ -80,13 +80,15 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0001:      0001-Revert-Add-best-as-default-behavior-RhBug16707761671683.patch
+# https://github.com/rpm-software-management/dnf/pull/1367
+Patch0002:      0001-Fix-the-installation-of-completion_helper.py.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -499,6 +501,10 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Thu Apr 04 15:15:12 CET 2019 Robert-André Mauchin <zebob.m@gmail.com> - 4.2.2-2
+- Add patch fixing the installation of completion_helper.py
+- Fix #1695853
+
 * Wed Mar 27 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.2-1
 - [conf] Use environment variables prefixed with DNF_VAR_
 - Enhance documentation of --whatdepends option (RhBug:1687070)
