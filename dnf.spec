@@ -1,5 +1,5 @@
 # default dependencies
-%global hawkey_version 0.28.0
+%global hawkey_version 0.31.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
@@ -79,16 +79,14 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.2.2
-Release:        2%{?dist}
+Version:        4.2.5
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0001:      0001-Revert-Add-best-as-default-behavior-RhBug16707761671683.patch
-# https://github.com/rpm-software-management/dnf/pull/1367
-Patch0002:      0001-Fix-the-installation-of-completion_helper.py.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -215,7 +213,7 @@ Conflicts:      dnfdaemon < %{conflicts_dnfdaemon_version}
 %description -n python2-%{name}
 Python 2 interface to DNF.
 %endif
-# ^ %{with python2}
+# ^ %%{with python2}
 
 %if %{with python3}
 %package -n python3-%{name}
@@ -415,6 +413,7 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %dir %{confdir}/protected.d
 %dir %{confdir}/vars
 %dir %{confdir}/aliases.d
+%exclude %{confdir}/aliases.d/zypper.conf
 %config(noreplace) %{confdir}/%{name}.conf
 %config(noreplace) %{confdir}/protected.d/%{name}.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
@@ -501,6 +500,19 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Thu Apr 25 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.5-1
+- Update to 4.2.5
+- Fix multilib obsoletes (RhBug:1672947)
+- Do not remove group package if other packages depend on it
+- Remove duplicates from "dnf list" and "dnf info" outputs
+- Installroot now requires absolute path
+- Allow globs in setopt in repoid part
+- Fix formatting of message about free space required
+- [doc] Add info of relation update_cache with fill_sack (RhBug:1658694)
+- Fix installation failiure when duplicit RPMs are specified (RhBug:1687286)
+- Add command abbreviations (RhBug:1634232)
+- Allow plugins to terminate dnf (RhBug:1701807)
+
 * Thu Apr 04 15:15:12 CET 2019 Robert-André Mauchin <zebob.m@gmail.com> - 4.2.2-2
 - Add patch fixing the installation of completion_helper.py
 - Fix #1695853
