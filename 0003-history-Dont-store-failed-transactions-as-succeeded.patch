@@ -1,0 +1,90 @@
+From 94a074b9747a437c478e388dc76ed90d06d8a666 Mon Sep 17 00:00:00 2001
+From: Daniel Mach <dmach@redhat.com>
+Date: Wed, 5 Jun 2019 08:29:03 +0200
+Subject: [PATCH] [history] Don't store failed transactions as succeeded.
+
+---
+ dnf/base.py       |  7 ++++---
+ dnf/db/history.py | 16 ++++++++++------
+ 2 files changed, 14 insertions(+), 9 deletions(-)
+
+diff --git a/dnf/base.py b/dnf/base.py
+index 7a388ec..add6403 100644
+--- a/dnf/base.py
++++ b/dnf/base.py
+@@ -987,15 +987,16 @@ class Base(object):
+             # particular element failed and if not, decide that is the
+             # case.
+             failed = [el for el in self._ts if el.Failed()]
+-            if len(failed) > 0:
++            if failed:
+                 for te in failed:
+                     te_nevra = dnf.util._te_nevra(te)
+                     for tsi in self._transaction:
+                         if str(tsi) == te_nevra:
+                             tsi.state = libdnf.transaction.TransactionItemState_ERROR
+ 
+                 errstring = _('Errors occurred during transaction.')
+                 logger.debug(errstring)
++                self.history.end(rpmdbv)
+             else:
+                 login = dnf.util.get_effective_login()
+                 msg = _("Failed to obtain the transaction lock "
+@@ -1006,7 +1007,7 @@ class Base(object):
+         else:
+             if self._record_history():
+                 herrors = [ucd(x) for x in errors]
+-                self.history.end(rpmdbv, 2, errors=herrors)
++                self.history.end(rpmdbv)
+ 
+             logger.critical(_("Transaction couldn't start:"))
+             for e in errors:
+@@ -1069,7 +1070,7 @@ class Base(object):
+             count = display_banner(tsi.pkg, count)
+ 
+         rpmdbv = rpmdb_sack._rpmdb_version()
+-        self.history.end(rpmdbv, 0)
++        self.history.end(rpmdbv)
+ 
+         timer()
+         self._trans_success = True
+diff --git a/dnf/db/history.py b/dnf/db/history.py
+index dc9c53b..7f22f97 100644
+--- a/dnf/db/history.py
++++ b/dnf/db/history.py
+@@ -486,22 +486,26 @@ class SwdbInterface(object):
+             self.swdb.log_error(self._tid, error)
+     '''
+ 
+-    # TODO: rename to end_transaction?
+-    def end(self, end_rpmdb_version="", return_code=0, errors=None):
+-        assert return_code or not errors
+-        # TODO: fix return_code
+-        return_code = not bool(return_code)
++    def end(self, end_rpmdb_version="", return_code=None, errors=None):
+         if not hasattr(self, '_tid'):
+             return  # Failed at beg() time
+ 
++        if return_code is None:
++            # return_code/state auto-detection
++            return_code = libdnf.transaction.TransactionState_DONE
++            for tsi in self.rpm:
++                if tsi.state == libdnf.transaction.TransactionItemState_ERROR:
++                    return_code = libdnf.transaction.TransactionState_ERROR
++                    break
++
+         for file_descriptor, line in self._output:
+             self.swdb.addConsoleOutputLine(file_descriptor, line)
+         self._output = []
+ 
+         self.swdb.endTransaction(
+             int(time.time()),
+             str(end_rpmdb_version),
+-            bool(return_code)
++            return_code,
+         )
+ 
+         # Closing and cleanup is done in the close() method.
+--
+libgit2 0.27.8
+

@@ -1,0 +1,27 @@
+From 41cbb0ff39c68a7eb3eaa8573a4b4be97c080c46 Mon Sep 17 00:00:00 2001
+From: Jaroslav Mracek <jmracek@redhat.com>
+Date: Mon, 3 Jun 2019 19:26:55 +0200
+Subject: [PATCH] [transaction] Set an error for first tsi in unknown state
+
+---
+ dnf/yum/rpmtrans.py | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/dnf/yum/rpmtrans.py b/dnf/yum/rpmtrans.py
+index 6a60b5a..50d8b81 100644
+--- a/dnf/yum/rpmtrans.py
++++ b/dnf/yum/rpmtrans.py
+@@ -386,6 +386,10 @@ class RPMTransaction(object):
+         msg = "Error unpacking rpm package %s" % tsi.pkg
+         for display in self.displays:
+             display.error(msg)
++        for tsi1 in transaction_list:
++            if tsi1.state == libdnf.transaction.TransactionItemState_UNKNOWN:
++                tsi1.state = libdnf.transaction.TransactionItemState_ERROR
++                return
+         tsi.state = libdnf.transaction.TransactionItemState_ERROR
+ 
+     def _scriptError(self, amount, total, key):
+--
+libgit2 0.27.8
+

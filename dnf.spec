@@ -80,13 +80,19 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0001:      0001-Revert-Add-best-as-default-behavior-RhBug16707761671683.patch
+Patch0002:      0002-transaction-Set-an-error-for-first-tsi-in-unknown-state.patch
+Patch0003:      0003-history-Dont-store-failed-transactions-as-succeeded.patch
+Patch0004:      0004-transaction-Add-RPMCALLBACK_INST_STARTSTOP-callback-handlers.patch
+Patch0005:      0005-Change-synchronization-of-rpm-transaction-to-swdb.patch
+Patch0006:      0006-Add-detailed-debug-login-for-swdbrpm-transaction.patch
+
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -500,6 +506,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Thu Jun 27 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.5-2
+- Backport patches to enhance synchronization of rpm transaction to swdb
+
 * Thu Apr 25 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.5-1
 - Update to 4.2.5
 - Fix multilib obsoletes (RhBug:1672947)
