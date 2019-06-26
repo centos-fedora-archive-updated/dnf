@@ -1,0 +1,57 @@
+From 9c34a5d3af3ac21b208c90f424e404b4bf68837b Mon Sep 17 00:00:00 2001
+From: Jaroslav Mracek <jmracek@redhat.com>
+Date: Tue, 25 Jun 2019 11:44:37 +0200
+Subject: [PATCH] Add detailed debug login for swdb/rpm transaction
+
+---
+ dnf/util.py | 25 +++++++++++++++++++++++--
+ 1 file changed, 23 insertions(+), 2 deletions(-)
+
+diff --git a/dnf/util.py b/dnf/util.py
+index 9d0288e..71f61ab 100644
+--- a/dnf/util.py
++++ b/dnf/util.py
+@@ -396,6 +396,23 @@ def _te_nevra(te):
+     return nevra + te.V() + '-' + te.R() + '.' + te.A()
+ 
+ 
++def _log_rpm_trans_with_swdb(rpm_transaction, swdb_transaction):
++    logger.debug("Logging transaction elements")
++    for rpm_el in rpm_transaction:
++        tsi = rpm_el.Key()
++        tsi_state = None
++        if tsi is not None:
++            tsi_state = tsi.state
++        msg = "RPM element: '{}', Key(): '{}', Key state: '{}', Failed() '{}': ".format(
++            _te_nevra(rpm_el), tsi, tsi_state, rpm_el.Failed())
++        logger.debug(msg)
++    for tsi in swdb_transaction:
++        msg = "SWDB element: '{}', State: '{}', Action: '{}', From repo: '{}', Reason: '{}', " \
++              "Get reason: '{}'".format(str(tsi), tsi.state, tsi.action, tsi.from_repo, tsi.reason,
++                                        tsi.get_reason())
++        logger.debug(msg)
++
++
+ def _sync_rpm_trans_with_swdb(rpm_transaction, swdb_transaction):
+     revert_actions = {libdnf.transaction.TransactionItemAction_DOWNGRADED,
+                       libdnf.transaction.TransactionItemAction_OBSOLETED,
+@@ -426,10 +443,14 @@ def _sync_rpm_trans_with_swdb(rpm_transaction, swdb_transaction):
+             error = True
+         else:
+             tsi.state = libdnf.transaction.TransactionItemState_DONE
++    for tsi in cached_tsi:
++        if tsi.state == libdnf.transaction.TransactionItemState_UNKNOWN:
++            logger.critical(_("TransactionSWDBItem not found for key: {}").format(str(tsi)))
++            el_not_found = True
+     if error:
+         logger.debug(_('Errors occurred during transaction.'))
+-
+-    return el_not_found
++    if el_not_found:
++        _log_rpm_trans_with_swdb(rpm_transaction, cached_tsi)
+ 
+ 
+ class tmpdir(object):
+--
+libgit2 0.27.8
+

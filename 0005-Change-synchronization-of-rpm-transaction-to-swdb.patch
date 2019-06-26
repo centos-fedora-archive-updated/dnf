@@ -1,0 +1,167 @@
+From 62c1214fba0fee703fef092bd5ceff0dd215a2f6 Mon Sep 17 00:00:00 2001
+From: Jaroslav Mracek <jmracek@redhat.com>
+Date: Thu, 13 Jun 2019 12:02:07 +0200
+Subject: [PATCH] Change synchronization of rpm transaction to swdb
+
+---
+ dnf/base.py         | 21 +++++----------------
+ dnf/util.py         | 36 ++++++++++++++++++++++++++++++++++++
+ dnf/yum/rpmtrans.py | 22 +++-------------------
+ 3 files changed, 44 insertions(+), 35 deletions(-)
+
+diff --git a/dnf/base.py b/dnf/base.py
+index add6403..237ad39 100644
+--- a/dnf/base.py
++++ b/dnf/base.py
+@@ -978,40 +978,29 @@ class Base(object):
+                 os.nice(onice)
+             except:
+                 pass
++        dnf.util._sync_rpm_trans_with_swdb(self._ts, self._transaction)
+ 
+         if errors is None:
+             pass
+         elif len(errors) == 0:
+             # this is a particularly tricky case happening also when rpm failed
+             # to obtain the transaction lock. We can only try to see if a
+             # particular element failed and if not, decide that is the
+             # case.
+             failed = [el for el in self._ts if el.Failed()]
+-            if failed:
+-                for te in failed:
+-                    te_nevra = dnf.util._te_nevra(te)
+-                    for tsi in self._transaction:
+-                        if str(tsi) == te_nevra:
+-                            tsi.state = libdnf.transaction.TransactionItemState_ERROR
+-
+-                errstring = _('Errors occurred during transaction.')
+-                logger.debug(errstring)
+-                self.history.end(rpmdbv)
+-            else:
++            if not failed:
+                 login = dnf.util.get_effective_login()
+                 msg = _("Failed to obtain the transaction lock "
+                         "(logged in as: %s).")
+                 logger.critical(msg, login)
+                 msg = _('Could not run transaction.')
+                 raise dnf.exceptions.Error(msg)
+         else:
+-            if self._record_history():
+-                herrors = [ucd(x) for x in errors]
+-                self.history.end(rpmdbv)
+-
+             logger.critical(_("Transaction couldn't start:"))
+             for e in errors:
+-                logger.critical(e[0])  # should this be 'to_unicoded'?
++                logger.critical(ucd(e[0]))
++            if self._record_history() and not self._ts.isTsFlagSet(rpm.RPMTRANS_FLAG_TEST):
++                self.history.end(rpmdbv)
+             msg = _("Could not run transaction.")
+             raise dnf.exceptions.Error(msg)
+ 
+diff --git a/dnf/util.py b/dnf/util.py
+index 2f1abe6..9d0288e 100644
+--- a/dnf/util.py
++++ b/dnf/util.py
+@@ -396,6 +396,42 @@ def _te_nevra(te):
+     return nevra + te.V() + '-' + te.R() + '.' + te.A()
+ 
+ 
++def _sync_rpm_trans_with_swdb(rpm_transaction, swdb_transaction):
++    revert_actions = {libdnf.transaction.TransactionItemAction_DOWNGRADED,
++                      libdnf.transaction.TransactionItemAction_OBSOLETED,
++                      libdnf.transaction.TransactionItemAction_REMOVE,
++                      libdnf.transaction.TransactionItemAction_UPGRADED,
++                      libdnf.transaction.TransactionItemAction_REINSTALLED}
++    cached_tsi = [tsi for tsi in swdb_transaction]
++    el_not_found = False
++    error = False
++    for rpm_el in rpm_transaction:
++        te_nevra = _te_nevra(rpm_el)
++        tsi = rpm_el.Key()
++        if tsi is None or not hasattr(tsi, "pkg"):
++            for tsi_candidate in cached_tsi:
++                if tsi_candidate.state != libdnf.transaction.TransactionItemState_UNKNOWN:
++                    continue
++                if tsi_candidate.action not in revert_actions:
++                    continue
++                if str(tsi_candidate) == te_nevra:
++                    tsi = tsi_candidate
++                    break
++        if tsi is None or not hasattr(tsi, "pkg"):
++            logger.critical(_("TransactionItem not found for key: {}").format(te_nevra))
++            el_not_found = True
++            continue
++        if rpm_el.Failed():
++            tsi.state = libdnf.transaction.TransactionItemState_ERROR
++            error = True
++        else:
++            tsi.state = libdnf.transaction.TransactionItemState_DONE
++    if error:
++        logger.debug(_('Errors occurred during transaction.'))
++
++    return el_not_found
++
++
+ class tmpdir(object):
+     def __init__(self):
+         prefix = '%s-' % dnf.const.PREFIX
+diff --git a/dnf/yum/rpmtrans.py b/dnf/yum/rpmtrans.py
+index 0834a8c..8a5bd47 100644
+--- a/dnf/yum/rpmtrans.py
++++ b/dnf/yum/rpmtrans.py
+@@ -336,10 +336,7 @@ class RPMTransaction(object):
+             return
+ 
+         transaction_list = self._extract_cbkey(key)
+-        for tsi in transaction_list:
+-            if tsi.state == libdnf.transaction.TransactionItemState_UNKNOWN:
+-                tsi.state = libdnf.transaction.TransactionItemState_DONE
+-                break
++        tsi = transaction_list[0]
+ 
+         for display in self.displays:
+             display.filelog(tsi.pkg, tsi.action)
+@@ -370,10 +367,7 @@ class RPMTransaction(object):
+ 
+     def _unInstStop(self, key):
+         transaction_list = self._extract_cbkey(key)
+-        for tsi in transaction_list:
+-            if tsi.state == libdnf.transaction.TransactionItemState_UNKNOWN:
+-                tsi.state = libdnf.transaction.TransactionItemState_DONE
+-                break
++        tsi = transaction_list[0]
+ 
+         for display in self.displays:
+             display.filelog(tsi.pkg, tsi.action)
+@@ -385,26 +379,16 @@ class RPMTransaction(object):
+ 
+     def _cpioError(self, key):
+         transaction_list = self._extract_cbkey(key)
+-        for tsi in transaction_list:
+-            if tsi.state == libdnf.transaction.TransactionItemState_UNKNOWN:
+-                tsi.state = libdnf.transaction.TransactionItemState_ERROR
+-                break
+         msg = "Error in cpio payload of rpm package %s" % transaction_list[0].pkg
+         for display in self.displays:
+             display.error(msg)
+ 
+     def _unpackError(self, key):
+         transaction_list = self._extract_cbkey(key)
+-        tsi = transaction_list[0]
+-        msg = "Error unpacking rpm package %s" % tsi.pkg
++        msg = "Error unpacking rpm package %s" % transaction_list[0].pkg
+         for display in self.displays:
+             display.error(msg)
+ 
+-        for tsi in transaction_list:
+-           if tsi.state == libdnf.transaction.TransactionItemState_UNKNOWN:
+-                tsi.state = libdnf.transaction.TransactionItemState_ERROR
+-                return
+-
+     def _scriptError(self, amount, total, key):
+         # "amount" carries the failed scriptlet tag,
+         # "total" carries fatal/non-fatal status
+--
+libgit2 0.27.8
+
