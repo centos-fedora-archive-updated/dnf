@@ -1,5 +1,5 @@
 # default dependencies
-%global hawkey_version 0.31.0
+%global hawkey_version 0.35.1
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
@@ -79,8 +79,8 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.2.5
-Release:        2%{?dist}
+Version:        4.2.7
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -92,6 +92,9 @@ Patch0003:      0003-history-Dont-store-failed-transactions-as-succeeded.patch
 Patch0004:      0004-transaction-Add-RPMCALLBACK_INST_STARTSTOP-callback-handlers.patch
 Patch0005:      0005-Change-synchronization-of-rpm-transaction-to-swdb.patch
 Patch0006:      0006-Add-detailed-debug-login-for-swdbrpm-transaction.patch
+# Temporary patch to not fail on modular RPMs without modular metadata
+# until the infrastructure is ready
+Patch0007:      0007-Revert-consequences-of-Fail-Safe-mechanism.patch
 
 BuildArch:      noarch
 BuildRequires:  cmake
@@ -161,11 +164,13 @@ Common data and configuration files for DNF
 %package -n %{yum_subpackage_name}
 Requires:       %{name} = %{version}-%{release}
 Summary:        %{pkg_summary}
+%if 0%{?fedora}
 %if 0%{?fedora} >= 31
 Provides:       %{name}-yum = %{version}-%{release}
 Obsoletes:      %{name}-yum < %{version}-%{release}
 %else
 Conflicts:      yum < 3.4.3-505
+%endif
 %endif
 
 %description -n %{yum_subpackage_name}
@@ -405,6 +410,7 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 %{_mandir}/man8/%{name}.8*
 %{_mandir}/man8/yum2dnf.8*
+%{_mandir}/man7/dnf.modularity.7*
 %{_unitdir}/%{name}-makecache.service
 %{_unitdir}/%{name}-makecache.timer
 %{_var}/cache/%{name}/
@@ -490,7 +496,7 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %files automatic
 %{_bindir}/%{name}-automatic
 %config(noreplace) %{confdir}/automatic.conf
-%{_mandir}/man8/%{name}.automatic.8*
+%{_mandir}/man8/%{name}-automatic.8*
 %{_unitdir}/%{name}-automatic.service
 %{_unitdir}/%{name}-automatic.timer
 %{_unitdir}/%{name}-automatic-notifyonly.service
@@ -506,6 +512,30 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Thu Jul 04 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.7-1
+- Update to 4.2.7
+- librepo: Turn on debug logging only if debuglevel is greater than 2
+  (RhBug:1355764,1580022)
+- Fix issues with terminal hangs when attempting bash completion
+  (RhBug:1702854)
+- Rename man page from dnf.automatic to dnf-automatic to match command name
+- [provides] Enhanced detecting of file provides (RhBug:1702621)
+- [provides] Sort the output packages alphabetically
+- Set default to skip_if_unavailable=false (RhBug:1679509)
+- Fix package reinstalls during yum module remove (RhBug:1700529)
+- Fail when "-c" option is given nonexistent file (RhBug:1512457)
+- Reuse empty lock file instead of stopping dnf (RhBug:1581824)
+- Propagate comps 'default' value correctly (RhBug:1674562)
+- Better search of provides in /(s)bin/ (RhBug:1657993)
+- Add detection for armv7hcnl (RhBug:1691430)
+- Fix group install/upgrade when group is not available (RhBug:1707624)
+- Report not matching plugins when using --enableplugin/--disableplugin
+  (RhBug:1673289) (RhBug:1467304)
+- Add support of modular FailSafe (RhBug:1623128) (temporarily with warnings
+  instead of errors when installing modular RPMs without modular metadata)
+- Replace logrotate with build-in log rotation for dnf.log and dnf.rpm.log
+  (RhBug:1702690)
+
 * Thu Jun 27 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.5-2
 - Backport patches to enhance synchronization of rpm transaction to swdb
 
