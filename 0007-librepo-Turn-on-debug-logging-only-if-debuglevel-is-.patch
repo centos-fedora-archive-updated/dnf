@@ -1,0 +1,45 @@
+From 7dc2bfafa21a185132ef3c70971cac70adfd91a1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
+Date: Wed, 27 Mar 2019 19:54:52 +0100
+Subject: [PATCH] librepo: Turn on debug logging only if debuglevel is greater
+ than 2
+
+Turns on debug level logging for the librepo logging handler only if
+debuglevel is greater than 2 (2 is the default).
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1580022
+https://bugzilla.redhat.com/show_bug.cgi?id=1678598
+https://bugzilla.redhat.com/show_bug.cgi?id=1355764
+https://bugzilla.redhat.com/show_bug.cgi?id=1695720
+---
+ dnf.spec       | 2 +-
+ dnf/logging.py | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/dnf.spec b/dnf.spec
+index f2463b303..541ffcddd 100644
+--- a/dnf.spec
++++ b/dnf.spec
+@@ -1,5 +1,5 @@
+ # default dependencies
+-%global hawkey_version 0.31.0
++%global hawkey_version 0.32.0
+ %global libcomps_version 0.1.8
+ %global libmodulemd_version 1.4.0
+ %global rpm_version 4.14.0
+diff --git a/dnf/logging.py b/dnf/logging.py
+index 374c6df73..885ad8c75 100644
+--- a/dnf/logging.py
++++ b/dnf/logging.py
+@@ -152,7 +152,7 @@ class Logging(object):
+         logger_warnings.addHandler(handler)
+ 
+         lr_logfile = os.path.join(logdir, dnf.const.LOG_LIBREPO)
+-        libdnf.repo.LibrepoLog.addHandler(lr_logfile)
++        libdnf.repo.LibrepoLog.addHandler(lr_logfile, verbose_level <= DEBUG)
+ 
+         # setup RPM callbacks logger
+         logger_rpm = logging.getLogger("dnf.rpm")
+-- 
+2.21.0
+

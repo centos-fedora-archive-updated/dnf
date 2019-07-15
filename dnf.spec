@@ -1,5 +1,5 @@
 # default dependencies
-%global hawkey_version 0.31.0
+%global hawkey_version 0.31.0-4
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
@@ -80,7 +80,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -92,6 +92,9 @@ Patch0003:      0003-history-Dont-store-failed-transactions-as-succeeded.patch
 Patch0004:      0004-transaction-Add-RPMCALLBACK_INST_STARTSTOP-callback-handlers.patch
 Patch0005:      0005-Change-synchronization-of-rpm-transaction-to-swdb.patch
 Patch0006:      0006-Add-detailed-debug-login-for-swdbrpm-transaction.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1355764#c50
+Patch0007:      0007-librepo-Turn-on-debug-logging-only-if-debuglevel-is-.patch
+Patch0008:      0008-sack-use-logdebug-argument-in-hawkey.Sack.patch
 
 BuildArch:      noarch
 BuildRequires:  cmake
@@ -506,6 +509,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Wed Jul 24 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.5-3
+- Backport patches to not log DEBUG messages by default (RhBug:1355764)
+
 * Thu Jun 27 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.5-2
 - Backport patches to enhance synchronization of rpm transaction to swdb
 

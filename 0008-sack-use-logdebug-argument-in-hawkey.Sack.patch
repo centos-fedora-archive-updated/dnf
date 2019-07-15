@@ -1,0 +1,32 @@
+From 0eef32c810ef3d5ca99e47e75e5f0e5dc30e8a1c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
+Date: Thu, 18 Apr 2019 15:49:04 +0200
+Subject: [PATCH] sack: use logdebug argument in hawkey.Sack()
+
+Sets logdebug to True if debuglevel is greater than 2 (2 is the
+default). This turns on logging of DEBUG level messages in hawkey.log
+only if the debug level was explicitly increased.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1355764
+https://bugzilla.redhat.com/show_bug.cgi?id=1695720
+---
+ dnf/sack.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/dnf/sack.py b/dnf/sack.py
+index 1c09928ae..283748631 100644
+--- a/dnf/sack.py
++++ b/dnf/sack.py
+@@ -50,7 +50,8 @@ def _build_sack(base):
+     return Sack(pkgcls=dnf.package.Package, pkginitval=base,
+                 arch=base.conf.substitutions["arch"],
+                 cachedir=cachedir, rootdir=base.conf.installroot,
+-                logfile=os.path.join(base.conf.logdir, dnf.const.LOG_HAWKEY))
++                logfile=os.path.join(base.conf.logdir, dnf.const.LOG_HAWKEY),
++                logdebug=base.conf.debuglevel > 2)
+ 
+ 
+ def _rpmdb_sack(base):
+-- 
+2.21.0
+
