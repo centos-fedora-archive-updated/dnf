@@ -1,0 +1,26 @@
+From 9eab5a74b5b67f47ade3f0621e0b86b5203022db Mon Sep 17 00:00:00 2001
+From: Pavla Kratochvilova <pkratoch@redhat.com>
+Date: Mon, 22 Jul 2019 09:04:20 +0200
+Subject: [PATCH] Revert "[rpm] add detection for armv7hcnl"
+
+---
+ dnf/rpm/__init__.py | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/dnf/rpm/__init__.py b/dnf/rpm/__init__.py
+index 045a065..85e64cb 100644
+--- a/dnf/rpm/__init__.py
++++ b/dnf/rpm/__init__.py
+@@ -90,8 +90,7 @@ _BASEARCH_MAP = _invert({
+     'alpha': ('alpha', 'alphaev4', 'alphaev45', 'alphaev5', 'alphaev56',
+               'alphaev6', 'alphaev67', 'alphaev68', 'alphaev7', 'alphapca56'),
+     'arm': ('armv5tejl', 'armv5tel', 'armv5tl', 'armv6l', 'armv7l', 'armv8l'),
+-    'armhfp': ('armv6hl', 'armv7hl', 'armv7hnl', 'armv7hcnl', 'armv8hl',
+-               'armv8hnl', 'armv8hcnl'),
++    'armhfp': ('armv6hl', 'armv7hl', 'armv7hnl', 'armv8hl', 'armv8hnl', 'armv8hcnl'),
+     'i386': ('i386', 'athlon', 'geode', 'i386', 'i486', 'i586', 'i686'),
+     'ia64': ('ia64',),
+     'mips': ('mips',),
+--
+libgit2 0.27.8
+

@@ -80,7 +80,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -95,6 +95,8 @@ Patch0006:      0006-Add-detailed-debug-login-for-swdbrpm-transaction.patch
 # Temporary patch to not fail on modular RPMs without modular metadata
 # until the infrastructure is ready
 Patch0007:      0007-Revert-consequences-of-Fail-Safe-mechanism.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1691430
+Patch0008:      0008-Revert-rpm-add-detection-for-armv7hcnl.patch
 
 BuildArch:      noarch
 BuildRequires:  cmake
@@ -512,6 +514,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Mon Jul 22 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.7-2
+- Revert patch: [rpm] add detection for armv7hcnl
+
 * Thu Jul 04 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.7-1
 - Update to 4.2.7
 - librepo: Turn on debug logging only if debuglevel is greater than 2
