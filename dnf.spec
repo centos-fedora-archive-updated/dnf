@@ -80,7 +80,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -514,6 +514,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Wed Jul 24 2019 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.7-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
 * Mon Jul 22 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.7-2
 - Revert patch: [rpm] add detection for armv7hcnl
 
