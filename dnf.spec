@@ -1,5 +1,5 @@
 # default dependencies
-%global hawkey_version 0.35.1
+%global hawkey_version 0.35.2
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
@@ -79,27 +79,20 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.2.7
-Release:        2%{?dist}
+Version:        4.2.8
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0001:      0001-Revert-Add-best-as-default-behavior-RhBug16707761671683.patch
-Patch0002:      0002-transaction-Set-an-error-for-first-tsi-in-unknown-state.patch
-Patch0003:      0003-history-Dont-store-failed-transactions-as-succeeded.patch
-Patch0004:      0004-transaction-Add-RPMCALLBACK_INST_STARTSTOP-callback-handlers.patch
-Patch0005:      0005-Change-synchronization-of-rpm-transaction-to-swdb.patch
-Patch0006:      0006-Add-detailed-debug-login-for-swdbrpm-transaction.patch
 # Do not the change of include skip_if_unavailable fedault to false for Fedora < 31
 # https://fedoraproject.org/wiki/Changes/Set_skip_if_unavailable_default_to_false
 Patch0007:      0007-Document-skip_if_unavailable-default-to-true.patch
 # Temporary patch to not fail on modular RPMs without modular metadata
 # until the infrastructure is ready
 Patch0008:      0008-Revert-consequences-of-Fail-Safe-mechanism.patch
-# https://bugzilla.redhat.com/show_bug.cgi?id=1691430
-Patch0009:      0009-Revert-rpm-add-detection-for-armv7hcnl.patch
 
 BuildArch:      noarch
 BuildRequires:  cmake
@@ -517,6 +510,21 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Wed Aug 14 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.8-1
+- Update to 4.2.8
+- Accept multiple specs in repoquery options (RhBug:1667898)
+- Prevent switching modules in all cases (RhBug:1706215)
+- [history] Don't store failed transactions as succeeded
+- [history] Do not require root for informative commands
+- [dnssec] Fix UnicodeWarning when using new rpm (RhBug:1699650)
+- Print rpm error messages during transaction (RhBug:1677199)
+- Report missing default profile as an error (RhBug:1669527)
+- Apply excludes before modular excludes (RhBug:1709453)
+- Improve help for command line arguments (RhBug:1659328)
+- [doc] Describe a behavior when plugin is removed (RhBug:1700741)
+- Add new modular API method ModuleBase.get_modules
+- Mark features used by ansible, anaconda and subscription-manager as an API
+
 * Mon Jul 22 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.7-2
 - Revert patch: [rpm] add detection for armv7hcnl
 
