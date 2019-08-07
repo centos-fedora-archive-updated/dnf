@@ -1,0 +1,35 @@
+From 94a55b1522fc5ac8ba5be6d868f76ed5d00fa971 Mon Sep 17 00:00:00 2001
+From: Jan Beran <jberan@redhat.com>
+Date: Tue, 21 May 2019 12:01:20 +0200
+Subject: [PATCH] Set error when "-c" option requires nonexistent file (RhBug:1512457)
+
+Fix of the following problem: When you feed "-c" option in `dnf -c /etc/does-not-exist.conf`
+with nonexistent file, dnf still returns 0. This is difference compared to yum.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1512457
+
+Signed-off-by: Jan Beran <jberan@redhat.com>
+---
+ dnf/cli/cli.py | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/dnf/cli/cli.py b/dnf/cli/cli.py
+index 558fbdf..09642d1 100644
+--- a/dnf/cli/cli.py
++++ b/dnf/cli/cli.py
+@@ -985,6 +985,12 @@ class Cli(object):
+         # search config file inside the installroot first
+         conf._search_inside_installroot('config_file_path')
+ 
++        # check whether a config file is requested from command line and the file exists
++        filename = conf._get_value('config_file_path')
++        if (conf._get_priority('config_file_path') == dnf.conf.PRIO_COMMANDLINE) and \
++                not os.path.isfile(filename):
++            raise dnf.exceptions.ConfigError(_('Config file "{}" does not exist').format(filename))
++
+         # read config
+         conf.read(priority=dnf.conf.PRIO_MAINCONFIG)
+ 
+--
+libgit2 0.28.2
+

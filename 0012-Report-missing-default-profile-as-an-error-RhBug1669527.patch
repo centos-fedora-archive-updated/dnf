@@ -1,0 +1,92 @@
+From 6df8eaa367b234234be4c050fcab05c95638e2fd Mon Sep 17 00:00:00 2001
+From: Jaroslav Mracek <jmracek@redhat.com>
+Date: Tue, 25 Jun 2019 18:54:54 +0200
+Subject: [PATCH] Report missing default profile as an error (RhBug:1669527)
+
+The behavior where module install command doesn't install any package
+when there are no default profiles was recognized by users as an
+unexpected behavior.
+
+The patch allows DNF to fail when no default profile is available.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1669527
+---
+ dnf/module/module_base.py | 27 +++++++++++++++++++++++----
+ tests/test_modules.py     | 12 ++----------
+ 2 files changed, 25 insertions(+), 14 deletions(-)
+
+diff --git a/dnf/module/module_base.py b/dnf/module/module_base.py
+index 35720ed..c86eabe 100644
+--- a/dnf/module/module_base.py
++++ b/dnf/module/module_base.py
+@@ -88,21 +88,40 @@ class ModuleBase(object):
+                     if nsvcap.profile:
+                         profiles.extend(latest_module.getProfiles(nsvcap.profile))
+                         if not profiles:
+-                            logger.error(_("Unable to match profile in argument {}").format(spec))
++                            available_profiles = latest_module.getProfiles()
++                            if available_profiles:
++                                profile_names = ", ".join(
++                                    [profile.getName() for profile in available_profiles])
++                                msg = _("Unable to match profile for argument {}. Available "
++                                        "profiles for '{}:{}': {}").format(
++                                    spec, name, stream, profile_names)
++                            else:
++                                msg = _("Unable to match profile for argument {}").format(spec)
++                            logger.error(msg)
+                             no_match_specs.append(spec)
+                             continue
+                     else:
+                         profiles_strings = self.base._moduleContainer.getDefaultProfiles(
+                             name, stream)
+                         if not profiles_strings:
+-                            logger.error(_("No default profiles for module {}:{}").format(
+-                                name, stream))
++                            available_profiles = latest_module.getProfiles()
++                            if available_profiles:
++                                profile_names = ", ".join(
++                                    [profile.getName() for profile in available_profiles])
++                                msg = _("No default profiles for module {}:{}. Available profiles"
++                                        ": {}").format(
++                                    name, stream, profile_names)
++                            else:
++                                msg = _("No default profiles for module {}:{}").format(name, stream)
++                            logger.error(msg)
++                            no_match_specs.append(spec)
+                         for profile in set(profiles_strings):
+                             module_profiles = latest_module.getProfiles(profile)
+                             if not module_profiles:
+                                 logger.error(
+-                                    _("Profile {} not matched for module {}:{}").format(
++                                    _("Default profile {} not available in module {}:{}").format(
+                                         profile, name, stream))
++                                no_match_specs.append(spec)
+ 
+                             profiles.extend(module_profiles)
+                     for profile in profiles:
+diff --git a/tests/test_modules.py b/tests/test_modules.py
+index d5fde4f..49e7718 100644
+--- a/tests/test_modules.py
++++ b/tests/test_modules.py
+@@ -274,16 +274,8 @@ class ModuleTest(unittest.TestCase):
+ 
+     def test_install_implicit_empty_default_profile(self):
+         # install module without a 'default' profile
+-        # -> no packages should be installed, just module enablement
+-        self.module_base.install(["m4:1.4.18"])
+-
+-        self.assertEqual(self.base._moduleContainer.getModuleState("m4"),
+-                         libdnf.module.ModulePackageContainer.ModuleState_ENABLED)
+-        self.assertEqual(self.base._moduleContainer.getEnabledStream("m4"), "1.4.18")
+-        self.assertEqual(list(self.base._moduleContainer.getInstalledProfiles("m4")), [])
+-
+-        self.base.resolve()
+-        self.assertInstalls([])
++        # -> It should raise an error
++        self.assertRaises(dnf.exceptions.MarkingErrors, self.module_base.install, ["m4:1.4.18"])
+ 
+     # dnf module upgrade / dnf upgrade @
+ 
+--
+libgit2 0.28.2
+

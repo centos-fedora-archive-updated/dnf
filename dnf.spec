@@ -80,7 +80,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -95,6 +95,20 @@ Patch0006:      0006-Add-detailed-debug-login-for-swdbrpm-transaction.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1355764#c50
 Patch0007:      0007-librepo-Turn-on-debug-logging-only-if-debuglevel-is-.patch
 Patch0008:      0008-sack-use-logdebug-argument-in-hawkey.Sack.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1702621
+Patch0009:      0009-Enhance-output-of-the-dnf-provides-command-RhBug1702621.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1512457
+Patch0010:      0010-Set-error-when--c-option-requires-nonexistent-file-RhBug1512457.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1707624
+Patch0011:      0011-Fix-two-group-issues-RhBug1707624.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1669527
+Patch0012:      0012-Report-missing-default-profile-as-an-error-RhBug1669527.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1673075
+Patch0013:      0013-doc-Make-API-examples-work-out-of-box-RhBug1673075.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1653736
+Patch0014:      0014-doc-Add-description-of-deplist-command-RhBug1653736.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1661814
+Patch0015:      0015-doc-Document-that-config-objects-return-other-than-Python-native-types-RhBug1661814.patch
 
 BuildArch:      noarch
 BuildRequires:  cmake
@@ -509,6 +523,16 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Wed Aug 14 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.5-4
+- Enhance output of the dnf provides command (RhBug:1702621)
+- Set error when "-c" option requires nonexistent file (RhBug:1512457)
+- Fix group install when group is not available (RhBug:1707624,1599010)
+- Fix traceback with group upgrade that is not available
+- Report missing default profile as an error (RhBug:1669527)
+- [doc] Make API examples work out of box (RhBug:1673075)
+- [doc] Add description of deplist command (RhBug:1653736)
+- [doc] Document that config objects return other than Python native types (RhBug:1661814)
+
 * Wed Jul 24 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.5-3
 - Backport patches to not log DEBUG messages by default (RhBug:1355764)
 

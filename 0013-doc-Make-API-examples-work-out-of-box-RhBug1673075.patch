@@ -1,0 +1,185 @@
+From 10f1ad2386fde35fb20027782514debb4a0454f4 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Fri, 21 Jun 2019 10:40:27 +0200
+Subject: [PATCH] [doc] Make API examples work out of box (RhBug:1673075)
+
+API examples were rewritten to be complete, runnable python programs.
+Users can just save them to a file and run them.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1673075
+---
+ doc/api_base.rst    | 24 ++++++++++++++++++------
+ doc/api_queries.rst | 63 ++++++++++++++++++++++++++++++++++++++++++++++++---------------
+ doc/api_repos.rst   | 13 ++++++++++---
+ 3 files changed, 76 insertions(+), 24 deletions(-)
+
+diff --git a/doc/api_base.rst b/doc/api_base.rst
+index 2c970d9..1132078 100644
+--- a/doc/api_base.rst
++++ b/doc/api_base.rst
+@@ -88,12 +88,24 @@
+ 
+     Example::
+ 
+-      base = dnf.Base()
+-      conf = base.conf
+-      conf.cachedir = CACHEDIR
+-      conf.substitutions['releasever'] = 22
+-      base.repos.add_new_repo('my-repo', conf, baseurl=[MY_REPO_URL])
+-      base.fill_sack()
++        #!/usr/bin/python3
++        import dnf
++
++        base = dnf.Base()
++        conf = base.conf
++        conf.cachedir = '/tmp/my_cache_dir'
++        conf.substitutions['releasever'] = '30'
++        conf.substitutions['basearch'] = 'x86_64'
++
++        base.repos.add_new_repo('my-repo', conf,
++            baseurl=["http://download.fedoraproject.org/pub/fedora/linux/releases/$releasever/Everything/$basearch/os/"])
++        base.fill_sack()
++
++        print("Enabled repositories:")
++        for repo in base.repos.iter_enabled():
++            print("id: {}".format(repo.id))
++            print("baseurl: {}".format(repo.baseurl))
++
+ 
+   .. method:: do_transaction([display])
+ 
+diff --git a/doc/api_queries.rst b/doc/api_queries.rst
+index 75f3195..6f7807a 100644
+--- a/doc/api_queries.rst
++++ b/doc/api_queries.rst
+@@ -25,15 +25,38 @@
+ 
+   Facilitates lookup of packages in a :class:`~dnf.sack.Sack` based on given criteria. Query actually does not consult the information in the :class:`~!dnf.sack.Sack` until it is evaluated. The evaluation happens either explicitly using :meth:`~dnf.query.Query.run` or by iterating the query, for example::
+ 
++    #!/usr/bin/python3
++    import dnf
++
++    base = dnf.Base()
++    base.fill_sack()
++
+     q = base.sack.query()
+     i = q.installed()
+-    i = i.filter(name='pepper')
+-    packages = list(i) # i only gets evaluated here
++    i = i.filter(name='dnf')
++
++    packages = list(i)  # i only gets evaluated here
++    print("Installed dnf package:")
++    for pkg in packages:
++        print(pkg, pkg.reponame)
++
++  or::
++
++    #!/usr/bin/python3
++    import dnf
++
++    base = dnf.Base()
++    base.read_all_repos()
++    base.fill_sack()
+ 
++    q = base.sack.query()
+     a = q.available()
+-    a = a.filter(name='pepper')
+-    for pkg in a: # a only gets evaluated here
+-        print(pkg.name)
++    a = a.filter(name='dnf')
++
++    print("Available dnf packages:")
++    for pkg in a:  # a only gets evaluated here
++        print('{} in repo {}'.format(pkg, pkg.reponame))
++
+ 
+   Notice that none of the filtering methods mutates the state of the :class:`~dnf.query.Query` but produces a new object instead.
+ 
+@@ -53,7 +76,7 @@
+ 
+     Return a new query that limits the result to installed packages that are not present in any repo
+ 
+-  .. method:: filter(**kwargs)
++  .. method:: filter(\*\*kwargs)
+ 
+     Return a new query limiting the original query to the key/value pairs from `kwargs`. Multiple `kwargs` can be passed, the filter then works by applying all of them together (logical AND). Values inside of list or query are cumulative (logical OR).
+ 
+@@ -106,7 +129,7 @@
+ 
+       q = base.sack.query().filter(name__substr="club")
+ 
+-  .. method:: filterm(**kwargs)
++  .. method:: filterm(\*\*kwargs)
+ 
+     Similar to :meth:`dnf.query.Query.filter` but it modifies the query in place.
+ 
+@@ -154,7 +177,7 @@
+     used in a transaction operation. `sack` and `forms` have the same meaning as in
+     :meth:`get_best_query`. If ``obsoletes``, selector will also contain packages that obsoletes
+     requested packages (default is True). If ``reponame``, the selection of available packages is
+-    limited to packages from that repo (default is False). Attribute ``reports`` is deprecated and
++    limited to packages from that repo (default is None). Attribute ``reports`` is deprecated and
+     not used any more. Will be removed on 2018-01-01.
+ 
+   .. method:: get_nevra_possibilities(self, forms=None)
+@@ -165,10 +188,20 @@
+ 
+     Example how to use it when it is known that string could be full NEVRA or NEVR::
+ 
+-      subject = dnf.subjet.Subject("my_nevra_string")
+-      possible_nevra = subject.get_nevra_possibilities(forms=[hawkey.FORM_NEVRA, hawkey.FORM_NEVR])
+-
+-    To print all possible names use::
+-
+-      for nevra in possible_nevra:
+-          print(nevra.name)
++        #!/usr/bin/python3
++        import dnf
++        import hawkey
++
++        nevra_string = "dnf-0:4.2.2-2.fc30.noarch"
++        subject = dnf.subject.Subject(nevra_string)
++        possible_nevra = subject.get_nevra_possibilities(
++            forms=[hawkey.FORM_NEVRA, hawkey.FORM_NEVR])
++
++        for i,nevra in enumerate(possible_nevra):
++            print("Possibility {} for \"{}\":".format(i+1, nevra_string))
++            print("name: {}".format(nevra.name))
++            print("epoch: {}".format(nevra.epoch))
++            print("version: {}".format(nevra.version))
++            print("release: {}".format(nevra.release))
++            print("architecture: {}".format(nevra.arch))
++            print()
+diff --git a/doc/api_repos.rst b/doc/api_repos.rst
+index bca5cb1..79e14f4 100644
+--- a/doc/api_repos.rst
++++ b/doc/api_repos.rst
+@@ -47,14 +47,21 @@ Repository Configuration
+ 
+     The returned list acts as a `composite <http://en.wikipedia.org/wiki/Composite_pattern>`_, transparently forwarding all method calls on itself to the contained repositories. The following thus disables all matching repos::
+ 
+-      repos = base.repos.get_matching('*-debuginfo')
+-      repos.disable()
++        #!/usr/bin/python3
++        import dnf
++
++        base = dnf.Base()
++        base.read_all_repos()
++        base.fill_sack()
++
++        repos = base.repos.get_matching('*-debuginfo')
++        repos.disable()
+ 
+   .. method:: iter_enabled()
+ 
+     Return an iterator over all enabled repos from the dict.
+ 
+-  .. method:: add_new_repo(repoid, conf, baseurl=(), **kwargs)
++  .. method:: add_new_repo(repoid, conf, baseurl=(), \*\*kwargs)
+ 
+     Initialize new :class:`.Repo` object and add it to the repodict. It requires ``repoid``
+     (string), and :class:`dnf.conf.Conf` object. Optionally it can be speciffied baseurl (list), and
+--
+libgit2 0.28.2
+

@@ -1,0 +1,53 @@
+From 4888fdeb327c810e6f67a35caff3e63e58730e39 Mon Sep 17 00:00:00 2001
+From: Jaroslav Mracek <jmracek@redhat.com>
+Date: Fri, 26 Jul 2019 12:08:50 +0200
+Subject: [PATCH] [doc] Add description of deplist command (RhBug:1653736)
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1653736
+---
+ doc/command_ref.rst | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/doc/command_ref.rst b/doc/command_ref.rst
+index 5de6e45..d3b7603 100644
+--- a/doc/command_ref.rst
++++ b/doc/command_ref.rst
+@@ -59,6 +59,7 @@ Available commands:
+ * :ref:`check <check_command-label>`
+ * :ref:`check-update <check_update_command-label>`
+ * :ref:`clean <clean_command-label>`
++* :ref:`deplist <deplist_command-label>`
+ * :ref:`distro-sync <distro_sync_command-label>`
+ * :ref:`downgrade <downgrade_command-label>`
+ * :ref:`group <group_command-label>`
+@@ -539,6 +540,15 @@ different distribution release versions.
+ ``dnf clean all``
+     Does all of the above.
+ 
++.. _deplist_command-label:
++
++---------------
++Deplist command
++---------------
++
++``dnf [options] deplist [<select-options>] [<query-options>] [<pkg-spec>]``
++    Alias for :ref:`dnf repoquery --deplist <deplist_option-label>`.
++
+ .. _distro_sync_command-label:
+ 
+ -------------------
+@@ -1247,8 +1257,10 @@ are displayed in the standard NEVRA notation.
+     ``--whatrequires``, ``--requires``, ``--conflicts``, ``--enhances``, ``--suggests``, ``--provides``,
+     ``--supplements``, ``--recommends``.
+ 
++.. _deplist_option-label:
++
+ ``--deplist``
+-    Produce a list of all dependencies and what packages provide those
++    Produce a list of all direct dependencies and what packages provide those
+     dependencies for the given packages. The result only shows the newest
+     providers (which can be changed by using --verbose).
+ 
+--
+libgit2 0.28.2
+

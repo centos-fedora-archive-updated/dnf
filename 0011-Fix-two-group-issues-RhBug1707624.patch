@@ -1,0 +1,227 @@
+From 031322e670c70446c27f5e5ad7d20140323dcd87 Mon Sep 17 00:00:00 2001
+From: Jaroslav Mracek <jmracek@redhat.com>
+Date: Mon, 13 May 2019 19:29:53 +0200
+Subject: [PATCH 1/3] Fix group install when group is not available
+ (RhBug:1707624)
+
+It raises ValueError when group was installed but not available for
+group install command.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1707624
+---
+ dnf/base.py            | 5 ++---
+ dnf/comps.py           | 2 ++
+ tests/test_commands.py | 2 +-
+ 3 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/dnf/base.py b/dnf/base.py
+index 22fe1cddd..667524ee1 100644
+--- a/dnf/base.py
++++ b/dnf/base.py
+@@ -1624,9 +1624,8 @@ class Base(object):
+         return self._add_comps_trans(trans)
+ 
+     def env_group_install(self, patterns, types, strict=True, exclude=None, exclude_groups=None):
+-        q = CompsQuery(self.comps, self.history,
+-                       CompsQuery.ENVIRONMENTS | CompsQuery.GROUPS,
+-                       CompsQuery.AVAILABLE | CompsQuery.INSTALLED)
++        q = CompsQuery(self.comps, self.history, CompsQuery.ENVIRONMENTS | CompsQuery.GROUPS,
++                       CompsQuery.AVAILABLE)
+         cnt = 0
+         done = True
+         for pattern in patterns:
+diff --git a/dnf/comps.py b/dnf/comps.py
+index dd2572df4..d9aa43a81 100644
+--- a/dnf/comps.py
++++ b/dnf/comps.py
+@@ -185,6 +185,8 @@ class CompsQuery(object):
+             if not envs and not grps:
+                 if self.status == self.INSTALLED:
+                     msg = _("Group '%s' is not installed.") % ucd(pat)
++                elif self.status == self.AVAILABLE:
++                    msg = _("Group '%s' is not available.") % ucd(pat)
+                 else:
+                     msg = _("Group '%s' does not exist.") % ucd(pat)
+                 raise CompsError(msg)
+diff --git a/tests/test_commands.py b/tests/test_commands.py
+index 51c01cb36..caa903a56 100644
+--- a/tests/test_commands.py
++++ b/tests/test_commands.py
+@@ -130,7 +130,7 @@ class InstallCommandTest(tests.support.ResultTestCase):
+                               tests.support.command_run, self._cmd, ['@non-existent'])
+ 
+         self.assertEqual(stdout.getvalue(),
+-                         "Warning: Module or Group 'non-existent' does not exist.\n")
++                         "Warning: Module or Group 'non-existent' is not available.\n")
+         self.assertResult(self._cmd.cli.base,
+                           self._cmd.cli.base.sack.query().installed())
+ 
+-- 
+2.21.0
+
+
+From 9490f0f9ff0aa2fffdfa1f5287bbea65c1b18890 Mon Sep 17 00:00:00 2001
+From: Jaroslav Mracek <jmracek@redhat.com>
+Date: Mon, 13 May 2019 19:38:41 +0200
+Subject: [PATCH 2/3] Enhance error message for translators
+
+Splited messages is very difficult to translate.
+---
+ dnf/base.py            | 2 +-
+ dnf/comps.py           | 6 +++---
+ tests/test_commands.py | 3 +--
+ 3 files changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/dnf/base.py b/dnf/base.py
+index 667524ee1..95151585e 100644
+--- a/dnf/base.py
++++ b/dnf/base.py
+@@ -1632,7 +1632,7 @@ class Base(object):
+             try:
+                 res = q.get(pattern)
+             except dnf.exceptions.CompsError as err:
+-                logger.error("Warning: Module or %s", ucd(err))
++                logger.error(ucd(err))
+                 done = False
+                 continue
+             for group_id in res.groups:
+diff --git a/dnf/comps.py b/dnf/comps.py
+index d9aa43a81..89be09862 100644
+--- a/dnf/comps.py
++++ b/dnf/comps.py
+@@ -184,11 +184,11 @@ class CompsQuery(object):
+                 res.groups.extend(grps)
+             if not envs and not grps:
+                 if self.status == self.INSTALLED:
+-                    msg = _("Group '%s' is not installed.") % ucd(pat)
++                    msg = _("Module or Group '%s' is not installed.") % ucd(pat)
+                 elif self.status == self.AVAILABLE:
+-                    msg = _("Group '%s' is not available.") % ucd(pat)
++                    msg = _("Module or Group '%s' is not available.") % ucd(pat)
+                 else:
+-                    msg = _("Group '%s' does not exist.") % ucd(pat)
++                    msg = _("Module or Group '%s' does not exist.") % ucd(pat)
+                 raise CompsError(msg)
+         return res
+ 
+diff --git a/tests/test_commands.py b/tests/test_commands.py
+index caa903a56..ae249ead4 100644
+--- a/tests/test_commands.py
++++ b/tests/test_commands.py
+@@ -129,8 +129,7 @@ class InstallCommandTest(tests.support.ResultTestCase):
+             self.assertRaises(dnf.exceptions.Error,
+                               tests.support.command_run, self._cmd, ['@non-existent'])
+ 
+-        self.assertEqual(stdout.getvalue(),
+-                         "Warning: Module or Group 'non-existent' is not available.\n")
++        self.assertEqual(stdout.getvalue(), "Module or Group 'non-existent' is not available.\n")
+         self.assertResult(self._cmd.cli.base,
+                           self._cmd.cli.base.sack.query().installed())
+ 
+-- 
+2.21.0
+
+
+From 06de5ad264997f0824bc44c08c65d98d6f050c98 Mon Sep 17 00:00:00 2001
+From: Jaroslav Mracek <jmracek@redhat.com>
+Date: Mon, 13 May 2019 20:33:22 +0200
+Subject: [PATCH 3/3] Fix traceback with group upgrade that is not available
+
+Traceback (most recent call last):
+  File "/usr/bin/dnf", line 58, in <module>
+    main.user_main(sys.argv[1:], exit_code=True)
+  File "/usr/lib/python3.7/site-packages/dnf/cli/main.py", line 191, in user_main
+    errcode = main(args)
+  File "/usr/lib/python3.7/site-packages/dnf/cli/main.py", line 65, in main
+    return _main(base, args, cli_class, option_parser_class)
+  File "/usr/lib/python3.7/site-packages/dnf/cli/main.py", line 98, in _main
+    return cli_run(cli, base)
+  File "/usr/lib/python3.7/site-packages/dnf/cli/main.py", line 114, in cli_run
+    cli.run()
+  File "/usr/lib/python3.7/site-packages/dnf/cli/cli.py", line 1129, in run
+    return self.command.run()
+  File "/usr/lib/python3.7/site-packages/dnf/cli/commands/group.py", line 391, in run
+    return self.base.env_group_upgrade(extcmds)
+  File "/usr/lib/python3.7/site-packages/dnf/base.py", line 1681, in env_group_upgrade
+    cnt += self.group_upgrade(grp)
+  File "/usr/lib/python3.7/site-packages/dnf/base.py", line 1695, in group_upgrade
+    trans = solver._group_upgrade(grp_id)
+  File "/usr/lib/python3.7/site-packages/dnf/comps.py", line 689, in _group_upgrade
+    new_set = self._pkgs_of_type(comps_group, pkg_types, exclude)
+  File "/usr/lib/python3.7/site-packages/dnf/comps.py", line 567, in _pkgs_of_type
+    pkgs.update(filter(group.mandatory_packages))
+AttributeError: 'NoneType' object has no attribute 'mandatory_packages'
+---
+ dnf/base.py  | 27 ++++++++++++++++++++++-----
+ dnf/comps.py |  9 ++++++---
+ 2 files changed, 28 insertions(+), 8 deletions(-)
+
+diff --git a/dnf/base.py b/dnf/base.py
+index 95151585e..5b47d7b7c 100644
+--- a/dnf/base.py
++++ b/dnf/base.py
+@@ -1671,12 +1671,29 @@ class Base(object):
+         q = CompsQuery(self.comps, self.history,
+                        CompsQuery.GROUPS | CompsQuery.ENVIRONMENTS,
+                        CompsQuery.INSTALLED)
+-        res = q.get(*patterns)
+         cnt = 0
+-        for env in res.environments:
+-            cnt += self.environment_upgrade(env)
+-        for grp in res.groups:
+-            cnt += self.group_upgrade(grp)
++        done = True
++        for pattern in patterns:
++            try:
++                res = q.get(pattern)
++            except dnf.exceptions.CompsError as err:
++                logger.error(ucd(err))
++                done = False
++                continue
++            for env in res.environments:
++                try:
++                    cnt += self.environment_upgrade(env)
++                except dnf.exceptions.CompsError as err:
++                    logger.error(ucd(err))
++                    continue
++            for grp in res.groups:
++                try:
++                    cnt += self.group_upgrade(grp)
++                except dnf.exceptions.CompsError as err:
++                    logger.error(ucd(err))
++                    continue
++        if not done:
++            raise dnf.exceptions.Error(_('Nothing to do.'))
+         if not cnt:
+             msg = _('No group marked for upgrade.')
+             raise dnf.cli.CliError(msg)
+diff --git a/dnf/comps.py b/dnf/comps.py
+index 89be09862..316d64708 100644
+--- a/dnf/comps.py
++++ b/dnf/comps.py
+@@ -625,6 +625,8 @@ class Solver(object):
+         swdb_env = self.history.env.get(comps_env.id)
+         if not swdb_env:
+             raise CompsError(_("Environment '%s' is not installed.") % env_id)
++        if not comps_env:
++            raise CompsError(_("Environment '%s' is not available.") % env_id)
+ 
+         old_set = set([i.getGroupId() for i in swdb_env.getGroups() if i.getInstalled()])
+         pkg_types = swdb_env.getPackageTypes()
+@@ -683,9 +685,10 @@ class Solver(object):
+         exclude = []
+ 
+         if not swdb_group:
+-            raise CompsError(_("Group '%s' not installed.") %
+-                             comps_group.ui_name)
+-
++            argument = comps_group.ui_name if comps_group else group_id
++            raise CompsError(_("Module or Group '%s' is not installed.") % argument)
++        if not comps_group:
++            raise CompsError(_("Module or Group '%s' is not available.") % group_id)
+         pkg_types = swdb_group.getPackageTypes()
+         old_set = set([i.getName() for i in swdb_group.getPackages()])
+         new_set = self._pkgs_of_type(comps_group, pkg_types, exclude)
+-- 
+2.21.0
+

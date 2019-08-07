@@ -1,0 +1,170 @@
+From 6b5c6874e7af259a58aa2d1828876e0e588a0ed8 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Tue, 30 Apr 2019 07:39:39 +0200
+Subject: [PATCH 1/4] [provides] Prevent multiple "Matched from:" captions to
+ be printed
+
+In case that multiple files of the package matched the searched provide,
+the output contained multiple "Matched from:" captions:
+
+pulp-rpm-plugins-2.15.2-1.fc29.noarch : Pulp RPM plugins
+Repo        : fedora
+Matched from:
+Filename    : /usr/lib/python2.7/site-packages/pulp_rpm/plugins/catalogers/yum.py
+Matched from:
+Filename    : /usr/lib/python2.7/site-packages/pulp_rpm/plugins/profilers/yum.py
+
+Closes: #1389
+Approved by: Conan-Kudo
+---
+ dnf/cli/output.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/dnf/cli/output.py b/dnf/cli/output.py
+index 23e7a35dd..8613263a3 100644
+--- a/dnf/cli/output.py
++++ b/dnf/cli/output.py
+@@ -871,8 +871,9 @@ class Output(object):
+             file_match = False
+             for filename in po.files:
+                 if fnmatch.fnmatch(filename, item):
++                    print_highlighted_key_item(
++                        key, filename, file_match or printed_match, can_overflow=False)
+                     file_match = True
+-                    print_highlighted_key_item(key, filename, printed_match, can_overflow=False)
+             return file_match
+ 
+         if self.conf.showdupesfromrepos:
+-- 
+2.21.0
+
+
+From acf813dbed72de0410ac90bc13d9f81152289a13 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Tue, 30 Apr 2019 07:49:58 +0200
+Subject: [PATCH 2/4] Reorder imports according to PEP-8
+
+Closes: #1389
+Approved by: Conan-Kudo
+---
+ dnf/cli/output.py | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/dnf/cli/output.py b/dnf/cli/output.py
+index 8613263a3..70e61168a 100644
+--- a/dnf/cli/output.py
++++ b/dnf/cli/output.py
+@@ -21,9 +21,17 @@ from __future__ import absolute_import
+ from __future__ import print_function
+ from __future__ import unicode_literals
+ 
++from copy import deepcopy
++import fnmatch
++import hawkey
++import itertools
+ import libdnf.transaction
++import logging
++import operator
++import pwd
++import sys
++import time
+ 
+-from copy import deepcopy
+ from dnf.cli.format import format_number, format_time
+ from dnf.i18n import _, C_, P_, ucd, fill_exact_width, textwrap_fill, exact_width, select_short_long
+ from dnf.pycomp import xrange, basestring, long, unicode
+@@ -39,14 +47,6 @@ import dnf.i18n
+ import dnf.transaction
+ import dnf.util
+ import dnf.yum.misc
+-import fnmatch
+-import hawkey
+-import itertools
+-import logging
+-import operator
+-import pwd
+-import sys
+-import time
+ 
+ logger = logging.getLogger('dnf')
+ 
+-- 
+2.21.0
+
+
+From 9f3a54fb0fd80d5c8768334ad9bbb981dcac2919 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Tue, 30 Apr 2019 07:59:17 +0200
+Subject: [PATCH 3/4] [provides] Enhanced detecting of file provides
+ (RhBug:1702621)
+
+Also strings which start with '**/' are now detected as file provides.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1702621
+
+Closes: #1389
+Approved by: Conan-Kudo
+---
+ dnf/cli/output.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/dnf/cli/output.py b/dnf/cli/output.py
+index 70e61168a..8ff5f6eb0 100644
+--- a/dnf/cli/output.py
++++ b/dnf/cli/output.py
+@@ -29,6 +29,7 @@ import libdnf.transaction
+ import logging
+ import operator
+ import pwd
++import re
+ import sys
+ import time
+ 
+@@ -112,6 +113,7 @@ class Output(object):
+     """Main output class for the yum command line."""
+ 
+     GRP_PACKAGE_INDENT = ' ' * 3
++    FILE_PROVIDE_RE = re.compile(r'^\*{0,2}/')
+ 
+     def __init__(self, base, conf):
+         self.conf = conf
+@@ -865,7 +867,7 @@ class Output(object):
+                 print(key % item)
+ 
+         def print_file_provides(item, printed_match):
+-            if not any([item.startswith("/"), item.startswith('*/')]):
++            if not self.FILE_PROVIDE_RE.match(item):
+                 return False
+             key = _("Filename    : %s")
+             file_match = False
+-- 
+2.21.0
+
+
+From af0bdb4811c98199215595ca75d2eb00db487e78 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Tue, 30 Apr 2019 08:04:30 +0200
+Subject: [PATCH 4/4] [provides] Sort the output packages alphabetically
+
+Closes: #1389
+Approved by: Conan-Kudo
+---
+ dnf/cli/cli.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dnf/cli/cli.py b/dnf/cli/cli.py
+index f9fa020f3..558fbdf4e 100644
+--- a/dnf/cli/cli.py
++++ b/dnf/cli/cli.py
+@@ -574,7 +574,7 @@ class BaseCli(dnf.Base):
+             query, used_search_string = super(BaseCli, self).provides(spec)
+             matches.extend(query)
+             used_search_strings.extend(used_search_string)
+-        for pkg in matches:
++        for pkg in sorted(matches):
+             self.output.matchcallback_verbose(pkg, used_search_strings, args)
+         self.conf.showdupesfromrepos = old_sdup
+ 
+-- 
+2.21.0
+
