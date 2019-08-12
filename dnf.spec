@@ -80,7 +80,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.7
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -122,7 +122,6 @@ Recommends:     (python2-dbus if NetworkManager)
 %endif
 Recommends:     (%{_bindir}/sqlite3 if bash-completion)
 %endif
-%{?systemd_requires}
 Provides:       dnf-command(alias)
 Provides:       dnf-command(autoremove)
 Provides:       dnf-command(check-update)
@@ -514,6 +513,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Mon Aug 12 2019 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 4.2.7-4
+- Drop %%systemd_requires from main package
+
 * Wed Jul 24 2019 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.7-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 
