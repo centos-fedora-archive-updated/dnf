@@ -80,7 +80,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -506,6 +506,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Fri Aug 16 2019 Miro Hrončok <mhroncok@redhat.com> - 4.2.9-2
+- Rebuilt for Python 3.8
+
 * Tue Aug 13 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.9-1
 - Update to 4.2.9
 - Accept multiple specs in repoquery options (RhBug:1667898)
