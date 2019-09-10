@@ -1,5 +1,5 @@
 # default dependencies
-%global hawkey_version 0.31.0-4
+%global hawkey_version 0.31.0-7
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
@@ -80,7 +80,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -109,6 +109,7 @@ Patch0013:      0013-doc-Make-API-examples-work-out-of-box-RhBug1673075.patch
 Patch0014:      0014-doc-Add-description-of-deplist-command-RhBug1653736.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1661814
 Patch0015:      0015-doc-Document-that-config-objects-return-other-than-Python-native-types-RhBug1661814.patch
+Patch0016:      0002-Keep-installed-packages-in-upgrade-job-RhBug172825216442411741381.patch
 
 BuildArch:      noarch
 BuildRequires:  cmake
@@ -523,6 +524,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Wed Sep 11 2019 Jaroslav Mracek <jmracek@redhat.com> - 4.2.5-5
+- Backport patch to fix reinstalling packages with a different buildtime
+
 * Wed Aug 14 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.5-4
 - Enhance output of the dnf provides command (RhBug:1702621)
 - Set error when "-c" option requires nonexistent file (RhBug:1512457)
