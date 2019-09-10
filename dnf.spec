@@ -1,5 +1,5 @@
 # default dependencies
-%global hawkey_version 0.35.2
+%global hawkey_version 0.35.2-2
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
@@ -80,13 +80,14 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0001:      0001-Revert-Add-best-as-default-behavior-RhBug16707761671683.patch
+Patch0002:      0002-Keep-installed-packages-in-upgrade-job-RhBug172825216442411741381.patch
 # Do not the change of include skip_if_unavailable fedault to false for Fedora < 31
 # https://fedoraproject.org/wiki/Changes/Set_skip_if_unavailable_default_to_false
 Patch0007:      0007-Document-skip_if_unavailable-default-to-true.patch
@@ -510,6 +511,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Thu Sep 10 2019 Jaroslav Mracek <jmracek@redhat.com> - 4.2.8-2
+- Backport patch to fix reinstalling packages with a different buildtime
+
 * Wed Aug 14 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.8-1
 - Update to 4.2.8
 - Accept multiple specs in repoquery options (RhBug:1667898)
