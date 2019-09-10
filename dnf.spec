@@ -1,5 +1,5 @@
 # default dependencies
-%global hawkey_version 0.35.3
+%global hawkey_version 0.35.3-3
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
@@ -80,13 +80,14 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0001:      0001-Revert-Add-best-as-default-behavior-RhBug16707761671683.patch
+Patch0002:      0002-Keep-installed-packages-in-upgrade-job-RhBug172825216442411741381.patch
 # Temporary patch to not fail on modular RPMs without modular metadata
 # until the infrastructure is ready
 Patch0007:      0007-Revert-consequences-of-Fail-Safe-mechanism.patch
@@ -506,6 +507,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Thu Sep 10 2019 Jaroslav Mracek <jmracek@redhat.com> - 4.2.9-3
+- Backport patch to fix reinstalling packages with a different buildtime
+
 * Fri Aug 16 2019 Miro Hrončok <mhroncok@redhat.com> - 4.2.9-2
 - Rebuilt for Python 3.8
 
