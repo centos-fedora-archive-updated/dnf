@@ -1,5 +1,5 @@
 # default dependencies
-%global hawkey_version 0.35.2-2
+%global hawkey_version 0.35.5
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
@@ -47,6 +47,8 @@
 %global yum_compat_level full
 %global yum_subpackage_name yum
 %if 0%{?fedora}
+    # Avoid file conflict with yum < 4 in all Fedoras
+    # It can be resolved by pretrans scriptlet but they are not recommended in Fedora
     %global yum_compat_level minimal
     %if 0%{?fedora} < 31
         # Avoid name conflict with yum < 4
@@ -80,7 +82,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.11
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -509,6 +511,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Tue Oct 01 2019 Ales Matej <amatej@redhat.com> - 4.2.11-2
+- Fix required hawkey_version
+
 * Tue Oct 01 2019 Ales Matej <amatej@redhat.com> - 4.2.11-1
 - Improve modularity documentation (RhBug:1730162,1730162,1730807,1734081)
 - Fix detection whether system is running on battery (used by metadata caching timer) (RhBug:1498680)
