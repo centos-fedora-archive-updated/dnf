@@ -79,18 +79,14 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.2.9
-Release:        3%{?dist}
+Version:        4.2.11
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0001:      0001-Revert-Add-best-as-default-behavior-RhBug16707761671683.patch
-Patch0002:      0002-Keep-installed-packages-in-upgrade-job-RhBug172825216442411741381.patch
-# Temporary patch to not fail on modular RPMs without modular metadata
-# until the infrastructure is ready
-Patch0007:      0007-Revert-consequences-of-Fail-Safe-mechanism.patch
 
 BuildArch:      noarch
 BuildRequires:  cmake
@@ -507,6 +503,18 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Thu Oct 01 2019 Ales Matej <amatej@redhat.com> - 4.2.11-1
+- Improve modularity documentation (RhBug:1730162,1730162,1730807,1734081)
+- Fix detection whether system is running on battery (used by metadata caching timer) (RhBug:1498680)
+- New repoquery queryformat: %{reason}
+- Print rpm errors during test transaction (RhBug:1730348) 
+- Fix: --setopt and repo with dots
+- Fix incorrectly marked profile and stream after failed rpm transaction check (RhBug:1719679)
+- Show transaction errors inside dnf shell (RhBug:1743644)
+- Don't reinstall modified packages with the same NEVRA (RhBug:1644241)
+- dnf-automatic now respects versionlock excludes (RhBug:1746562)
+- Fully enable the modular fail safe mechanism (RhBug:1616167)
+
 * Thu Sep 10 2019 Jaroslav Mracek <jmracek@redhat.com> - 4.2.9-3
 - Backport patch to fix reinstalling packages with a different buildtime
 
