@@ -1,0 +1,69 @@
+From 7897eacf572081fee1d068f2ede711d54445b144 Mon Sep 17 00:00:00 2001
+From: Jaroslav Mracek <jmracek@redhat.com>
+Date: Mon, 16 Sep 2019 10:01:09 +0200
+Subject: [PATCH] Allow to ship alternative dnf.conf (RhBug:1752249)
+
+In fedora and other distribution it is required to ship dnf with
+different setting in dnf.conf.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1752249
+---
+ dnf.spec                | 7 +++++++
+ etc/dnf/CMakeLists.txt  | 2 +-
+ etc/dnf/dnf-strict.conf | 6 ++++++
+ etc/dnf/dnf.conf        | 2 ++
+ 4 files changed, 16 insertions(+), 1 deletion(-)
+ create mode 100644 etc/dnf/dnf-strict.conf
+
+diff --git a/dnf.spec b/dnf.spec
+index e490eadb..33a5e9ec 100644
+--- a/dnf.spec
++++ b/dnf.spec
+@@ -325,6 +325,13 @@ mv %{buildroot}%{_bindir}/dnf-automatic-2 %{buildroot}%{_bindir}/dnf-automatic
+ %endif
+ rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
+ 
++# Strict conf distribution
++%if 0%{?rhel}
++mv -f %{buildroot}%{confdir}/%{name}-strict.conf %{buildroot}%{confdir}/%{name}.conf
++%else
++rm -vf %{buildroot}%{confdir}/%{name}-strict.conf
++%endif
++
+ # YUM compat layer
+ ln -sr  %{buildroot}%{confdir}/%{name}.conf %{buildroot}%{_sysconfdir}/yum.conf
+ %if %{with python3}
+diff --git a/etc/dnf/CMakeLists.txt b/etc/dnf/CMakeLists.txt
+index 844a6106..6f0eec94 100644
+--- a/etc/dnf/CMakeLists.txt
++++ b/etc/dnf/CMakeLists.txt
+@@ -1,3 +1,3 @@
+-INSTALL (FILES "dnf.conf" "automatic.conf" DESTINATION ${SYSCONFDIR}/dnf)
++INSTALL (FILES "dnf-strict.conf" "dnf.conf" "automatic.conf" DESTINATION ${SYSCONFDIR}/dnf)
+ ADD_SUBDIRECTORY (aliases.d)
+ ADD_SUBDIRECTORY (protected.d)
+diff --git a/etc/dnf/dnf-strict.conf b/etc/dnf/dnf-strict.conf
+new file mode 100644
+index 00000000..3d08d075
+--- /dev/null
++++ b/etc/dnf/dnf-strict.conf
+@@ -0,0 +1,6 @@
++[main]
++gpgcheck=1
++installonly_limit=3
++clean_requirements_on_remove=True
++best=True
++skip_if_unavailable=False
+diff --git a/etc/dnf/dnf.conf b/etc/dnf/dnf.conf
+index 81b3e44d..be734b1c 100644
+--- a/etc/dnf/dnf.conf
++++ b/etc/dnf/dnf.conf
+@@ -2,3 +2,5 @@
+ gpgcheck=1
+ installonly_limit=3
+ clean_requirements_on_remove=True
++best=False
++skip_if_unavailable=True
+-- 
+2.23.0
+

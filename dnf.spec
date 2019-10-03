@@ -80,7 +80,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.9
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -91,6 +91,8 @@ Patch0002:      0002-Keep-installed-packages-in-upgrade-job-RhBug172825216442411
 # Temporary patch to not fail on modular RPMs without modular metadata
 # until the infrastructure is ready
 Patch0007:      0007-Revert-consequences-of-Fail-Safe-mechanism.patch
+# Temporary patch before rebase after release of F31, changes default DNF settings
+Patch0009:      0009-Allow-to-ship-alternative-dnf.conf-RhBug-1752249.patch
 
 BuildArch:      noarch
 BuildRequires:  cmake
@@ -330,6 +332,13 @@ mv %{buildroot}%{_bindir}/dnf-automatic-2 %{buildroot}%{_bindir}/dnf-automatic
 %endif
 rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 
+# Strict conf distribution
+%if 0%{?rhel}
+mv -f %{buildroot}%{confdir}/%{name}-strict.conf %{buildroot}%{confdir}/%{name}.conf
+%else
+rm -vf %{buildroot}%{confdir}/%{name}-strict.conf
+%endif
+
 # YUM compat layer
 ln -sr  %{buildroot}%{confdir}/%{name}.conf %{buildroot}%{_sysconfdir}/yum.conf
 %if %{with python3}
@@ -507,7 +516,10 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
-* Thu Sep 10 2019 Jaroslav Mracek <jmracek@redhat.com> - 4.2.9-3
+* Thu Oct 03 2019 Ales Matej <amatej@redhat.com> - 4.2.9-4
+- Backport patch to adjust default DNF settings (best, skip_if_unavailable)
+
+* Tue Sep 10 2019 Jaroslav Mracek <jmracek@redhat.com> - 4.2.9-3
 - Backport patch to fix reinstalling packages with a different buildtime
 
 * Fri Aug 16 2019 Miro Hrončok <mhroncok@redhat.com> - 4.2.9-2
