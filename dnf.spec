@@ -80,7 +80,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.9
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -164,7 +164,7 @@ Summary:        %{pkg_summary}
 %if 0%{?fedora}
 %if 0%{?fedora} >= 31
 Provides:       %{name}-yum = %{version}-%{release}
-Obsoletes:      %{name}-yum < %{version}-%{release}
+Obsoletes:      %{name}-yum < 5
 %else
 Conflicts:      yum < 3.4.3-505
 %endif
@@ -516,6 +516,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Thu Oct 17 2019 Ales Matej <amatej@redhat.com> - 4.2.9-5
+- Bump dnf-yum obsoletes to workaround lower version of dnf in F31 (RhBug:1760937)
+
 * Thu Oct 03 2019 Ales Matej <amatej@redhat.com> - 4.2.9-4
 - Backport patch to adjust default DNF settings (best, skip_if_unavailable)
 
