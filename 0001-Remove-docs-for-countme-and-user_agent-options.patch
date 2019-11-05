@@ -1,0 +1,73 @@
+From 1103224b6a243bcd743511a1244b1d9664aa412c Mon Sep 17 00:00:00 2001
+From: Pavla Kratochvilova <pkratoch@redhat.com>
+Date: Mon, 11 Nov 2019 09:10:40 +0100
+Subject: [PATCH] Remove docs for countme and user_agent options
+
+---
+ doc/conf_ref.rst | 43 -------------------------------------------
+ 1 file changed, 43 deletions(-)
+
+diff --git a/doc/conf_ref.rst b/doc/conf_ref.rst
+index d3ea11d..61839cd 100644
+--- a/doc/conf_ref.rst
++++ b/doc/conf_ref.rst
+@@ -553,29 +553,6 @@ configuration.
+ 
+     Total bandwidth available for downloading. Meaningful when used with the :ref:`throttle option <throttle-label>`. Storage size is in bytes by default but can be specified with a unit of storage. Valid units are 'k', 'M', 'G'.
+ 
+-``countme``
+-    :ref:`boolean <boolean-label>`
+-
+-    Determines whether a special flag should be added to a single, randomly
+-    chosen metalink/mirrorlist query each week.
+-    This allows the repository owner to estimate the number of systems
+-    consuming it, by counting such queries over a week's time, which is much
+-    more accurate than just counting unique IP addresses (which is subject to
+-    both overcounting and undercounting due to short DHCP leases and NAT,
+-    respectively).
+-
+-    The flag is a simple "countme=N" parameter appended to the metalink and
+-    mirrorlist URL, where N is an integer representing the "longevity" bucket
+-    this system belongs to.
+-    The following 4 buckets are defined, based on how many full weeks have
+-    passed since the beginning of the week when this system was installed: 1 =
+-    first week, 2 = first month (2-4 weeks), 3 = six months (5-24 weeks) and 4
+-    = more than six months (> 24 weeks).
+-    This information is meant to help distinguish short-lived installs from
+-    long-term ones, and to gather other statistics about system lifecycle.
+-
+-    Default is False.
+-
+ .. _deltarpm-label:
+ 
+ ``deltarpm``
+@@ -791,26 +768,6 @@ configuration.
+ 
+     The username to use for connecting to repo with basic HTTP authentication. Empty by default.
+ 
+-``user_agent``
+-    :ref:`string <string-label>`
+-
+-    The User-Agent string to include in HTTP requests sent by DNF.
+-    Defaults to ::
+-
+-        libdnf (NAME VERSION_ID; VARIANT_ID; OS.BASEARCH)
+-
+-    where NAME, VERSION_ID and VARIANT_ID are OS identifiers read from the
+-    :manpage:`os-release(5)` file, and OS and BASEARCH are the canonical OS
+-    name and base architecture, respectively.
+-    Example: ::
+-
+-        libdnf (Fedora 31; server; Linux.x86_64)
+-
+-    To avoid leaking identifiable data, the variant in the above string will be
+-    replaced by "generic" if the value is not an official Fedora variant.
+-    Likewise, the whole OS part (enclosed in parenthesis) will be omitted if
+-    this is a non-Fedora system.
+-
+ =================
+ Types of Options
+ =================
+--
+libgit2 0.28.2
+

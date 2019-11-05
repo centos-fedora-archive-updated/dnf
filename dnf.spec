@@ -1,5 +1,5 @@
 # default dependencies
-%global hawkey_version 0.35.5
+%global hawkey_version 0.37.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
@@ -81,19 +81,15 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.2.11
-Release:        2%{?dist}
+Version:        4.2.15
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
-Patch0001:      0001-Revert-Add-best-as-default-behavior-RhBug16707761671683.patch
-# Do not the change of include skip_if_unavailable fedault to false for Fedora < 31
-# https://fedoraproject.org/wiki/Changes/Set_skip_if_unavailable_default_to_false
-Patch0007:      0007-Document-skip_if_unavailable-default-to-true.patch
 # This change is not approved in F30 (https://fedoraproject.org/wiki/Changes/DNF_Better_Counting)
-Patch0009:      0009-Revert-doc-Add-user_agent-option.patch
+Patch0001:      0001-Remove-docs-for-countme-and-user_agent-options.patch
 
 BuildArch:      noarch
 BuildRequires:  cmake
@@ -119,7 +115,6 @@ Recommends:     (python2-dbus if NetworkManager)
 %endif
 Recommends:     (%{_bindir}/sqlite3 if bash-completion)
 %endif
-%{?systemd_requires}
 Provides:       dnf-command(alias)
 Provides:       dnf-command(autoremove)
 Provides:       dnf-command(check-update)
@@ -166,7 +161,7 @@ Summary:        %{pkg_summary}
 %if 0%{?fedora}
 %if 0%{?fedora} >= 31
 Provides:       %{name}-yum = %{version}-%{release}
-Obsoletes:      %{name}-yum < %{version}-%{release}
+Obsoletes:      %{name}-yum < 5
 %else
 Conflicts:      yum < 3.4.3-505
 %endif
@@ -333,6 +328,13 @@ ln -sr %{buildroot}%{_bindir}/dnf-2 %{buildroot}%{_bindir}/dnf
 mv %{buildroot}%{_bindir}/dnf-automatic-2 %{buildroot}%{_bindir}/dnf-automatic
 %endif
 rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
+
+# Strict conf distribution
+%if 0%{?rhel}
+mv -f %{buildroot}%{confdir}/%{name}-strict.conf %{buildroot}%{confdir}/%{name}.conf
+%else
+rm -vf %{buildroot}%{confdir}/%{name}-strict.conf
+%endif
 
 # YUM compat layer
 ln -sr  %{buildroot}%{confdir}/%{name}.conf %{buildroot}%{_sysconfdir}/yum.conf
@@ -511,6 +513,27 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Wed Nov 06 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.15-1
+- Update to 4.2.15
+- Fix downloading local packages into destdir (RhBug:1727137)
+- Report skipped packages with identical nevra only once (RhBug:1643109)
+- Restore functionality of dnf remove --duplicates (RhBug:1674296)
+- Improve API documentation
+- Document NEVRA parsing in the man page
+- Do not wrap output when no terminal (RhBug:1577889)
+- Allow to ship alternative dnf.conf (RhBug:1752249)
+- Don't check if repo is expired if it doesn't have loaded metadata (RhBug:1745170)
+- Remove duplicate entries from "dnf search" output (RhBug:1742926)
+- Set default value of repo name attribute to repo id (RhBug:1669711)
+- Allow searching in disabled modules using "dnf module provides" (RhBug:1629667)
+- Group install takes obsoletes into account (RhBug:1761137)
+- Improve handling of vars
+- Do not load metadata for repolist commands (RhBug:1697472,1713055,1728894)
+- Fix messages for starting and failing scriptlets (RhBug:1724779)
+- Don't show older install-only pkgs updates in updateinfo (RhBug:1649383,1728004)
+- Add --ids option to the group command (RhBug:1706382)
+- Add --with_cve and --with_bz options to the updateinfo command (RhBug:1750528)
+
 * Tue Oct 01 2019 Ales Matej <amatej@redhat.com> - 4.2.11-2
 - Fix required hawkey_version
 
@@ -526,7 +549,7 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 - dnf-automatic now respects versionlock excludes (RhBug:1746562)
 - Fully enable the modular fail safe mechanism (RhBug:1616167)
 
-* Thu Sep 10 2019 Jaroslav Mracek <jmracek@redhat.com> - 4.2.8-2
+* Tue Sep 10 2019 Jaroslav Mracek <jmracek@redhat.com> - 4.2.8-2
 - Backport patch to fix reinstalling packages with a different buildtime
 
 * Wed Aug 14 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.8-1
