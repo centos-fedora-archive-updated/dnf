@@ -82,7 +82,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.15
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -90,6 +90,8 @@ URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 # This change is not approved in F30 (https://fedoraproject.org/wiki/Changes/DNF_Better_Counting)
 Patch0001:      0001-Remove-docs-for-countme-and-user_agent-options.patch
+# Temporary patch until revert is merged upstream, the fix has to be reverted because it break API
+Patch0002:      0002-Revert-Fix-messages-for-starting-and-failing-scriptlets.patch
 
 BuildArch:      noarch
 BuildRequires:  cmake
@@ -513,6 +515,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Tue Nov 12 2019 Ales Matej <amatej@redhat.com> - 4.2.15-2
+- Revert: Fix messages for starting and failing scriptlets (RhBug:1724779)
+
 * Wed Nov 06 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.15-1
 - Update to 4.2.15
 - Fix downloading local packages into destdir (RhBug:1727137)
