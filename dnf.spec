@@ -82,12 +82,16 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.15
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+# Temporary patch until revert is merged upstream, the fix has to be reverted because it break API
+Patch0002:      0002-Revert-Fix-messages-for-starting-and-failing-scriptlets.patch
+# Temporary patch until fix is released
+Patch0003:      0003-Fix-misplaced-parenthesis.patch
 
 BuildArch:      noarch
 BuildRequires:  cmake
@@ -511,6 +515,10 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Tue Nov 12 2019 Ales Matej <amatej@redhat.com> - 4.2.15-2
+- Revert: Fix messages for starting and failing scriptlets (RhBug:1724779)
+- Fix traceback when trying to install package with fileconflict
+
 * Wed Nov 06 2019 Pavla Kratochvilova <pkratoch@redhat.com> - 4.2.15-1
 - Update to 4.2.15
 - Improve modularity documentation (RhBug:1730162,1730162,1730807,1734081)
