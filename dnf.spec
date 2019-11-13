@@ -82,7 +82,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.15
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -92,6 +92,8 @@ Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0001:      0001-Remove-docs-for-countme-and-user_agent-options.patch
 # Temporary patch until revert is merged upstream, the fix has to be reverted because it break API
 Patch0002:      0002-Revert-Fix-messages-for-starting-and-failing-scriptlets.patch
+# Temporary patch until fix is released
+Patch0003:      0003-Fix-misplaced-parenthesis.patch
 
 BuildArch:      noarch
 BuildRequires:  cmake
@@ -515,6 +517,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Wed Nov 13 2019 Ales Matej <amatej@redhat.com> - 4.2.15-3
+- Fix traceback when trying to install package with fileconflict
+
 * Tue Nov 12 2019 Ales Matej <amatej@redhat.com> - 4.2.15-2
 - Revert: Fix messages for starting and failing scriptlets (RhBug:1724779)
 
