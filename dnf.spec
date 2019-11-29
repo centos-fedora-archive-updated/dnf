@@ -1,11 +1,11 @@
 # default dependencies
-%global hawkey_version 0.37.0
+%global hawkey_version 0.39.1
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
 
 # conflicts
-%global conflicts_dnf_plugins_core_version 4.0.6
+%global conflicts_dnf_plugins_core_version 4.0.12
 %global conflicts_dnf_plugins_extras_version 4.0.4
 %global conflicts_dnfdaemon_version 0.3.19
 
@@ -81,18 +81,13 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.2.15
-Release:        2%{?dist}
+Version:        4.2.17
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
-# Temporary patch until revert is merged upstream, the fix has to be reverted because it break API
-Patch0002:      0002-Revert-Fix-messages-for-starting-and-failing-scriptlets.patch
-# Temporary patch until fix is newly released
-Patch0003:      0003-Fix-misplaced-parenthesis.patch
-
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -515,6 +510,26 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Fri Nov 29 2019 Ales Matej <amatej@redhat.com> - 4.2.17-1
+- Enable versionlock for check-update command (RhBug:1750620)
+- Add error message when no active modules matched (RhBug:1696204)
+- Log mirror failures as warning when repo load fails (RhBug:1713627)
+- dnf-automatic: Change all systemd timers to a fixed time of day (RhBug:1754609)
+- DNF can use config from the remote location (RhBug:1721091)
+- [doc] update reference to plugin documentation (RhBug:1706386)
+- [yum compatibility] Report all packages in repoinfo
+- [doc] Add definition of active/inactive module stream
+- repoquery: Add a switch to disable modular excludes
+- Report more informative messages when no match for argument (RhBug:1709563)
+- [doc] Add description of excludes in dnf
+- Report more descriptive message when removed package is excluded
+- Add module repoquery command
+- Fix assumptions about ARMv8 and the way the rpm features work (RhBug:1691430)
+- Add Requires information into module info commands
+- Enhance inheritance of transaction reasons (RhBug:1672618,1769788)
+- Make DNF compatible with FIPS mode (RhBug:1762032)
+- Return always alphabetically sorted modular profiles
+
 * Tue Nov 12 2019 Ales Matej <amatej@redhat.com> - 4.2.15-2
 - Revert: Fix messages for starting and failing scriptlets (RhBug:1724779)
 - Fix traceback when trying to install package with fileconflict
