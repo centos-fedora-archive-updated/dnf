@@ -1,5 +1,5 @@
 # default dependencies
-%global hawkey_version 0.39.1
+%global hawkey_version 0.41.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
@@ -81,7 +81,7 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.2.17
+Version:        4.2.18
 Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
@@ -277,7 +277,7 @@ mkdir build-py3
 %build
 %if %{with python2}
     pushd build-py2
-    %cmake .. -DPYTHON_DESIRED:FILEPATH=%{__python2}
+    %cmake .. -DPYTHON_DESIRED:FILEPATH=%{__python2} -DDNF_VERSION=%{version}
     %make_build
     make doc-man
     popd
@@ -285,7 +285,7 @@ mkdir build-py3
 
 %if %{with python3}
     pushd build-py3
-    %cmake .. -DPYTHON_DESIRED:FILEPATH=%{__python3}
+    %cmake .. -DPYTHON_DESIRED:FILEPATH=%{__python3} -DDNF_VERSION=%{version}
     %make_build
     make doc-man
     popd
@@ -513,6 +513,24 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Wed Jan 15 2020 Aleš Matěj <amatej@redhat.com> - 4.2.18-1
+- [doc] Remove note about user-agent whitelist
+- Do a substitution of variables in repo_id (RhBug:1748841)
+- Respect order of config files in aliases.d (RhBug:1680489)
+- Unify downgrade exit codes with upgrade (RhBug:1759847)
+- Improve help for 'dnf module' command (RhBug:1758447)
+- Add shell restriction for local packages (RhBug:1773483)
+- Fix detection of the latest module (RhBug:1781769)
+- Document the retries config option only works for packages (RhBug:1783041)
+- Sort packages in transaction output by nevra (RhBug:1773436)
+- Honor repo priority with check-update (RhBug:1769466)
+- Strip '\' from aliases when processing (RhBug:1680482)
+- Print the whole alias definition in case of infinite recursion (RhBug:1680488)
+- Add support of commandline packages by repoquery (RhBug:1784148)
+- Running with tsflags=test doesn't update log files
+- Restore functionality of remove --oldinstallonly
+- Allow disabling individual aliases config files (RhBug:1680566)
+
 * Fri Nov 29 2019 Ales Matej <amatej@redhat.com> - 4.2.17-1
 - Enable versionlock for check-update command (RhBug:1750620)
 - Add error message when no active modules matched (RhBug:1696204)

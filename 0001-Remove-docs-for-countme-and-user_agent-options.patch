@@ -1,14 +1,14 @@
-From 1103224b6a243bcd743511a1244b1d9664aa412c Mon Sep 17 00:00:00 2001
-From: Pavla Kratochvilova <pkratoch@redhat.com>
-Date: Mon, 11 Nov 2019 09:10:40 +0100
+From 8f0b28905f0483585cddb6e3e0e4773190fe28f8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ale=C5=A1=20Mat=C4=9Bj?= <amatej@redhat.com>
+Date: Wed, 15 Jan 2020 14:59:16 +0100
 Subject: [PATCH] Remove docs for countme and user_agent options
 
 ---
- doc/conf_ref.rst | 43 -------------------------------------------
- 1 file changed, 43 deletions(-)
+ doc/conf_ref.rst | 38 --------------------------------------
+ 1 file changed, 38 deletions(-)
 
 diff --git a/doc/conf_ref.rst b/doc/conf_ref.rst
-index d3ea11d..61839cd 100644
+index 19683ac9..0e6082d9 100644
 --- a/doc/conf_ref.rst
 +++ b/doc/conf_ref.rst
 @@ -553,29 +553,6 @@ configuration.
@@ -41,7 +41,7 @@ index d3ea11d..61839cd 100644
  .. _deltarpm-label:
  
  ``deltarpm``
-@@ -791,26 +768,6 @@ configuration.
+@@ -794,21 +771,6 @@ configuration.
  
      The username to use for connecting to repo with basic HTTP authentication. Empty by default.
  
@@ -60,14 +60,9 @@ index d3ea11d..61839cd 100644
 -
 -        libdnf (Fedora 31; server; Linux.x86_64)
 -
--    To avoid leaking identifiable data, the variant in the above string will be
--    replaced by "generic" if the value is not an official Fedora variant.
--    Likewise, the whole OS part (enclosed in parenthesis) will be omitted if
--    this is a non-Fedora system.
--
  =================
  Types of Options
  =================
---
-libgit2 0.28.2
+-- 
+2.24.1
 
