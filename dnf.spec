@@ -1,5 +1,5 @@
 # default dependencies
-%global hawkey_version 0.41.0
+%global hawkey_version 0.45.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
@@ -81,8 +81,8 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.2.18
-Release:        2%{?dist}
+Version:        4.2.19
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -195,9 +195,6 @@ Requires:       %{name}-data = %{version}-%{release}
 Recommends:     deltarpm
 Recommends:     python2-unbound
 %endif
-%if 0%{?centos}
-Requires:       deltarpm
-%endif
 Requires:       python2-hawkey >= %{hawkey_version}
 Requires:       python2-libdnf >= %{hawkey_version}
 Requires:       python2-libcomps >= %{libcomps_version}
@@ -234,9 +231,6 @@ Requires:       python3-gpg
 Requires:       %{name}-data = %{version}-%{release}
 %if 0%{?fedora}
 Recommends:     deltarpm
-%endif
-%if 0%{?centos}
-Requires:       deltarpm
 %endif
 Requires:       python3-hawkey >= %{hawkey_version}
 Requires:       python3-libdnf >= %{hawkey_version}
@@ -510,6 +504,22 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Mon Feb 24 2020 Aleš Matěj <amatej@redhat.com> - 4.2.19-1
+- List arguments: only first empty value is used (RhBug:1788154)
+- Report missing profiles or default as broken module (RhBug:1790967)
+- repoquery: fix rich deps matching by using provide expansion from libdnf (RhBug:1534123)
+- [documentation] repoquery --what* with  multiple arguments (RhBug:1790262)
+- Format history table to use actual terminal width (RhBug:1786316)
+- Update `dnf alias` documentation
+- Handle custom exceptions from libdnf
+- Fix _skipped_packages to return only skipped (RhBug:1774617)
+- Add setter for tsi.reason
+- Add new hook for commands: Run_resolved
+- Add doc entry: include url (RhBug 1786072)
+- Clean also .yaml repository metadata
+- New API function base.setup_loggers() (RhBug:1788212)
+- Use WantedBy=timers.target for all dnf timers (RhBug:1798475)
+
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.18-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
