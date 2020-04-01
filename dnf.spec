@@ -1,5 +1,5 @@
 # default dependencies
-%global hawkey_version 0.41.0
+%global hawkey_version 0.46.2
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
@@ -81,7 +81,7 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.2.18
+Version:        4.2.21
 Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
@@ -193,10 +193,8 @@ Requires:       python2-enum34
 Requires:       %{name}-data = %{version}-%{release}
 %if 0%{?fedora}
 Recommends:     deltarpm
+# required for DNSSEC main.gpgkey_dns_verification https://dnf.readthedocs.io/en/latest/conf_ref.html
 Recommends:     python2-unbound
-%endif
-%if 0%{?centos}
-Requires:       deltarpm
 %endif
 Requires:       python2-hawkey >= %{hawkey_version}
 Requires:       python2-libdnf >= %{hawkey_version}
@@ -235,15 +233,13 @@ Requires:       %{name}-data = %{version}-%{release}
 %if 0%{?fedora}
 Recommends:     deltarpm
 %endif
-%if 0%{?centos}
-Requires:       deltarpm
-%endif
 Requires:       python3-hawkey >= %{hawkey_version}
 Requires:       python3-libdnf >= %{hawkey_version}
 Requires:       python3-libcomps >= %{libcomps_version}
 Requires:       python3-libdnf
 BuildRequires:  python3-rpm >= %{rpm_version}
 Requires:       python3-rpm >= %{rpm_version}
+# required for DNSSEC main.gpgkey_dns_verification https://dnf.readthedocs.io/en/latest/conf_ref.html
 Recommends:     python3-unbound
 %if 0%{?rhel} && 0%{?rhel} <= 7
 Requires:       rpm-plugin-systemd-inhibit
@@ -510,6 +506,36 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Wed Apr 01 2020 Aleš Matěj <amatej@redhat.com> - 4.2.21-1
+- Update to 4.2.21
+- Fix completion helper if solv files not in roon cache (RhBug:1714376)
+- Add bash completion for 'dnf module' (RhBug:1565614)
+- Check command no longer reports  missing %pre and %post deps (RhBug:1543449)
+- Check if arguments can be encoded in 'utf-8'
+- [doc] Remove incorrect information about includepkgs (RhBug:1813460)
+- Fix crash with "dnf -d 6 repolist" (RhBug:1812682)
+- Do not print the first empty line for repoinfo
+- Redirect logger and repo download progress when --verbose
+- Respect repo priority when listing packages (RhBug:1800342)
+- [doc] Document that list and info commands respect repo priority
+- [repoquery] Do not protect running kernel for --unsafisfied (RhBug:1750745)
+- Remove misleading green color from the "broken dependencies" lines (RhBug:1814192)
+- [doc] Document color options
+- List arguments: only first empty value is used (RhBug:1788154)
+- Report missing profiles or default as broken module (RhBug:1790967)
+- repoquery: fix rich deps matching by using provide expansion from libdnf (RhBug:1534123)
+- [documentation] repoquery --what* with  multiple arguments (RhBug:1790262)
+- Format history table to use actual terminal width (RhBug:1786316)
+- Update `dnf alias` documentation
+- Handle custom exceptions from libdnf
+- Fix _skipped_packages to return only skipped (RhBug:1774617)
+- Add setter for tsi.reason
+- Add new hook for commands: Run_resolved
+- Add doc entry: include url (RhBug 1786072)
+- Clean also .yaml repository metadata
+- New API function base.setup_loggers() (RhBug:1788212)
+- Use WantedBy=timers.target for all dnf timers (RhBug:1798475)
+
 * Wed Jan 15 2020 Aleš Matěj <amatej@redhat.com> - 4.2.18-1
 - [doc] Remove note about user-agent whitelist
 - Do a substitution of variables in repo_id (RhBug:1748841)
