@@ -82,7 +82,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.21
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -135,10 +135,11 @@ Provides:       dnf-command(search)
 Provides:       dnf-command(updateinfo)
 Provides:       dnf-command(upgrade)
 Provides:       dnf-command(upgrade-to)
+Recommends:     dnf-command(system-upgrade)
 Conflicts:      python2-dnf-plugins-core < %{conflicts_dnf_plugins_core_version}
 Conflicts:      python3-dnf-plugins-core < %{conflicts_dnf_plugins_core_version}
-Conflicts:      python2-dnf-plugins-extras < %{conflicts_dnf_plugins_extras_version}
-Conflicts:      python3-dnf-plugins-extras < %{conflicts_dnf_plugins_extras_version}
+Conflicts:      python2-dnf-plugins-extras-common < %{conflicts_dnf_plugins_extras_version}
+Conflicts:      python3-dnf-plugins-extras-common < %{conflicts_dnf_plugins_extras_version}
 
 %description
 %{pkg_description}
@@ -506,6 +507,10 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Fri Apr 24 2020 Stephen Gallagher <sgallagh@redhat.com> - 4.2.21-2
+- Add Recommends: on dnf-command(system-upgrade)
+- Fix up Conflicts: on python3-dnf-plugins-extras so it actually works
+
 * Wed Apr 01 2020 Aleš Matěj <amatej@redhat.com> - 4.2.21-1
 - Update to 4.2.21
 - Fix completion helper if solv files not in roon cache (RhBug:1714376)
