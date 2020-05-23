@@ -82,7 +82,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.2.21
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -506,6 +506,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Sat May 23 2020 Miro Hrončok <mhroncok@redhat.com> - 4.2.21-2
+- Rebuilt for Python 3.9
+
 * Wed Apr 01 2020 Aleš Matěj <amatej@redhat.com> - 4.2.21-1
 - Update to 4.2.21
 - Fix completion helper if solv files not in roon cache (RhBug:1714376)
