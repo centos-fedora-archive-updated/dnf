@@ -1,11 +1,11 @@
 # default dependencies
-%global hawkey_version 0.46.2
+%global hawkey_version 0.48.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
 
 # conflicts
-%global conflicts_dnf_plugins_core_version 4.0.12
+%global conflicts_dnf_plugins_core_version 4.0.16
 %global conflicts_dnf_plugins_extras_version 4.0.4
 %global conflicts_dnfdaemon_version 0.3.19
 
@@ -81,8 +81,8 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.2.21
-Release:        2%{?dist}
+Version:        4.2.23
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -137,8 +137,8 @@ Provides:       dnf-command(upgrade)
 Provides:       dnf-command(upgrade-to)
 Conflicts:      python2-dnf-plugins-core < %{conflicts_dnf_plugins_core_version}
 Conflicts:      python3-dnf-plugins-core < %{conflicts_dnf_plugins_core_version}
-Conflicts:      python2-dnf-plugins-extras < %{conflicts_dnf_plugins_extras_version}
-Conflicts:      python3-dnf-plugins-extras < %{conflicts_dnf_plugins_extras_version}
+Conflicts:      python2-dnf-plugins-extras-common < %{conflicts_dnf_plugins_extras_version}
+Conflicts:      python3-dnf-plugins-extras-common < %{conflicts_dnf_plugins_extras_version}
 
 %description
 %{pkg_description}
@@ -506,6 +506,21 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Tue Jun 02 2020 Nicola Sella <nsella@redhat.com> - 4.2.23-1
+- Fix behavior of install-n, autoremove-n, remove-n, repoquery-n
+- Fix behavior of localinstall and list-updateinfo aliases
+- Add updated field to verbose output of updateinfo list (RhBug: 1801092)
+- Add comment option to transaction (RhBug:1773679)
+- Add new API for handling gpg signatures (RhBug:1339617)
+- Verify GPG signatures when running dnf-automatic (RhBug:1793298)
+- Fix up Conflicts: on python-dnf-plugins-extras
+- [doc] Move yum-plugin-post-transaction-actions to dnf-plugins-core
+- Remove args "--set-enabled", "--set-disabled" from DNF (RhBug:1727882)
+- Search command is now alphabetical (RhBug:1811802)
+- Fix downloading packages with full URL as their location
+- repo: catch libdnf.error.Error in addition to RuntimeError in load() (RhBug:1788182)
+- History table to max size when redirect to file (RhBug:1786335,1786316)
+
 * Sat May 23 2020 Miro Hrončok <mhroncok@redhat.com> - 4.2.21-2
 - Rebuilt for Python 3.9
 
