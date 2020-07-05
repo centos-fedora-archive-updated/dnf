@@ -1,3 +1,6 @@
+# Always build out-of-source
+%undefine __cmake_in_source_build
+
 # default dependencies
 %global hawkey_version 0.48.0
 %global libcomps_version 0.1.8
