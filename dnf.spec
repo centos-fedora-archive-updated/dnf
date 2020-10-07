@@ -84,8 +84,8 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.2.23
-Release:        2%{?dist}
+Version:        4.4.0
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+ and GPLv2 and GPL
@@ -400,6 +400,7 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %{_mandir}/man8/%{name}.8*
 %{_mandir}/man8/yum2dnf.8*
 %{_mandir}/man7/dnf.modularity.7*
+%{_mandir}/man5/dnf-transaction-json.5*
 %{_unitdir}/%{name}-makecache.service
 %{_unitdir}/%{name}-makecache.timer
 %{_var}/cache/%{name}/
@@ -501,6 +502,33 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Wed Oct 07 2020 Nicola Sella <nsella@redhat.com> - 4.4.0-1
+- Update to 4.4.0
+- Handle empty comps group name (RhBug:1826198)
+- Remove dead history info code (RhBug:1845800)
+- Improve command emmitter in dnf-automatic
+- Enhance --querytags and --qf help output
+- [history] add option --reverse to history list (RhBug:1846692)
+- Add logfilelevel configuration (RhBug:1802074)
+- Don't turn off stdout/stderr logging longer than necessary (RhBug:1843280)
+- Mention the date/time that updates were applied
+- [dnf-automatic] Wait for internet connection (RhBug:1816308)
+- [doc] Enhance repo variables documentation (RhBug:1848161,1848615)
+- Add librepo logger for handling messages from librepo (RhBug:1816573)
+- [doc] Add package-name-spec to the list of possible specs
+- [doc] Do not use <package-nevr-spec>
+- [doc] Add section to explain -n, -na and -nevra suffixes
+- Add alias 'ls' for list command
+- README: Reference Fedora Weblate instead of Zanata
+- remove log_lock.pid after reboot(Rhbug:1863006)
+- comps: Raise CompsError when removing a non-existent group
+- Add methods for working with comps to RPMTransactionItemWrapper
+- Implement storing and replaying a transaction
+- Log failure to access last makecache time as warning
+- [doc] Document Substitutions class
+- Dont document removed attribute ``reports`` for get_best_selector
+- Change the debug log timestamps from UTC to local time
+
 * Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.23-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
