@@ -2,7 +2,7 @@
 %undefine __cmake_in_source_build
 
 # default dependencies
-%global hawkey_version 0.48.0
+%global hawkey_version 0.54.1
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
@@ -85,10 +85,10 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.4.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
-License:        GPLv2+ and GPLv2 and GPL
+License:        GPLv2+
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
@@ -502,6 +502,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Tue Oct 13 2020 Ales Matej <amatej@redhat.com> - 4.4.0-2
+- Increase required libdnf (hawkey) version
+
 * Wed Oct 07 2020 Nicola Sella <nsella@redhat.com> - 4.4.0-1
 - Update to 4.4.0
 - Handle empty comps group name (RhBug:1826198)
