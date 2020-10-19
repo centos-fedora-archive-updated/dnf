@@ -82,7 +82,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.4.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+
@@ -507,6 +507,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Mon Oct 19 2020 Ales Matej <amatej@redhat.com> - 4.4.0-3
+- Rebuild to fix Fedora lower version caused by pushing older bodhi update later
+
 * Tue Oct 13 2020 Ales Matej <amatej@redhat.com> - 4.4.0-2
 - Increase required libdnf (hawkey) version
 
