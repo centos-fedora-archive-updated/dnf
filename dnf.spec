@@ -1,5 +1,5 @@
 # default dependencies
-%global hawkey_version 0.54.1
+%global hawkey_version 0.54.4
 %global libcomps_version 0.1.8
 %global libmodulemd_version 1.4.0
 %global rpm_version 4.14.0
@@ -81,8 +81,8 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.4.0
-Release:        3%{?dist}
+Version:        4.4.2
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+
@@ -507,6 +507,14 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Thu Nov 26 2020 Nicola Sella <nsella@redhat.com> - 4.4.2-1
+- Update to 4.4.2
+- spec: Fix building with new cmake macros (backport from downstream)
+- Warn about key retrieval over http:
+- Fix --setopt=cachedir writing outside of installroot
+- Add vendor to dnf API (RhBug:1876561)
+- Add allow_vendor_change option (RhBug:1788371) (RhBug:1788371)
+
 * Mon Oct 19 2020 Ales Matej <amatej@redhat.com> - 4.4.0-3
 - Rebuild to fix Fedora lower version caused by pushing older bodhi update later
 
