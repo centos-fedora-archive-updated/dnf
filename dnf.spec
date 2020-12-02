@@ -1,7 +1,7 @@
 # default dependencies
-%global hawkey_version 0.54.4
+%global hawkey_version 0.55.1
 %global libcomps_version 0.1.8
-%global libmodulemd_version 1.4.0
+%global libmodulemd_version 2.9.3
 %global rpm_version 4.14.0
 
 # conflicts
@@ -81,7 +81,7 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.4.2
+Version:        4.5.1
 Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
@@ -507,6 +507,17 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
 %changelog
+* Wed Dec 02 2020 Nicola Sella <nsella@redhat.com> - 4.5.1-1
+- Add a get_current() method to SwdbInterface
+- Add `from_repo` attribute for Package class (RhBug:1898968,1879168)
+- Correct description of Package().reponane attribute
+- Add unittest for new API
+- Make rotated log file (mode, owner, group) match previous log settings (RhBug:1894344)
+- [doc] Improve description of modular filtering
+- [doc] add documentation for from_repo
+- [doc] deprecated alias for dnf repoquery --deplist <deplist_option-label>
+- New config option module_allow_stream_switch allows switching enabled streams
+
 * Thu Nov 26 2020 Nicola Sella <nsella@redhat.com> - 4.4.2-1
 - Update to 4.4.2
 - spec: Fix building with new cmake macros (backport from downstream)
