@@ -1,11 +1,8 @@
 # Always build out-of-source
-%if (0%{?fedora} && 0%{?fedora} <= 32) || 0%{?rhel}
-%else
-    %undefine __cmake_in_source_build
-%endif
+%define __cmake_in_source_build 1
 
 # default dependencies
-%global hawkey_version 0.57.0
+%global hawkey_version 0.59.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 2.9.3
 %global rpm_version 4.14.0
@@ -68,7 +65,7 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.6.0
+Version:        4.6.1
 Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
@@ -143,7 +140,6 @@ Conflicts:      yum < 3.4.3-505
 %description -n %{yum_subpackage_name}
 %{pkg_description}
 
-
 %package -n python3-%{name}
 Summary:        Python 3 interface to DNF
 %{?python_provide:%python_provide python3-%{name}}
@@ -190,35 +186,22 @@ Systemd units that can periodically download package upgrades and apply them.
 
 %prep
 %autosetup -p1
-%if (0%{?fedora} && 0%{?fedora} <= 32) || 0%{?rhel}
-    mkdir build-py3
-%endif
+
+mkdir build-py3
 
 %build
 
-%if (0%{?fedora} && 0%{?fedora} <= 32) || 0%{?rhel}
-    pushd build-py3
-    %cmake .. -DPYTHON_DESIRED:FILEPATH=%{__python3} -DDNF_VERSION=%{version}
-    %make_build
-    make doc-man
-    popd
-%else
-    %global _vpath_builddir build-py3
-    %cmake -DPYTHON_DESIRED:FILEPATH=%{__python3} -DDNF_VERSION=%{version}
-    %cmake_build
-    %cmake_build --target doc-man
-%endif
+pushd build-py3
+%cmake .. -DPYTHON_DESIRED:FILEPATH=%{__python3} -DDNF_VERSION=%{version}
+%make_build
+make doc-man
+popd
 
 %install
 
-%if (0%{?fedora} && 0%{?fedora} <= 32) || 0%{?rhel}
-    pushd build-py3
-    %make_install
-    popd
-%else
-    %global _vpath_builddir build-py3
-    %cmake_install
-%endif
+pushd build-py3
+%make_install
+popd
 
 %find_lang %{name}
 mkdir -p %{buildroot}%{confdir}/vars
@@ -254,14 +237,9 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 
 %check
 
-%if (0%{?fedora} && 0%{?fedora} <= 32) || 0%{?rhel}
-    pushd build-py3
-    ctest -VV
-    popd
-%else
-    %global _vpath_builddir build-py3
-    %ctest
-%endif
+pushd build-py3
+ctest -VV
+popd
 
 
 %post
@@ -393,6 +371,25 @@ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Tue Mar 02 2021 Nicola Sella <nsella@redhat.com> - 4.6.1-1
+- Update to 4.6.1
+- Fix recreate script
+- Add unit test for fill_sack_from_repos_in_cache (RhBug:1865803)
+- Add docs and examples for fill_sack_from_repos_in_cache (RhBug:1865803)
+- [spec] remove python2 support
+- Remove problematic language
+- The noroot plugin no longer exists, remove mention
+- Run tests for fill_sack_from_repos_in_cache in installroot (RhBug:1865803)
+- expand history to full term size when output is redirected (RhBug:1852577) (RhBug:1852577,1906970)
+- [doc] Fix: "sslcacert" contains path to the file
+- [doc] Added proxy ssl configuration options, increase libdnf require
+- Set persistdir and substitutions for fill_sack_from_repos_in_cache tests (RhBug:1865803)
+- Update documentation for module_obsoletes and module_stream_switch
+- print additional information when verifying GPG key using DNS
+- Bugs fixed (RhBug:1897573)
+- Remove hardcoded logfile permissions (RhBug:1910084)
+- Enhanced detection of plugins removed in transaction (RhBug:1929163)
+
 * Mon Mar 01 2021 Nicola Sella <nsella@redhat.com> - 4.6.0-1
 - Update to 4.6.0
 - Log scriptlets output also for API users (RhBug:1847340)
