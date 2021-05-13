@@ -2,13 +2,13 @@
 %define __cmake_in_source_build 1
 
 # default dependencies
-%global hawkey_version 0.59.0
+%global hawkey_version 0.61.1
 %global libcomps_version 0.1.8
 %global libmodulemd_version 2.9.3
 %global rpm_version 4.14.0
 
 # conflicts
-%global conflicts_dnf_plugins_core_version 4.0.16
+%global conflicts_dnf_plugins_core_version 4.0.20
 %global conflicts_dnf_plugins_extras_version 4.0.4
 %global conflicts_dnfdaemon_version 0.3.19
 
@@ -65,7 +65,7 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.6.1
+Version:        4.7.0
 Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
@@ -150,7 +150,6 @@ BuildRequires:  python3-libcomps >= %{libcomps_version}
 BuildRequires:  python3-libdnf
 BuildRequires:  libmodulemd >= %{libmodulemd_version}
 Requires:       libmodulemd >= %{libmodulemd_version}
-BuildRequires:  python3-nose
 BuildRequires:  python3-gpg
 Requires:       python3-gpg
 Requires:       %{name}-data = %{version}-%{release}
@@ -371,6 +370,26 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Thu May 13 2021 Nicola Sella <nsella@redhat.com> - 4.7.0-1
+- Update to 4.7.0
+- Improve repo config path ordering to fix a comps merging issue (RhBug:1928181)
+- Keep reason when package is removed (RhBug:1921063)
+- Improve mechanism for application of security filters (RhBug:1918475)
+- [doc] Add description for new API
+- [API] Add new method for reset of security filters
+- [doc] Improve documentation for Hotfix repositories
+- [doc] fix: "makecache" command downloads only enabled repositories
+- Use libdnf.utils.checksum_{check,value}
+- [doc] Add info that maximum parallel downloads is 20
+- Increase loglevel in case of invalid config options
+- [doc] installonly_limit documentation follows behavior
+- Prevent traceback (catch ValueError) if pkg is from cmdline
+- Add documentation for config option sslverifystatus (RhBug:1814383)
+- Check for specific key string when verifing signatures (RhBug:1915990)
+- Use rpmkeys binary to verify package signature (RhBug:1915990)
+- Bugs fixed (RhBug:1916783)
+- Preserve file mode during log rotation (RhBug:1910084)
+
 * Tue Mar 02 2021 Nicola Sella <nsella@redhat.com> - 4.6.1-1
 - Update to 4.6.1
 - Fix recreate script
