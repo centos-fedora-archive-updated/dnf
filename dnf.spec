@@ -66,7 +66,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.7.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+
@@ -361,6 +361,9 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Thu Jun 03 2021 Python Maint <python-maint@redhat.com> - 4.7.0-2
+- Rebuilt for Python 3.10
+
 * Thu Apr 15 2021 Nicola Sella <nsella@redhat.com> - 4.7.0-1
 - Improve repo config path ordering to fix a comps merging issue (RhBug:1928181)
 - Keep reason when package is removed (RhBug:1921063)
