@@ -65,8 +65,8 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.7.0
-Release:        2%{?dist}
+Version:        4.8.0
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+
@@ -361,6 +361,17 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Tue Jun 15 2021 Pavla Kratochvilova <pkratoch@redhat.com> - 4.8.0-1
+- Update to 4.8.0
+- Do not assume that a remote rpm is complete if present
+- Use positive percentage for "Failed delta RPMs" message
+- Remove redundant new line in Groups output
+- Format empty group names outputs to <name-unset>
+- [doc] Document default colors
+- Use rpmkeys alone to verify signature
+- Add dnf.error message to explain rpm.error traceback when package not found after resolving a transaction (RhBug:1815327,1887293,1909845)
+- Bugs fixed (RhBug:1946975,1955309)
+
 * Thu Jun 03 2021 Python Maint <python-maint@redhat.com> - 4.7.0-2
 - Rebuilt for Python 3.10
 
