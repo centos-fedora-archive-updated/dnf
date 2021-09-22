@@ -1,0 +1,37 @@
+From 7800d565c36cb75c16597f9292d047a981aa3ca3 Mon Sep 17 00:00:00 2001
+From: Petr Viktorin <pviktori@redhat.com>
+Date: Fri, 2 Jul 2021 13:57:44 +0200
+Subject: [PATCH] Determine the PLUGINPATH at configure time, rather than
+ runtime
+
+The sysconfig.get_path() function should be used to determine where
+files *should* be installed, not necessarily where they *have* been
+installed.
+For DNF specifically, these locations might differ, since system
+packages (RPMs) might use different locations than packages installed
+by tools like pip, setuptools and distutils.
+---
+ dnf/const.py.in | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/dnf/const.py.in b/dnf/const.py.in
+index 5c1fef0fd5..bcadc80410 100644
+--- a/dnf/const.py.in
++++ b/dnf/const.py.in
+@@ -19,7 +19,6 @@
+ #
+ 
+ from __future__ import unicode_literals
+-import sysconfig
+ 
+ CONF_FILENAME='/etc/dnf/dnf.conf' # :api
+ CONF_AUTOMATIC_FILENAME='/etc/dnf/automatic.conf'
+@@ -50,7 +49,7 @@ VERBOSE_LEVEL=6
+ PREFIX=NAME.lower()
+ PROGRAM_NAME=NAME.lower()  # Deprecated - no longer used, Argparser prints program name based on sys.argv
+ PLUGINCONFPATH = '/etc/dnf/plugins'  # :api
+-PLUGINPATH = '%s/dnf-plugins' % sysconfig.get_path('purelib')
++PLUGINPATH = '@PYTHON_INSTALL_DIR@/dnf-plugins'
+ VERSION='@DNF_VERSION@'
+ USER_AGENT = "dnf/%s" % VERSION
+ 

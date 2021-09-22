@@ -66,12 +66,17 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.8.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+
+# Determine the default plugin path at configure time, rather than runtime
+# Merged upstream, part of 4.9.0
+Patch1782:      %{url}/pull/1782.patch
+
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -361,6 +366,9 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Wed Sep 22 2021 Miro Hrončok <mhroncok@redhat.com> - 4.8.0-3
+- Determine the default plugin path at configure time, rather than runtime
+
 * Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.8.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
