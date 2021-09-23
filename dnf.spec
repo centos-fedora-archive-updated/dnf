@@ -2,7 +2,7 @@
 %define __cmake_in_source_build 1
 
 # default dependencies
-%global hawkey_version 0.61.1
+%global hawkey_version 0.64.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 2.9.3
 %global rpm_version 4.14.0
@@ -65,8 +65,8 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.8.0
-Release:        2%{?dist}
+Version:        4.9.0
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+
@@ -361,6 +361,14 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Thu Sep 23 2021 Pavla Kratochvilova <pkratoch@redhat.com> - 4.9.0-1
+- Update to 4.9.0
+- [API] Add method "set_or_append_opt_value" to BaseConfig (RhBug:1967925)
+- Add aliases for commands: info, updateinfo, provides (RhBug:1938333)
+- Add report about demodularized rpms into module info (RhBug:1805260)
+- Remove DNSSEC errors on COPR group email keys
+- Documentation inprovements - bugs: 1938352, 1993899, 1963704
+
 * Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.8.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
