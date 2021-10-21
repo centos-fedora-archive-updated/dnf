@@ -2,7 +2,7 @@
 %define __cmake_in_source_build 1
 
 # default dependencies
-%global hawkey_version 0.64.0
+%global hawkey_version 0.65.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 2.9.3
 %global rpm_version 4.14.0
@@ -65,7 +65,7 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.9.0
+Version:        4.11.0
 Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
@@ -85,7 +85,6 @@ Requires:       python-dbus
 Requires:       %{_bindir}/sqlite3
 %else
 Recommends:     (python3-dbus if NetworkManager)
-Recommends:     (%{_bindir}/sqlite3 if bash-completion)
 %endif
 Provides:       dnf-command(alias)
 Provides:       dnf-command(autoremove)
@@ -128,13 +127,12 @@ Common data and configuration files for DNF
 %package -n %{yum_subpackage_name}
 Requires:       %{name} = %{version}-%{release}
 Summary:        %{pkg_summary}
-%if 0%{?fedora}
-%if 0%{?fedora} >= 31
+
+%if 0%{?fedora} && 0%{?fedora} < 31
+Conflicts:      yum < 3.4.3-505
+%else
 Provides:       %{name}-yum = %{version}-%{release}
 Obsoletes:      %{name}-yum < 5
-%else
-Conflicts:      yum < 3.4.3-505
-%endif
 %endif
 
 %description -n %{yum_subpackage_name}
@@ -155,6 +153,8 @@ Requires:       python3-gpg
 Requires:       %{name}-data = %{version}-%{release}
 %if 0%{?fedora}
 Recommends:     deltarpm
+# required for DNSSEC main.gpgkey_dns_verification https://dnf.readthedocs.io/en/latest/conf_ref.html
+Recommends:     python3-unbound
 %endif
 Requires:       python3-hawkey >= %{hawkey_version}
 Requires:       python3-libdnf >= %{hawkey_version}
@@ -162,12 +162,10 @@ Requires:       python3-libcomps >= %{libcomps_version}
 Requires:       python3-libdnf
 BuildRequires:  python3-rpm >= %{rpm_version}
 Requires:       python3-rpm >= %{rpm_version}
-# required for DNSSEC main.gpgkey_dns_verification https://dnf.readthedocs.io/en/latest/conf_ref.html
-Recommends:     python3-unbound
 %if 0%{?rhel} && 0%{?rhel} <= 7
 Requires:       rpm-plugin-systemd-inhibit
 %else
-Recommends:     rpm-plugin-systemd-inhibit
+Recommends:     (rpm-plugin-systemd-inhibit if systemd)
 %endif
 
 %description -n python3-%{name}
@@ -361,6 +359,28 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Mon Mar 14 2022 Pavla Kratochvilova <pkratoch@redhat.com> - 4.11.0-1
+- Add support for excluding packages to be installed as weak dependencies, off by defaulf
+- Add fail_fast parameter to download_payloads methods for use in reposync
+- Acquire all relevant locks during "dnf clean"
+- API: Raise CompsError when group/env not found in install_group and install_environment (RhBug:1947958)
+- Allow destdir option with modulesync command
+- Add documentation for query api flags (RhBug:2035577)
+- Fix swap command to work with local rpm files correctly (RhBug:2036434)
+- Don't recommend %{_bindir}/sqlite3 for bash-completion (RhBug:1947925)
+- Recommend rpm-plugin-systemd-inhibit only if systemd (RhBug:1947924)
+- Fix regression in verifying signatures using rpmkeys
+- Use rpm.TransactionSet.dbCookie() to determining if rpmdb has changed (RhBug:2043476)
+- Fix decompression of groups.xml (RhBug:2030255)
+- Fix history undo on a Reason Change (RhBug:2010259,2053014)
+- Remove /usr/bin from sys.path to avoid accidentally importing garbage
+- Fix: Python dnf API does not respect cacheonly (RhBug:1862970)
+- Fix python3.11 build: remove deprecated, update traceback regex
+- fix dnf mark error when history sqlite missing
+- [doc] Improve description of multilib_policy=all (RhBug:1996681,1995630)
+- [doc] clarify effect of --enablerepo and --disablerepo options (RhBug:2031414)
+- [doc] default values for module_obsoletes and module_stream_switch (RhBug: 2051846)
+
 * Thu Sep 23 2021 Pavla Kratochvilova <pkratoch@redhat.com> - 4.9.0-1
 - Update to 4.9.0
 - [API] Add method "set_or_append_opt_value" to BaseConfig (RhBug:1967925)
