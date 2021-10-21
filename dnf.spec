@@ -2,7 +2,7 @@
 %define __cmake_in_source_build 1
 
 # default dependencies
-%global hawkey_version 0.64.0
+%global hawkey_version 0.65.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 2.9.3
 %global rpm_version 4.14.0
@@ -65,7 +65,7 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.9.0
+Version:        4.10.0
 Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
@@ -361,6 +361,14 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Thu Oct 21 2021 Pavla Kratochvilova <pkratoch@redhat.com> - 4.10.0-1
+- Update to 4.10.0
+- Add support for autodetecting packages to be excluded from being installed as weak dependencies (RhBug:1699672)
+- Add support for excluding packages to be installed as weak dependencies (RhBug:1699672)
+- Add fail_fast parameter to download_payloads methods for use in reposync
+- Acquire all relevant locks during "dnf clean"
+- API: Raise CompsError when group/env not found in install_group and install_environment (RhBug:1947958)
+
 * Thu Sep 23 2021 Pavla Kratochvilova <pkratoch@redhat.com> - 4.9.0-1
 - Update to 4.9.0
 - [API] Add method "set_or_append_opt_value" to BaseConfig (RhBug:1967925)
