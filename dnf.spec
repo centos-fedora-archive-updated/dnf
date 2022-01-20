@@ -66,7 +66,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.10.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+
@@ -361,6 +361,9 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.10.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
 * Thu Oct 21 2021 Pavla Kratochvilova <pkratoch@redhat.com> - 4.10.0-1
 - Update to 4.10.0
 - Add support for autodetecting packages to be excluded from being installed as weak dependencies (RhBug:1699672)
