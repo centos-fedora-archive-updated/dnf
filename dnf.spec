@@ -2,7 +2,7 @@
 %define __cmake_in_source_build 1
 
 # default dependencies
-%global hawkey_version 0.66.0
+%global hawkey_version 0.65.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 2.9.3
 %global rpm_version 4.14.0
@@ -66,7 +66,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.11.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+
@@ -359,6 +359,9 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Mon Mar 14 2022 Pavla Kratochvilova <pkratoch@redhat.com> - 4.11.0-2
+- Use older source to resolve interdependencies
+
 * Mon Mar 14 2022 Pavla Kratochvilova <pkratoch@redhat.com> - 4.11.0-1
 - Allow destdir option with modulesync command
 - Add documentation for query api flags (RhBug:2035577)
