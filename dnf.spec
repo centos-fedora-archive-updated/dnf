@@ -2,13 +2,13 @@
 %define __cmake_in_source_build 1
 
 # default dependencies
-%global hawkey_version 0.65.0
+%global hawkey_version 0.66.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 2.9.3
 %global rpm_version 4.14.0
 
 # conflicts
-%global conflicts_dnf_plugins_core_version 4.0.20
+%global conflicts_dnf_plugins_core_version 4.0.26
 %global conflicts_dnf_plugins_extras_version 4.0.4
 %global conflicts_dnfdaemon_version 0.3.19
 
@@ -65,7 +65,7 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.11.0
+Version:        4.11.1
 Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
@@ -359,6 +359,9 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Tue Mar 15 2022 Pavla Kratochvilova <pkratoch@redhat.com> - 4.11.1-1
+- Update to 4.11.1
+
 * Mon Mar 14 2022 Pavla Kratochvilova <pkratoch@redhat.com> - 4.11.0-1
 - Add support for excluding packages to be installed as weak dependencies, off by defaulf
 - Add fail_fast parameter to download_payloads methods for use in reposync
