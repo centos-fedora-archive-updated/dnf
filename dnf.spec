@@ -66,12 +66,13 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.11.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0001:      0001-Fix-processing-of-download-errors-RhBug-2024527.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -359,6 +360,9 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Wed Mar 30 2022 Jaroslav Rohel <jrohel@redhat.com> - 4.11.1-2
+- Backport patch to fix: dnf breaks updateprocess with "already downloaded" (RhBug:2024527)
+
 * Mon Mar 14 2022 Pavla Kratochvilova <pkratoch@redhat.com> - 4.11.1-1
 - Update to 4.11.1
 
