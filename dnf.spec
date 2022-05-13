@@ -66,7 +66,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.12.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+
@@ -74,7 +74,8 @@ URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 # Upstream commit which fixes leak of libsolv's page file descriptors.
 # https://github.com/rpm-software-management/dnf/commit/5ce5ed1ea08ad6e198c1c1642c4d9ea2db6eab86
-Patch0002:      0001-Base.reset-plug-temporary-leak-of-libsolv-s-page-fil.patch
+Patch0001:      0001-Base.reset-plug-temporary-leak-of-libsolv-s-page-fil.patch
+Patch0002:      0002-Don-t-use-undocumented-re.template.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -362,6 +363,9 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Fri May 13 2022 Marek Blaha <mblaha@redhat.com> - 4.12.0-2
+- Backport patch to not use re.template() deprecated in Python 3.11
+
 * Thu May 05 2022 Jaroslav Rohel <jrohel@redhat.com> - 4.12.0-1
 - Update to 4.12.0
 - dnf.conf: hint users where to find more info about defaults and other options
