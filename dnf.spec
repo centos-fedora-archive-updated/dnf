@@ -66,7 +66,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.13.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPLv2+
@@ -359,6 +359,9 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.13.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
 * Wed Jun 15 2022 Python Maint <python-maint@redhat.com> - 4.13.0-2
 - Rebuilt for Python 3.11
 
