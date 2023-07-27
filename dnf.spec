@@ -65,7 +65,7 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.15.1
+Version:        4.16.2
 Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
@@ -86,29 +86,6 @@ Requires:       %{_bindir}/sqlite3
 %else
 Recommends:     (python3-dbus if NetworkManager)
 %endif
-Provides:       dnf-command(alias)
-Provides:       dnf-command(autoremove)
-Provides:       dnf-command(check-update)
-Provides:       dnf-command(clean)
-Provides:       dnf-command(distro-sync)
-Provides:       dnf-command(downgrade)
-Provides:       dnf-command(group)
-Provides:       dnf-command(history)
-Provides:       dnf-command(info)
-Provides:       dnf-command(install)
-Provides:       dnf-command(list)
-Provides:       dnf-command(makecache)
-Provides:       dnf-command(mark)
-Provides:       dnf-command(provides)
-Provides:       dnf-command(reinstall)
-Provides:       dnf-command(remove)
-Provides:       dnf-command(repolist)
-Provides:       dnf-command(repoquery)
-Provides:       dnf-command(repository-packages)
-Provides:       dnf-command(search)
-Provides:       dnf-command(updateinfo)
-Provides:       dnf-command(upgrade)
-Provides:       dnf-command(upgrade-to)
 Conflicts:      python3-dnf-plugins-core < %{conflicts_dnf_plugins_core_version}
 Conflicts:      python3-dnf-plugins-extras-common < %{conflicts_dnf_plugins_extras_version}
 
@@ -118,6 +95,9 @@ Conflicts:      python3-dnf-plugins-extras-common < %{conflicts_dnf_plugins_extr
 %package data
 Summary:        Common data and configuration files for DNF
 Requires:       libreport-filesystem
+%if 0%{?fedora} > 38
+Requires:       /etc/dnf/dnf.conf
+%endif
 Obsoletes:      %{name}-conf <= %{version}-%{release}
 Provides:       %{name}-conf = %{version}-%{release}
 
@@ -167,6 +147,29 @@ Requires:       rpm-plugin-systemd-inhibit
 %else
 Recommends:     (rpm-plugin-systemd-inhibit if systemd)
 %endif
+Provides:       dnf-command(alias)
+Provides:       dnf-command(autoremove)
+Provides:       dnf-command(check-update)
+Provides:       dnf-command(clean)
+Provides:       dnf-command(distro-sync)
+Provides:       dnf-command(downgrade)
+Provides:       dnf-command(group)
+Provides:       dnf-command(history)
+Provides:       dnf-command(info)
+Provides:       dnf-command(install)
+Provides:       dnf-command(list)
+Provides:       dnf-command(makecache)
+Provides:       dnf-command(mark)
+Provides:       dnf-command(provides)
+Provides:       dnf-command(reinstall)
+Provides:       dnf-command(remove)
+Provides:       dnf-command(repolist)
+Provides:       dnf-command(repoquery)
+Provides:       dnf-command(repository-packages)
+Provides:       dnf-command(search)
+Provides:       dnf-command(updateinfo)
+Provides:       dnf-command(upgrade)
+Provides:       dnf-command(upgrade-to)
 
 %description -n python3-%{name}
 Python 3 interface to DNF.
@@ -174,7 +177,7 @@ Python 3 interface to DNF.
 %package automatic
 Summary:        %{pkg_summary} - automated upgrades
 BuildRequires:  systemd
-Requires:       %{name} = %{version}-%{release}
+Requires:       python3-%{name} = %{version}-%{release}
 %{?systemd_requires}
 
 %description automatic
@@ -211,6 +214,7 @@ mkdir -p %{buildroot}%{_localstatedir}/log/
 mkdir -p %{buildroot}%{_var}/cache/dnf/
 touch %{buildroot}%{_localstatedir}/log/%{name}.log
 ln -sr %{buildroot}%{_bindir}/dnf-3 %{buildroot}%{_bindir}/dnf
+ln -sr %{buildroot}%{_bindir}/dnf-3 %{buildroot}%{_bindir}/dnf4
 mv %{buildroot}%{_bindir}/dnf-automatic-3 %{buildroot}%{_bindir}/dnf-automatic
 rm -vf %{buildroot}%{_bindir}/dnf-automatic-*
 
@@ -231,6 +235,9 @@ ln -sr  %{buildroot}%{confdir}/protected.d %{buildroot}%{_sysconfdir}/yum/protec
 ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
 %endif
 
+%if 0%{?fedora} > 38
+rm %{buildroot}%{confdir}/%{name}.conf
+%endif
 
 %check
 
@@ -283,11 +290,16 @@ popd
 %dir %{confdir}/modules.d
 %dir %{confdir}/modules.defaults.d
 %dir %{pluginconfpath}
+%if 0%{?fedora} <= 38
 %dir %{confdir}/protected.d
 %dir %{confdir}/vars
+%endif
 %dir %{confdir}/aliases.d
 %exclude %{confdir}/aliases.d/zypper.conf
+%if 0%{?fedora} <= 38
 %config(noreplace) %{confdir}/%{name}.conf
+%endif
+
 # No longer using `noreplace` here. Older versions of DNF 4 marked `dnf` as a
 # protected package, but since Fedora 39, DNF needs to be able to update itself
 # to DNF 5, so we need to replace the old /etc/dnf/protected.d/dnf.conf.
@@ -347,6 +359,7 @@ popd
 
 %files -n python3-%{name}
 %{_bindir}/%{name}-3
+%{_bindir}/%{name}4
 %exclude %{python3_sitelib}/%{name}/automatic
 %{python3_sitelib}/%{name}/
 %dir %{py3pluginpath}
@@ -367,6 +380,21 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Thu Jul 27 2023 Nicola Sella <nsella@redhat.com> - 4.16.2-1
+- Update to 4.16.2
+- depend on /etc/dnf/dnf.conf, not libdnf5
+- Update repo metadata cache pattern to include zstd
+- Add provide exception handling
+- When parsing over a KVP list, do not return till the whole list is parsed
+- Provide /usr/bin/dnf4 symlink to /usr/bin/dnf-3
+- Document the symbols in the output of `dnf history list` (RhBug:2172067)
+- Update to 4.16.1
+- DNF5 should not deprecate DNF on Fedora 38
+- Update to 4.16.0
+- Remove ownership of dnf.conf, protected.d, vars
+- Add requirement of libdnf5 to dnf-data
+- dnf-automatic: require python3-dnf, not dnf
+
 * Thu May 18 2023 Jan Kolarik <jkolarik@redhat.com> - 4.15.1-1
 - Update to 4.15.1
 - automatic: Fix online detection with proxy (RhBug:2022440)
