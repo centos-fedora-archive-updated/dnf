@@ -2,10 +2,10 @@
 %define __cmake_in_source_build 1
 
 # default dependencies
-%global hawkey_version 0.66.0
+%global hawkey_version 0.71.0
 %global libcomps_version 0.1.8
 %global libmodulemd_version 2.9.3
-%global rpm_version 4.14.0
+%global rpm_version 4.18.0
 
 # conflicts
 %global conflicts_dnf_plugins_core_version 4.0.26
@@ -67,14 +67,13 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.16.2
-Release:        5%{?dist}
+Version:        4.17.0
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPL-2.0-or-later AND GPL-1.0-only
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
-Patch0:         0001-Revert-Unprotect-dnf-and-yum-protect-python3-dnf.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -131,8 +130,6 @@ BuildRequires:  python3-libcomps >= %{libcomps_version}
 BuildRequires:  python3-libdnf
 BuildRequires:  libmodulemd >= %{libmodulemd_version}
 Requires:       libmodulemd >= %{libmodulemd_version}
-BuildRequires:  python3-gpg
-Requires:       python3-gpg
 Requires:       %{name}-data = %{version}-%{release}
 %if 0%{?fedora}
 Recommends:     deltarpm
@@ -384,6 +381,15 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Thu Sep 21 2023 Jan Kolarik <jkolarik@redhat.com> - 4.17.0-1
+- Update to 4.17.0
+- crypto: Use libdnf crypto API instead of using GnuPG/GpgME
+- Reprotect dnf, unprotect python3-dnf (RhBug:2221905)
+- Block signals during RPM transaction processing (RhBug:2133398)
+- Fix bash completion due to sqlite changes (RhBug:2232052)
+- automatic: allow use of STARTTLS/TLS
+- automatic: use email_port specified in config
+
 * Mon Sep 11 2023 Jan Kolarik <jkolarik@redhat.com> - 4.16.2-5
 - Add patch for reprotecting dnf
 
