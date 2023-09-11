@@ -68,12 +68,13 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.16.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPL-2.0-or-later AND GPL-1.0-only
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0:         0001-Revert-Unprotect-dnf-and-yum-protect-python3-dnf.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -299,15 +300,10 @@ popd
 %dir %{confdir}/aliases.d
 %exclude %{confdir}/aliases.d/zypper.conf
 %if %{without dnf5_obsoletes_dnf}
+# If DNF5 does not obsolete DNF ownership of dnf.conf should be DNF's
 %config(noreplace) %{confdir}/%{name}.conf
 %endif
-
-# No longer using `noreplace` here. Older versions of DNF 4 marked `dnf` as a
-# protected package, but since Fedora 39, DNF needs to be able to update itself
-# to DNF 5, so we need to replace the old /etc/dnf/protected.d/dnf.conf.
-%config %{confdir}/protected.d/%{name}.conf
-# Protect python3-dnf instead, which does not conflict with DNF 5
-%config(noreplace) %{confdir}/protected.d/python3-%{name}.conf
+%config(noreplace) %{confdir}/protected.d/%{name}.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %ghost %attr(644,-,-) %{_localstatedir}/log/hawkey.log
 %ghost %attr(644,-,-) %{_localstatedir}/log/%{name}.log
@@ -333,10 +329,16 @@ popd
 %{_mandir}/man5/yum.conf.5.*
 %{_mandir}/man8/yum-shell.8*
 %{_mandir}/man1/yum-aliases.1*
+%if %{without dnf5_obsoletes_dnf}
+# If DNF5 does not obsolete DNF, protected.d/yum.conf should be owned by DNF
+%config(noreplace) %{confdir}/protected.d/yum.conf
+%else
+# If DNF5 obsoletes DNF
 # No longer using `noreplace` here. Older versions of DNF 4 marked `yum` as a
 # protected package, but since Fedora 39, DNF needs to be able to update itself
 # to DNF 5, so we need to replace the old /etc/dnf/protected.d/yum.conf.
 %config %{confdir}/protected.d/yum.conf
+%endif
 %else
 %exclude %{_sysconfdir}/yum.conf
 %exclude %{_sysconfdir}/yum/pluginconf.d
@@ -382,6 +384,9 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Mon Sep 11 2023 Jan Kolarik <jkolarik@redhat.com> - 4.16.2-5
+- Add patch for reprotecting dnf
+
 * Wed Aug 16 2023 Jan Kolarik <jkolarik@redhat.com> - 4.16.2-4
 - Fixes of conditions in spec file
 

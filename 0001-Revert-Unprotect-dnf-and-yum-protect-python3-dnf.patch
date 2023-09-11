@@ -1,0 +1,108 @@
+diff --git a/dnf.spec b/dnf.spec
+index 52b057d0..a7f987c1 100644
+--- a/dnf.spec
++++ b/dnf.spec
+@@ -12,6 +12,8 @@
+ %global conflicts_dnf_plugins_extras_version 4.0.4
+ %global conflicts_dnfdaemon_version 0.3.19
+ 
++%bcond dnf5_obsoletes_dnf %[0%{?fedora} > 40 || 0%{?rhel} > 10]
++
+ # override dependencies for rhel 7
+ %if 0%{?rhel} == 7
+     %global rpm_version 4.11.3-32
+@@ -95,7 +97,7 @@ Conflicts:      python3-dnf-plugins-extras-common < %{conflicts_dnf_plugins_extr
+ %package data
+ Summary:        Common data and configuration files for DNF
+ Requires:       libreport-filesystem
+-%if 0%{?fedora} > 38
++%if %{with dnf5_obsoletes_dnf}
+ Requires:       /etc/dnf/dnf.conf
+ %endif
+ Obsoletes:      %{name}-conf <= %{version}-%{release}
+@@ -235,7 +237,7 @@ ln -sr  %{buildroot}%{confdir}/protected.d %{buildroot}%{_sysconfdir}/yum/protec
+ ln -sr  %{buildroot}%{confdir}/vars %{buildroot}%{_sysconfdir}/yum/vars
+ %endif
+ 
+-%if 0%{?fedora} > 38
++%if %{with dnf5_obsoletes_dnf}
+ rm %{buildroot}%{confdir}/%{name}.conf
+ %endif
+ 
+@@ -290,22 +292,17 @@ popd
+ %dir %{confdir}/modules.d
+ %dir %{confdir}/modules.defaults.d
+ %dir %{pluginconfpath}
+-%if 0%{?fedora} <= 38
++%if %{without dnf5_obsoletes_dnf}
+ %dir %{confdir}/protected.d
+ %dir %{confdir}/vars
+ %endif
+ %dir %{confdir}/aliases.d
+ %exclude %{confdir}/aliases.d/zypper.conf
+-%if 0%{?fedora} <= 38
++%if %{without dnf5_obsoletes_dnf}
++# If DNF5 does not obsolete DNF ownership of dnf.conf should be DNF's
+ %config(noreplace) %{confdir}/%{name}.conf
+ %endif
+-
+-# No longer using `noreplace` here. Older versions of DNF 4 marked `dnf` as a
+-# protected package, but since Fedora 39, DNF needs to be able to update itself
+-# to DNF 5, so we need to replace the old /etc/dnf/protected.d/dnf.conf.
+-%config %{confdir}/protected.d/%{name}.conf
+-# Protect python3-dnf instead, which does not conflict with DNF 5
+-%config(noreplace) %{confdir}/protected.d/python3-%{name}.conf
++%config(noreplace) %{confdir}/protected.d/%{name}.conf
+ %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
+ %ghost %attr(644,-,-) %{_localstatedir}/log/hawkey.log
+ %ghost %attr(644,-,-) %{_localstatedir}/log/%{name}.log
+@@ -331,10 +328,16 @@ popd
+ %{_mandir}/man5/yum.conf.5.*
+ %{_mandir}/man8/yum-shell.8*
+ %{_mandir}/man1/yum-aliases.1*
++%if %{without dnf5_obsoletes_dnf}
++# If DNF5 does not obsolete DNF, protected.d/yum.conf should be owned by DNF
++%config(noreplace) %{confdir}/protected.d/yum.conf
++%else
++# If DNF5 obsoletes DNF
+ # No longer using `noreplace` here. Older versions of DNF 4 marked `yum` as a
+ # protected package, but since Fedora 39, DNF needs to be able to update itself
+ # to DNF 5, so we need to replace the old /etc/dnf/protected.d/yum.conf.
+ %config %{confdir}/protected.d/yum.conf
++%endif
+ %else
+ %exclude %{_sysconfdir}/yum.conf
+ %exclude %{_sysconfdir}/yum/pluginconf.d
+diff --git a/etc/dnf/protected.d/CMakeLists.txt b/etc/dnf/protected.d/CMakeLists.txt
+index d58d805f..d368f146 100644
+--- a/etc/dnf/protected.d/CMakeLists.txt
++++ b/etc/dnf/protected.d/CMakeLists.txt
+@@ -1 +1 @@
+-INSTALL (FILES "dnf.conf" "yum.conf" "python3-dnf.conf" DESTINATION ${SYSCONFDIR}/dnf/protected.d)
++INSTALL (FILES "dnf.conf" "yum.conf" DESTINATION ${SYSCONFDIR}/dnf/protected.d)
+diff --git a/etc/dnf/protected.d/dnf.conf b/etc/dnf/protected.d/dnf.conf
+index c2b5885c..6148f6c9 100644
+--- a/etc/dnf/protected.d/dnf.conf
++++ b/etc/dnf/protected.d/dnf.conf
+@@ -1,3 +1 @@
+-# DNF is obsoleted in Fedora 39 by DNF 5 and should no longer be marked as protected.
+-
+-# dnf
++dnf
+diff --git a/etc/dnf/protected.d/python3-dnf.conf b/etc/dnf/protected.d/python3-dnf.conf
+deleted file mode 100644
+index f3cce4b0..00000000
+--- a/etc/dnf/protected.d/python3-dnf.conf
++++ /dev/null
+@@ -1 +0,0 @@
+-python3-dnf
+diff --git a/etc/dnf/protected.d/yum.conf b/etc/dnf/protected.d/yum.conf
+index 4f1d0b5a..f42afee9 100644
+--- a/etc/dnf/protected.d/yum.conf
++++ b/etc/dnf/protected.d/yum.conf
+@@ -1,4 +1 @@
+-# In Fedora 39, yum is obsoleted/provided by the dnf5 package rather than dnf,
+-# and DNF cannot replace itself with DNF5 if yum is marked as protected.
+-
+-# yum
++yum
