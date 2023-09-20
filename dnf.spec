@@ -68,7 +68,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.17.0
-Release:        2%{?dist}
+Release:        6%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPL-2.0-or-later AND GPL-1.0-only
@@ -382,7 +382,7 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
-* Wed Sep 20 2023 Jan Kolarik <jkolarik@redhat.com> - 4.17.0-2
+* Wed Sep 20 2023 Jan Kolarik <jkolarik@redhat.com> - 4.17.0-6
 - Revert "Block signals during RPM transaction processing" (RhBug:2236997)
 
 * Fri Sep 01 2023 Jan Kolarik <jkolarik@redhat.com> - 4.17.0-1
