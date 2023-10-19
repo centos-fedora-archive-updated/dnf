@@ -68,12 +68,13 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.18.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPL-2.0-or-later AND GPL-1.0-only
 URL:            https://github.com/rpm-software-management/dnf
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0:         0001-Revert-Does-not-print-Verify-package-RhBug-1908253.patch
 BuildArch:      noarch
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -383,6 +384,9 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Thu Oct 19 2023 Jan Kolarik <jkolarik@redhat.com> - 4.18.0-2
+- Revert "Does not print Verify: package" (RhBug:1908253)
+
 * Wed Oct 18 2023 Jan Kolarik <jkolarik@redhat.com> - 4.18.0-1
 - Update to 4.18.0
 - base: Add obsoleters of only latest versions (RhBug:2183279,2176263)
