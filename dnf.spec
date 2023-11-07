@@ -67,8 +67,8 @@
 It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
-Version:        4.18.0
-Release:        2%{?dist}
+Version:        4.18.1
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPL-2.0-or-later AND GPL-1.0-only
@@ -384,6 +384,11 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Tue Nov 07 2023 Jan Kolarik <jkolarik@redhat.com> - 4.18.1-1
+- Update to 4.18.1
+- Do not translate repoquery time format strings (RhBug:2245773)
+- automatic: Fix applying the color option
+
 * Thu Oct 19 2023 Jan Kolarik <jkolarik@redhat.com> - 4.18.0-2
 - Revert "Does not print Verify: package" (RhBug:1908253)
 
