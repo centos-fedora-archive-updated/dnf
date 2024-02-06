@@ -77,6 +77,8 @@ Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
 # https://fedoraproject.org/wiki/Changes/Drop_Delta_RPMs
 Patch:          0001-disable-deltarpm-support-in-default-configuration.patch
+# https://github.com/rpm-software-management/dnf/pull/2043
+Patch:          0001-Fix-failing-API-unit-test-on-rawhide.patch
 
 BuildArch:      noarch
 BuildRequires:  cmake

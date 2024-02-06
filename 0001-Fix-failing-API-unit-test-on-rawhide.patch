@@ -1,0 +1,37 @@
+From 7fc4bb613eb6abe9fc01c029e123e8b260af67a6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ale=C5=A1=20Mat=C4=9Bj?= <amatej@redhat.com>
+Date: Tue, 30 Jan 2024 06:45:04 +0100
+Subject: [PATCH] Fix failing API unit test on rawhide (RhBug:2261066)
+
+For: https://bugzilla.redhat.com/show_bug.cgi?id=2261066
+
+Fixes:
+1: ERROR: test_do_transaction (tests.api.test_dnf_base.DnfBaseApiTest.test_do_transaction)
+1: ----------------------------------------------------------------------
+1: Traceback (most recent call last):
+1:   File "/builddir/build/BUILD/dnf-4.19.0-0.20240130004727.4.18.2+6.g0e400470/tests/api/test_dnf_base.py", line 174, in test_do_transaction
+1:     self.base.do_transaction(display=None)
+1:   File "/builddir/build/BUILD/dnf-4.19.0-0.20240130004727.4.18.2+6.g0e400470/dnf/base.py", line 953, in do_transaction
+1:     self._moduleContainer.save()
+1:   File "/usr/lib64/python3.12/site-packages/libdnf/module.py", line 1241, in save
+1:     return _module.ModulePackageContainer_save(self)
+1:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1: libdnf._error.Error: Failed to create directory "/etc/dnf/modules.d": 13 - Permission denied# Please enter the commit message for your changes. Lines starting
+
+It is also failing in our nightlies.
+---
+ tests/api/test_dnf_base.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/api/test_dnf_base.py b/tests/api/test_dnf_base.py
+index 19754b072e..7f2ba2bc26 100644
+--- a/tests/api/test_dnf_base.py
++++ b/tests/api/test_dnf_base.py
+@@ -28,6 +28,7 @@ class DnfBaseApiTest(TestCase):
+     def setUp(self):
+         self.base = dnf.Base(dnf.conf.Conf())
+         self.base.conf.persistdir = "/tmp/tests"
++        self.base.conf.installroot = "/tmp/dnf-test-installroot/"
+ 
+     def tearDown(self):
+         self.base.close()
