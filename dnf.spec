@@ -68,7 +68,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.20.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPL-2.0-or-later AND GPL-1.0-only
@@ -416,6 +416,9 @@ popd
 %{python3_sitelib}/%{name}/automatic/
 
 %changelog
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 4.20.0-2
+- Rebuilt for Python 3.13
+
 * Wed Apr 24 2024 Jan Kolarik <jkolarik@redhat.com> - 4.20.0-1
 - Update to 4.20.0
 - repoquery: Fix loading filelists when -f is used (RhBug:2276012)
