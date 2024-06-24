@@ -23,7 +23,7 @@ export CFLAGS=
 %install
 CFLAGS=
 export CFLAGS=
-mkdir -p $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT/usr/bin/
 cat > $RPM_BUILD_ROOT/usr/bin/dnf <<EOF
 #!/bin/bash
 /usr/bin/yum $@
