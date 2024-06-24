@@ -1,6 +1,6 @@
 Name:           dnf
 Version:        0.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        dnf
 
 Group:          Web
@@ -26,7 +26,7 @@ export CFLAGS=
 mkdir -p $RPM_BUILD_ROOT/usr/bin/
 cat > $RPM_BUILD_ROOT/usr/bin/dnf <<EOF
 #!/bin/bash
-/usr/bin/yum $@
+/usr/bin/yum \$@
 EOF
 chmod 777 $RPM_BUILD_ROOT/usr/bin/dnf
 
